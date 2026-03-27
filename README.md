@@ -231,7 +231,7 @@ salvadash/
 - [x] Export dati in Excel
 - [ ] Open Banking — sync automatico saldi (Salt Edge)
 - [ ] Obiettivi di risparmio con progress bar
-- [ ] Dark mode
+- [x] Dark mode
 - [ ] Docker multi-stage per deploy
 - [ ] Dashboard condivisa per coppie/famiglie
 
