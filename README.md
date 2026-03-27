@@ -4,7 +4,7 @@
 
 **Il tuo tracker di risparmi personale — bello, veloce, tuo.**
 
-[![CI](https://github.com/bakko/salvadash/actions/workflows/ci.yml/badge.svg)](https://github.com/bakko/salvadash/actions/workflows/ci.yml)
+[![CI](https://github.com/GitBakko/salvadash/actions/workflows/ci.yml/badge.svg)](https://github.com/GitBakko/salvadash/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -68,7 +68,7 @@ salvadash/
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/bakko/salvadash.git
+git clone https://github.com/GitBakko/salvadash.git
 cd salvadash
 pnpm install
 ```
