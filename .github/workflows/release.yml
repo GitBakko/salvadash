@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: 🏷️ Tag & Release
+    runs-on: ubuntu-latest
+    # Only run if the commit message starts with a conventional prefix
+    if: >-
+      startsWith(github.event.head_commit.message, 'feat') ||
+      startsWith(github.event.head_commit.message, 'fix') ||
+      startsWith(github.event.head_commit.message, 'perf') ||
+      startsWith(github.event.head_commit.message, 'refactor')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get current version
+        id: pkg
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Check if tag exists
+        id: tag_check
+        run: |
+          if git rev-parse "v${{ steps.pkg.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Git tag
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ steps.pkg.outputs.version }}" -m "Release v${{ steps.pkg.outputs.version }}"
+          git push origin "v${{ steps.pkg.outputs.version }}"
+
+      - name: Generate changelog
+        if: steps.tag_check.outputs.exists == 'false'
+        id: changelog
+        run: |
+          PREV_TAG=$(git tag --sort=-version:refname | head -2 | tail -1)
+          if [ -z "$PREV_TAG" ]; then
+            CHANGELOG=$(git log --oneline --pretty=format:"- %s (%h)" HEAD)
+          else
+            CHANGELOG=$(git log --oneline --pretty=format:"- %s (%h)" "${PREV_TAG}..HEAD")
+          fi
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: steps.tag_check.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.pkg.outputs.version }}
+          name: v${{ steps.pkg.outputs.version }}
+          body: |
+            ## What's Changed
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ---
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.changelog.outputs.prev_tag || 'initial' }}...v${{ steps.pkg.outputs.version }}
+          draft: false
+          prerelease: false

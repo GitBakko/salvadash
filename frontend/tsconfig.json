@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsBuildInfo",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "jsx": "react-jsx"
+  },
+  "include": ["src/**/*", "vite-env.d.ts"]
+}

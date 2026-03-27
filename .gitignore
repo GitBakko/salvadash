@@ -1,0 +1,66 @@
+# ─── Dependencies ───────────────────────────────────────────
+node_modules/
+
+# ─── Build outputs ─────────────────────────────────────────
+dist/
+build/
+*.tsbuildinfo
+
+# ─── Environment ───────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ─── IDE ────────────────────────────────────────────────────
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── OS ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ─── Prisma ─────────────────────────────────────────────────
+backend/prisma/migrations/
+
+# ─── Logs ───────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+
+# ─── Test & Coverage ───────────────────────────────────────
+coverage/
+**/test-results/
+**/__tests__/*.js
+**/__tests__/*.js.map
+**/__tests__/*.d.ts
+**/__tests__/*.d.ts.map
+
+# ─── Seed data (sensitive) ─────────────────────────────────
+backend/prisma/data/*.xlsx
+backend/prisma/data/*.csv
+!backend/prisma/data/.gitkeep
+
+# ─── PWA ────────────────────────────────────────────────────
+frontend/dev-dist/
+
+# ─── Uploads (user-generated) ──────────────────────────────
+backend/uploads/
+
+# ─── Backups ────────────────────────────────────────────────
+backups/
+*.sql
+*.dump
+
+# ─── Temp ───────────────────────────────────────────────────
+tmp/
+temp/
+*.tmp

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: salvadash-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: salvadash
+      POSTGRES_USER: salvadash
+      POSTGRES_PASSWORD: salvadash_dev
+    volumes:
+      - salvadash_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U salvadash"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  salvadash_pgdata:

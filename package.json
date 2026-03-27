@@ -1,0 +1,46 @@
+{
+  "name": "salvadash",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SalvaDash — Personal Savings Tracker PWA",
+  "scripts": {
+    "dev": "pnpm --parallel -r run dev",
+    "dev:backend": "pnpm --filter backend run dev",
+    "dev:frontend": "pnpm --filter frontend run dev",
+    "build": "pnpm -r run build",
+    "build:backend": "pnpm --filter backend run build",
+    "build:frontend": "pnpm --filter frontend run build",
+    "lint": "pnpm -r run lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:generate": "pnpm --filter backend run db:generate",
+    "db:migrate": "pnpm --filter backend run db:migrate",
+    "db:push": "pnpm --filter backend run db:push",
+    "db:seed": "pnpm --filter backend run db:seed",
+    "db:studio": "pnpm --filter backend run db:studio",
+    "test": "pnpm -r run test",
+    "test:backend": "pnpm --filter backend run test",
+    "test:frontend": "pnpm --filter frontend run test",
+    "clean": "pnpm -r exec rm -rf node_modules dist .turbo && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.58.2",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "playwright": "^1.58.2",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.18.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
