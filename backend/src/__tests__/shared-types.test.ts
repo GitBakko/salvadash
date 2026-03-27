@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { formatCurrency, formatDelta, formatPercent, CURRENCIES, type CurrencyCode } from '@salvadash/shared';
+import {
+  formatCurrency,
+  formatDelta,
+  formatPercent,
+  CURRENCIES,
+  type CurrencyCode,
+} from '@salvadash/shared';
 
 describe('CURRENCIES', () => {
   it('has EUR, GBP, USD', () => {

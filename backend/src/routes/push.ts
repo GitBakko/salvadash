@@ -28,7 +28,9 @@ router.post('/subscribe', async (req: Request, res: Response): Promise<void> => 
   try {
     const parsed = subscribeSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Invalid subscription', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Invalid subscription', details: parsed.error.flatten() });
       return;
     }
 

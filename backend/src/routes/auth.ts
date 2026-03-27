@@ -1,5 +1,12 @@
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
-import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema, changePasswordSchema, changeEmailSchema } from '@salvadash/shared';
+import {
+  loginSchema,
+  registerSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  changePasswordSchema,
+  changeEmailSchema,
+} from '@salvadash/shared';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -52,7 +59,9 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 
@@ -73,7 +82,10 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
     }
 
     // Generate username from email
-    const baseUsername = email.split('@')[0].toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    const baseUsername = email
+      .split('@')[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '');
     let username = baseUsername;
     let suffix = 1;
     while (await prisma.user.findUnique({ where: { username } })) {
@@ -140,7 +152,9 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 
@@ -159,7 +173,9 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     }
 
     if (!user.emailVerified) {
-      res.status(403).json({ success: false, error: 'Email not verified. Please check your inbox.' });
+      res
+        .status(403)
+        .json({ success: false, error: 'Email not verified. Please check your inbox.' });
       return;
     }
 
@@ -230,7 +246,10 @@ router.post('/forgot-password', async (req: Request, res: Response): Promise<voi
     }
 
     // Always respond 200 to prevent email enumeration
-    const successMsg = { success: true, data: { message: 'If the email exists, a reset link has been sent.' } };
+    const successMsg = {
+      success: true,
+      data: { message: 'If the email exists, a reset link has been sent.' },
+    };
 
     const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
     if (!user || !user.isActive) {
@@ -263,7 +282,9 @@ router.post('/reset-password', async (req: Request, res: Response): Promise<void
   try {
     const parsed = resetPasswordSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 
@@ -481,8 +502,14 @@ router.put('/change-email', authenticate, async (req: Request, res: Response): P
       where: { id: user.id },
       data: { email: newEmail },
       select: {
-        id: true, name: true, email: true, username: true, role: true,
-        language: true, currency: true, avatarUrl: true,
+        id: true,
+        name: true,
+        email: true,
+        username: true,
+        role: true,
+        language: true,
+        currency: true,
+        avatarUrl: true,
       },
     });
 
@@ -498,9 +525,10 @@ router.put('/change-email', authenticate, async (req: Request, res: Response): P
 router.post('/avatar', authenticate, (req: Request, res: Response): void => {
   avatarUpload.single('avatar')(req, res, async (err) => {
     if (err) {
-      const message = err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE'
-        ? 'File too large (max 2MB)'
-        : err.message;
+      const message =
+        err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE'
+          ? 'File too large (max 2MB)'
+          : err.message;
       res.status(400).json({ success: false, error: message });
       return;
     }
@@ -517,7 +545,11 @@ router.post('/avatar', authenticate, (req: Request, res: Response): void => {
         select: { avatarUrl: true },
       });
       if (current?.avatarUrl) {
-        const oldPath = path.resolve(import.meta.dirname, '../..', current.avatarUrl.replace(/^\//, ''));
+        const oldPath = path.resolve(
+          import.meta.dirname,
+          '../..',
+          current.avatarUrl.replace(/^\//, ''),
+        );
         fs.unlink(oldPath, () => {}); // fire & forget
       }
 
@@ -526,8 +558,14 @@ router.post('/avatar', authenticate, (req: Request, res: Response): void => {
         where: { id: req.user!.userId },
         data: { avatarUrl },
         select: {
-          id: true, name: true, email: true, username: true, role: true,
-          language: true, currency: true, avatarUrl: true,
+          id: true,
+          name: true,
+          email: true,
+          username: true,
+          role: true,
+          language: true,
+          currency: true,
+          avatarUrl: true,
         },
       });
 
@@ -549,7 +587,11 @@ router.delete('/avatar', authenticate, async (req: Request, res: Response): Prom
     });
 
     if (current?.avatarUrl) {
-      const filePath = path.resolve(import.meta.dirname, '../..', current.avatarUrl.replace(/^\//, ''));
+      const filePath = path.resolve(
+        import.meta.dirname,
+        '../..',
+        current.avatarUrl.replace(/^\//, ''),
+      );
       fs.unlink(filePath, () => {});
     }
 
@@ -557,8 +599,14 @@ router.delete('/avatar', authenticate, async (req: Request, res: Response): Prom
       where: { id: req.user!.userId },
       data: { avatarUrl: null },
       select: {
-        id: true, name: true, email: true, username: true, role: true,
-        language: true, currency: true, avatarUrl: true,
+        id: true,
+        name: true,
+        email: true,
+        username: true,
+        role: true,
+        language: true,
+        currency: true,
+        avatarUrl: true,
       },
     });
 
@@ -582,7 +630,10 @@ router.post('/resend-verification', async (req: Request, res: Response): Promise
     const user = await prisma.user.findUnique({ where: { email } });
 
     // Always respond 200 to prevent email enumeration
-    const successMsg = { success: true, data: { message: 'If the email exists and is not verified, a new link has been sent.' } };
+    const successMsg = {
+      success: true,
+      data: { message: 'If the email exists and is not verified, a new link has been sent.' },
+    };
 
     if (!user || user.emailVerified || !user.isActive) {
       res.json(successMsg);

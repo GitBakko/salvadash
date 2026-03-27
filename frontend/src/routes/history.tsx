@@ -14,7 +14,11 @@ export const Route = createFileRoute('/history')({
 // ─── Utilities ─────────────────────────────────────────────
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+  return new Date(dateStr).toLocaleDateString('it-IT', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 function formatMonthShort(dateStr: string): string {
@@ -85,12 +89,7 @@ function HistoryPage() {
       )}
 
       {/* Entry detail bottom sheet */}
-      {selectedId && (
-        <EntryDetailSheet
-          entryId={selectedId}
-          onClose={() => setSelectedId(null)}
-        />
-      )}
+      {selectedId && <EntryDetailSheet entryId={selectedId} onClose={() => setSelectedId(null)} />}
     </div>
   );
 }
@@ -133,18 +132,22 @@ function EntryCard({ entry, onTap }: { entry: EntryListItem; onTap: () => void }
 
           {/* Delta badge */}
           {hasDelta && (
-            <div className={`shrink-0 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
-              isPositive
-                ? 'bg-positive/15 text-positive'
-                : 'bg-negative/15 text-negative'
-            }`}>
+            <div
+              className={`shrink-0 flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
+                isPositive ? 'bg-positive/15 text-positive' : 'bg-negative/15 text-negative'
+              }`}
+            >
               <span className="icon text-[14px]">
                 {isPositive ? 'arrow_upward' : 'arrow_downward'}
               </span>
-              <span>{isPositive ? '+' : ''}{fmtCurrency(entry.delta!)}</span>
+              <span>
+                {isPositive ? '+' : ''}
+                {fmtCurrency(entry.delta!)}
+              </span>
               {entry.deltaPercent != null && (
                 <span className="text-[10px] opacity-70">
-                  ({isPositive ? '+' : ''}{entry.deltaPercent.toFixed(1)}%)
+                  ({isPositive ? '+' : ''}
+                  {entry.deltaPercent.toFixed(1)}%)
                 </span>
               )}
             </div>
@@ -264,7 +267,12 @@ function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () =
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
-            <Button variant="danger" fullWidth onClick={handleDelete} loading={deleteEntry.isPending}>
+            <Button
+              variant="danger"
+              fullWidth
+              onClick={handleDelete}
+              loading={deleteEntry.isPending}
+            >
               <span className="icon text-sm">delete</span>
               {t('common.delete')}
             </Button>

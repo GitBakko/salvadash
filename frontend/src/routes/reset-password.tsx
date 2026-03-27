@@ -77,7 +77,9 @@ function ResetPasswordPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
-          <h2 className="font-heading text-lg font-semibold text-center">{t('auth.resetPassword')}</h2>
+          <h2 className="font-heading text-lg font-semibold text-center">
+            {t('auth.resetPassword')}
+          </h2>
 
           {error && (
             <div className="bg-negative/10 border border-negative/30 rounded-[var(--radius-md)] px-4 py-2.5 text-sm text-negative">
@@ -112,7 +114,10 @@ function ResetPasswordPage() {
           </Button>
 
           <div className="text-center">
-            <Link to="/login" className="text-sm text-brand hover:text-brand-hover transition-colors">
+            <Link
+              to="/login"
+              className="text-sm text-brand hover:text-brand-hover transition-colors"
+            >
               {t('auth.backToLogin')}
             </Link>
           </div>

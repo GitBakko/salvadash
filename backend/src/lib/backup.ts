@@ -20,11 +20,16 @@ async function ensureBackupDir(): Promise<void> {
 function pgDumpArgs(): string[] {
   const url = new URL(process.env.DATABASE_URL ?? '');
   return [
-    '--host', url.hostname,
-    '--port', url.port || '5432',
-    '--username', url.username,
-    '--dbname', url.pathname.slice(1),
-    '--format', 'plain',
+    '--host',
+    url.hostname,
+    '--port',
+    url.port || '5432',
+    '--username',
+    url.username,
+    '--dbname',
+    url.pathname.slice(1),
+    '--format',
+    'plain',
     '--no-owner',
     '--no-privileges',
   ];
@@ -32,7 +37,9 @@ function pgDumpArgs(): string[] {
 
 // ─── Create Backup ─────────────────────────────────────────
 
-export async function createBackup(triggeredBy?: string): Promise<{ id: string; filename: string }> {
+export async function createBackup(
+  triggeredBy?: string,
+): Promise<{ id: string; filename: string }> {
   await ensureBackupDir();
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -61,7 +68,9 @@ export async function createBackup(triggeredBy?: string): Promise<{ id: string; 
       dump.stdout!.pipe(gzip).pipe(out);
 
       let stderr = '';
-      dump.stderr!.on('data', (chunk) => { stderr += chunk; });
+      dump.stderr!.on('data', (chunk) => {
+        stderr += chunk;
+      });
 
       out.on('finish', resolve);
       dump.on('error', reject);
@@ -110,10 +119,14 @@ export async function restoreBackup(filename: string): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const url = new URL(process.env.DATABASE_URL ?? '');
     const args = [
-      '--host', url.hostname,
-      '--port', url.port || '5432',
-      '--username', url.username,
-      '--dbname', url.pathname.slice(1),
+      '--host',
+      url.hostname,
+      '--port',
+      url.port || '5432',
+      '--username',
+      url.username,
+      '--dbname',
+      url.pathname.slice(1),
       '--single-transaction',
       '--clean',
       '--if-exists',
@@ -127,7 +140,9 @@ export async function restoreBackup(filename: string): Promise<void> {
     input.pipe(gunzip).pipe(psql.stdin!);
 
     let stderr = '';
-    psql.stderr!.on('data', (chunk) => { stderr += chunk; });
+    psql.stderr!.on('data', (chunk) => {
+      stderr += chunk;
+    });
 
     psql.on('close', (code) => {
       if (code === 0) resolve();
@@ -187,7 +202,11 @@ export async function applyRetention(): Promise<number> {
 
 // ─── DB Maintenance ────────────────────────────────────────
 
-export async function runDbMaintenance(): Promise<{ vacuum: boolean; analyze: boolean; reindex: boolean }> {
+export async function runDbMaintenance(): Promise<{
+  vacuum: boolean;
+  analyze: boolean;
+  reindex: boolean;
+}> {
   const results = { vacuum: false, analyze: false, reindex: false };
 
   try {

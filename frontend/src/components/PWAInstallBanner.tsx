@@ -5,7 +5,8 @@ import { Button } from './ui/Button';
 
 export function PWAInstallBanner() {
   const { t } = useTranslation();
-  const { showInstallBanner, deferredPrompt, dismissInstallBanner, setDeferredPrompt } = useUIStore();
+  const { showInstallBanner, deferredPrompt, dismissInstallBanner, setDeferredPrompt } =
+    useUIStore();
 
   async function handleInstall() {
     if (!deferredPrompt) return;

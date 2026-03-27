@@ -5,7 +5,12 @@ interface SkeletonProps {
   height?: string | number;
 }
 
-export function Skeleton({ className = '', variant = 'rectangular', width, height }: SkeletonProps) {
+export function Skeleton({
+  className = '',
+  variant = 'rectangular',
+  width,
+  height,
+}: SkeletonProps) {
   const variantClasses = {
     text: 'rounded-[var(--radius-sm)] h-4',
     circular: 'rounded-full',

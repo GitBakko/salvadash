@@ -15,7 +15,7 @@
 
 <img src="docs/assets/hero.png" alt="SalvaDash Dashboard" width="720" />
 
-*Tieni traccia dei tuoi risparmi mese dopo mese. Visualizza trend, obiettivi e crescita — tutto in un'app installabile.*
+_Tieni traccia dei tuoi risparmi mese dopo mese. Visualizza trend, obiettivi e crescita — tutto in un'app installabile._
 
 </div>
 
@@ -48,12 +48,12 @@ salvadash/
 └── package.json       pnpm monorepo workspace
 ```
 
-| Layer | Stack |
-|-------|-------|
+| Layer        | Stack                                                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------- |
 | **Frontend** | React 19, Vite 6, TanStack Router & Query, Zustand, Framer Motion, Recharts, Tailwind CSS v4, Dexie (IndexedDB) |
-| **Backend** | Express 4.21, Prisma 6, JWT auth, Nodemailer, Web Push, XLSX export |
-| **Shared** | Zod schemas, TypeScript types — contratto API type-safe |
-| **Infra** | Docker Compose (PostgreSQL), PM2 (production), GitHub Actions CI/CD |
+| **Backend**  | Express 4.21, Prisma 6, JWT auth, Nodemailer, Web Push, XLSX export                                             |
+| **Shared**   | Zod schemas, TypeScript types — contratto API type-safe                                                         |
+| **Infra**    | Docker Compose (PostgreSQL), PM2 (production), GitHub Actions CI/CD                                             |
 
 ---
 
@@ -100,29 +100,29 @@ pnpm db:seed        # (opzionale) Popola dati di esempio
 pnpm dev            # Backend + Frontend in parallelo
 ```
 
-| Servizio | URL |
-|----------|-----|
-| Frontend | http://localhost:5173 |
-| Backend API | http://localhost:3000/api |
-| Prisma Studio | `pnpm db:studio` |
+| Servizio      | URL                       |
+| ------------- | ------------------------- |
+| Frontend      | http://localhost:5173     |
+| Backend API   | http://localhost:3000/api |
+| Prisma Studio | `pnpm db:studio`          |
 
 ---
 
 ## 📜 Script disponibili
 
-| Comando | Descrizione |
-|---------|-------------|
-| `pnpm dev` | Avvia tutti i servizi in sviluppo |
-| `pnpm build` | Build di produzione completa |
-| `pnpm test` | Esegui tutti i test (Vitest) |
-| `pnpm lint` | Linting con ESLint |
-| `pnpm format` | Formattazione con Prettier |
-| `pnpm db:generate` | Rigenera Prisma Client |
-| `pnpm db:migrate` | Crea ed esegui migrazioni |
-| `pnpm db:push` | Sync schema → DB (dev) |
-| `pnpm db:seed` | Popola database |
-| `pnpm db:studio` | Apri Prisma Studio GUI |
-| `pnpm clean` | Rimuovi node_modules e dist |
+| Comando            | Descrizione                       |
+| ------------------ | --------------------------------- |
+| `pnpm dev`         | Avvia tutti i servizi in sviluppo |
+| `pnpm build`       | Build di produzione completa      |
+| `pnpm test`        | Esegui tutti i test (Vitest)      |
+| `pnpm lint`        | Linting con ESLint                |
+| `pnpm format`      | Formattazione con Prettier        |
+| `pnpm db:generate` | Rigenera Prisma Client            |
+| `pnpm db:migrate`  | Crea ed esegui migrazioni         |
+| `pnpm db:push`     | Sync schema → DB (dev)            |
+| `pnpm db:seed`     | Popola database                   |
+| `pnpm db:studio`   | Apri Prisma Studio GUI            |
+| `pnpm clean`       | Rimuovi node_modules e dist       |
 
 ---
 
@@ -135,6 +135,7 @@ pnpm test:frontend        # Solo frontend
 ```
 
 I test usano **Vitest** con:
+
 - Backend: ambiente Node.js, coverage su `src/lib` e `src/middleware`
 - Frontend: ambiente jsdom, coverage su `src/lib` e `src/stores`
 
@@ -159,15 +160,15 @@ Un `Dockerfile` multi-stage per il deploy completo è nei piani futuri.
 
 Tutte le variabili d'ambiente sono documentate in [`.env.example`](.env.example):
 
-| Variabile | Descrizione |
-|-----------|-------------|
-| `DATABASE_URL` | Stringa di connessione PostgreSQL |
-| `JWT_ACCESS_SECRET` | Chiave segreta per access token |
-| `JWT_REFRESH_SECRET` | Chiave segreta per refresh token |
-| `SMTP_*` | Configurazione email (SMTP) |
-| `VAPID_*` | Chiavi per Web Push notifications |
-| `APP_URL` | URL del frontend |
-| `API_URL` / `API_PORT` | URL e porta del backend |
+| Variabile              | Descrizione                       |
+| ---------------------- | --------------------------------- |
+| `DATABASE_URL`         | Stringa di connessione PostgreSQL |
+| `JWT_ACCESS_SECRET`    | Chiave segreta per access token   |
+| `JWT_REFRESH_SECRET`   | Chiave segreta per refresh token  |
+| `SMTP_*`               | Configurazione email (SMTP)       |
+| `VAPID_*`              | Chiavi per Web Push notifications |
+| `APP_URL`              | URL del frontend                  |
+| `API_URL` / `API_PORT` | URL e porta del backend           |
 
 ---
 

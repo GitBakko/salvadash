@@ -34,15 +34,17 @@ async function request<T = unknown>(
     ...rest,
     headers,
     credentials: 'include',
-    body: body !== undefined
-      ? body instanceof FormData ? body : JSON.stringify(body)
-      : undefined,
+    body: body !== undefined ? (body instanceof FormData ? body : JSON.stringify(body)) : undefined,
   };
 
   let res = await fetch(`${API_BASE}${endpoint}`, config);
 
   // Auto-refresh on 401
-  if (res.status === 401 && !endpoint.includes('/auth/refresh') && !endpoint.includes('/auth/login')) {
+  if (
+    res.status === 401 &&
+    !endpoint.includes('/auth/refresh') &&
+    !endpoint.includes('/auth/login')
+  ) {
     const refreshed = await refreshTokens();
     if (refreshed) {
       res = await fetch(`${API_BASE}${endpoint}`, config);
@@ -54,8 +56,7 @@ async function request<T = unknown>(
 }
 
 export const api = {
-  get: <T = unknown>(endpoint: string) =>
-    request<T>(endpoint, { method: 'GET' }),
+  get: <T = unknown>(endpoint: string) => request<T>(endpoint, { method: 'GET' }),
 
   post: <T = unknown>(endpoint: string, body?: unknown) =>
     request<T>(endpoint, { method: 'POST', body }),

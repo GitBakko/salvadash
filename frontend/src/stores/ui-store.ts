@@ -51,12 +51,14 @@ export const useUIStore = create<UIState>((set) => ({
   closeSheet: () => set({ activeSheet: null, sheetData: null }),
 
   toasts: [],
-  addToast: (toast) => set((state) => ({
-    toasts: [...state.toasts, { ...toast, id: `toast-${++toastCounter}` }],
-  })),
-  removeToast: (id) => set((state) => ({
-    toasts: state.toasts.filter((t) => t.id !== id),
-  })),
+  addToast: (toast) =>
+    set((state) => ({
+      toasts: [...state.toasts, { ...toast, id: `toast-${++toastCounter}` }],
+    })),
+  removeToast: (id) =>
+    set((state) => ({
+      toasts: state.toasts.filter((t) => t.id !== id),
+    })),
 
   deferredPrompt: null,
   showInstallBanner: false,

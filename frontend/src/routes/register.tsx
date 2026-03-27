@@ -133,7 +133,10 @@ function RegisterPage() {
         {/* Login link */}
         <p className="text-center text-sm text-text-secondary">
           {t('auth.hasAccount')}{' '}
-          <Link to="/login" className="text-brand hover:text-brand-hover font-medium transition-colors">
+          <Link
+            to="/login"
+            className="text-brand hover:text-brand-hover font-medium transition-colors"
+          >
             {t('auth.login')}
           </Link>
         </p>

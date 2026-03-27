@@ -43,7 +43,7 @@ const IS_PROD = config.nodeEnv === 'production';
 export const ACCESS_COOKIE_OPTIONS = {
   httpOnly: true,
   secure: IS_PROD,
-  sameSite: IS_PROD ? 'strict' as const : 'lax' as const,
+  sameSite: IS_PROD ? ('strict' as const) : ('lax' as const),
   path: '/',
   maxAge: 15 * 60 * 1000, // 15 min
 };
@@ -51,7 +51,7 @@ export const ACCESS_COOKIE_OPTIONS = {
 export const REFRESH_COOKIE_OPTIONS = {
   httpOnly: true,
   secure: IS_PROD,
-  sameSite: IS_PROD ? 'strict' as const : 'lax' as const,
+  sameSite: IS_PROD ? ('strict' as const) : ('lax' as const),
   path: '/api/auth/refresh',
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };

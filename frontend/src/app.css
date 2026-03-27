@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ─── SalvaDash Design Tokens (Tailwind v4 CSS-first) ──── */
 @theme {
@@ -31,9 +31,9 @@
   --color-border-active: rgba(0, 212, 160, 0.4);
 
   /* ── Fonts ─────────────────────────────────────────────── */
-  --font-heading: "Space Grotesk", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
-  --font-mono: "Fira Code", ui-monospace, monospace;
+  --font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, monospace;
 
   /* ── Border Radius ─────────────────────────────────────── */
   --radius-sm: 0.5rem;
@@ -54,12 +54,14 @@
 
 /* ─── Brand Glow Effect ─────────────────────────────────── */
 @utility glow-brand {
-  box-shadow: 0 0 20px var(--color-brand-glow), 0 0 40px rgba(0, 212, 160, 0.1);
+  box-shadow:
+    0 0 20px var(--color-brand-glow),
+    0 0 40px rgba(0, 212, 160, 0.1);
 }
 
 /* ─── Material Symbols (loaded from Google Fonts CDN) ───── */
 @utility icon {
-  font-family: "Material Symbols Outlined";
+  font-family: 'Material Symbols Outlined';
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -70,7 +72,7 @@
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;
-  font-feature-settings: "liga";
+  font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
 }
 
@@ -109,11 +111,18 @@ html.light {
   --color-info: #2563eb;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
 }
 
-code, pre, .font-mono {
+code,
+pre,
+.font-mono {
   font-family: var(--font-mono);
 }
 

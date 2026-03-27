@@ -9,7 +9,15 @@ interface AuthState {
 
   fetchUser: () => Promise<void>;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (data: { name: string; email: string; password: string; confirmPassword: string; inviteCode: string; language?: string; currency?: string }) => Promise<{ success: boolean; error?: string }>;
+  register: (data: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    inviteCode: string;
+    language?: string;
+    currency?: string;
+  }) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   setUser: (user: UserPublic | null) => void;
 }

@@ -31,7 +31,11 @@ function AnimatedNumber({ value, className }: { value: number; className?: strin
     return unsubscribe;
   }, [display]);
 
-  return <span ref={ref} className={className}>{fmtCurrency(value)}</span>;
+  return (
+    <span ref={ref} className={className}>
+      {fmtCurrency(value)}
+    </span>
+  );
 }
 
 // ─── Utilities ─────────────────────────────────────────────
@@ -103,7 +107,13 @@ function DashboardPage() {
 
 // ─── Hero Card ─────────────────────────────────────────────
 
-function HeroCard({ data, t }: { data: DashboardData; t: (k: string, o?: Record<string, string>) => string }) {
+function HeroCard({
+  data,
+  t,
+}: {
+  data: DashboardData;
+  t: (k: string, o?: Record<string, string>) => string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -113,17 +123,25 @@ function HeroCard({ data, t }: { data: DashboardData; t: (k: string, o?: Record<
       {/* Subtle glow */}
       <div className="absolute inset-0 bg-gradient-to-b from-brand/5 to-transparent pointer-events-none" />
 
-      <p className="text-text-secondary text-sm font-medium relative">{t('dashboard.currentTotal')}</p>
+      <p className="text-text-secondary text-sm font-medium relative">
+        {t('dashboard.currentTotal')}
+      </p>
       <div className="relative">
-        <AnimatedNumber value={data.currentTotal} className="font-heading text-[42px] font-bold text-gold leading-tight" />
+        <AnimatedNumber
+          value={data.currentTotal}
+          className="font-heading text-[42px] font-bold text-gold leading-tight"
+        />
       </div>
 
       {data.currentEntry && (
         <p className="text-text-muted text-xs mt-1 relative">
           {formatMonth(data.currentEntry.date)}
           {data.currentEntry.delta != null && (
-            <span className={`ml-2 ${data.currentEntry.delta >= 0 ? 'text-positive' : 'text-negative'}`}>
-              {data.currentEntry.delta >= 0 ? '+' : ''}{fmtCurrencyCompact(data.currentEntry.delta)}
+            <span
+              className={`ml-2 ${data.currentEntry.delta >= 0 ? 'text-positive' : 'text-negative'}`}
+            >
+              {data.currentEntry.delta >= 0 ? '+' : ''}
+              {fmtCurrencyCompact(data.currentEntry.delta)}
             </span>
           )}
         </p>
@@ -134,7 +152,15 @@ function HeroCard({ data, t }: { data: DashboardData; t: (k: string, o?: Record<
 
 // ─── KPI Grid ──────────────────────────────────────────────
 
-function KPIGrid({ data, t, year }: { data: DashboardData; t: (k: string, o?: Record<string, string>) => string; year: string }) {
+function KPIGrid({
+  data,
+  t,
+  year,
+}: {
+  data: DashboardData;
+  t: (k: string, o?: Record<string, string>) => string;
+  year: string;
+}) {
   const kpis = [
     {
       label: t('dashboard.yearTotal', { year }),
@@ -175,7 +201,9 @@ function KPIGrid({ data, t, year }: { data: DashboardData; t: (k: string, o?: Re
             <div className="flex items-start gap-2">
               <span className={`icon text-lg ${kpi.color}`}>{kpi.icon}</span>
               <div className="min-w-0">
-                <p className="text-text-muted text-[10px] uppercase tracking-wider leading-tight">{kpi.label}</p>
+                <p className="text-text-muted text-[10px] uppercase tracking-wider leading-tight">
+                  {kpi.label}
+                </p>
                 <p className="font-heading text-lg font-bold mt-0.5">{kpi.value}</p>
               </div>
             </div>
@@ -196,7 +224,9 @@ function KPIGrid({ data, t, year }: { data: DashboardData; t: (k: string, o?: Re
               <div className="flex items-center gap-2">
                 <span className="icon text-lg text-gold">emoji_events</span>
                 <div>
-                  <p className="text-text-muted text-[10px] uppercase tracking-wider">{t('dashboard.bestMonth')}</p>
+                  <p className="text-text-muted text-[10px] uppercase tracking-wider">
+                    {t('dashboard.bestMonth')}
+                  </p>
                   <p className="text-sm font-semibold capitalize">{data.bestMonth.month}</p>
                 </div>
               </div>
@@ -258,12 +288,17 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
     >
-      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">{t('accounts.title')}</p>
+      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">
+        {t('accounts.title')}
+      </p>
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
         {data.accountBreakdown.map((acc) => (
           <Card key={acc.accountId} className="shrink-0 w-36 p-3">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: acc.color ?? '#00d4a0' }} />
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: acc.color ?? '#00d4a0' }}
+              />
               <span className="text-xs text-text-secondary truncate">{acc.name}</span>
             </div>
             <p className="font-heading text-base font-bold">{fmtCurrency(acc.amount)}</p>
@@ -283,14 +318,22 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
 
 // ─── Recent Entries ────────────────────────────────────────
 
-function RecentEntries({ entries, t }: { entries: DashboardData['recentEntries']; t: (k: string) => string }) {
+function RecentEntries({
+  entries,
+  t,
+}: {
+  entries: DashboardData['recentEntries'];
+  t: (k: string) => string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">{t('dashboard.recentEntries')}</p>
+      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">
+        {t('dashboard.recentEntries')}
+      </p>
       <Card className="divide-y divide-border-default">
         {entries.map((entry) => (
           <div key={entry.id} className="flex items-center justify-between px-4 py-3">
@@ -301,7 +344,8 @@ function RecentEntries({ entries, t }: { entries: DashboardData['recentEntries']
             {entry.delta != null && (
               <div className={`text-right ${entry.delta >= 0 ? 'text-positive' : 'text-negative'}`}>
                 <p className="text-sm font-mono font-semibold">
-                  {entry.delta >= 0 ? '+' : ''}{fmtCurrencyCompact(entry.delta)}
+                  {entry.delta >= 0 ? '+' : ''}
+                  {fmtCurrencyCompact(entry.delta)}
                 </p>
                 {entry.deltaPercent != null && (
                   <p className="text-[10px]">{fmtPercent(entry.deltaPercent)}</p>
@@ -321,11 +365,15 @@ function DashboardSkeleton() {
   return (
     <div className="p-4 max-w-lg mx-auto space-y-4">
       <div className="flex gap-2">
-        {[1, 2, 3, 4].map((i) => <Skeleton key={i} width={56} height={28} variant="rectangular" />)}
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} width={56} height={28} variant="rectangular" />
+        ))}
       </div>
       <Skeleton height={120} variant="rectangular" />
       <div className="grid grid-cols-2 gap-3">
-        {[1, 2, 3, 4].map((i) => <Skeleton key={i} height={72} variant="rectangular" />)}
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} height={72} variant="rectangular" />
+        ))}
       </div>
       <Skeleton height={96} variant="rectangular" />
       <Skeleton height={200} variant="rectangular" />

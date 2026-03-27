@@ -85,7 +85,10 @@ function LoginPage() {
           </Button>
 
           <div className="text-center">
-            <Link to="/forgot-password" className="text-sm text-brand hover:text-brand-hover transition-colors">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-brand hover:text-brand-hover transition-colors"
+            >
               {t('auth.forgotPassword')}
             </Link>
           </div>
@@ -94,7 +97,10 @@ function LoginPage() {
         {/* Register link */}
         <p className="text-center text-sm text-text-secondary">
           {t('auth.noAccount')}{' '}
-          <Link to="/register" className="text-brand hover:text-brand-hover font-medium transition-colors">
+          <Link
+            to="/register"
+            className="text-brand hover:text-brand-hover font-medium transition-colors"
+          >
             {t('auth.register')}
           </Link>
         </p>

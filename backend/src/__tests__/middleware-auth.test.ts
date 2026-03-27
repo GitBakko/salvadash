@@ -38,7 +38,9 @@ describe('authenticate middleware', () => {
 
     await authenticate(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Authentication required' }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'Authentication required' }),
+    );
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -49,7 +51,9 @@ describe('authenticate middleware', () => {
 
     await authenticate(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Invalid or expired token' }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'Invalid or expired token' }),
+    );
   });
 
   it('returns 401 if user not found', async () => {
@@ -62,7 +66,9 @@ describe('authenticate middleware', () => {
 
     await authenticate(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'User not found or inactive' }));
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ error: 'User not found or inactive' }),
+    );
   });
 
   it('returns 401 if user is inactive', async () => {
@@ -71,7 +77,11 @@ describe('authenticate middleware', () => {
     const res = mockRes();
     const next = vi.fn();
 
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'user1', role: 'BASE', isActive: false } as any);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      id: 'user1',
+      role: 'BASE',
+      isActive: false,
+    } as any);
 
     await authenticate(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
@@ -83,7 +93,11 @@ describe('authenticate middleware', () => {
     const res = mockRes();
     const next = vi.fn();
 
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({ id: 'user1', role: 'ADMIN', isActive: true } as any);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      id: 'user1',
+      role: 'ADMIN',
+      isActive: true,
+    } as any);
 
     await authenticate(req, res, next);
     expect(req.user).toEqual({ userId: 'user1', role: 'ADMIN' });

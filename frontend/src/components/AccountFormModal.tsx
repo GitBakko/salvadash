@@ -8,15 +8,33 @@ import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 
 const COLOR_OPTIONS = [
-  '#00d4a0', '#4d9fff', '#ffd166', '#a78bfa', '#ff4567',
-  '#f472b6', '#38bdf8', '#facc15', '#34d399', '#fb923c',
-  '#818cf8', '#e879f9',
+  '#00d4a0',
+  '#4d9fff',
+  '#ffd166',
+  '#a78bfa',
+  '#ff4567',
+  '#f472b6',
+  '#38bdf8',
+  '#facc15',
+  '#34d399',
+  '#fb923c',
+  '#818cf8',
+  '#e879f9',
 ];
 
 const ICON_OPTIONS = [
-  'account_balance', 'savings', 'credit_card', 'wallet',
-  'currency_bitcoin', 'trending_up', 'payments', 'account_balance_wallet',
-  'monetization_on', 'attach_money', 'show_chart', 'pie_chart',
+  'account_balance',
+  'savings',
+  'credit_card',
+  'wallet',
+  'currency_bitcoin',
+  'trending_up',
+  'payments',
+  'account_balance_wallet',
+  'monetization_on',
+  'attach_money',
+  'show_chart',
+  'pie_chart',
 ];
 
 interface Props {
@@ -63,7 +81,11 @@ export function AccountFormModal({ account, onClose }: Props) {
   const isLoading = createAccount.isPending || updateAccount.isPending;
 
   return (
-    <Modal isOpen onClose={onClose} title={isEditing ? t('accounts.editAccount') : t('accounts.addAccount')}>
+    <Modal
+      isOpen
+      onClose={onClose}
+      title={isEditing ? t('accounts.editAccount') : t('accounts.addAccount')}
+    >
       <form onSubmit={handleSubmit} className="space-y-5">
         {error && (
           <div className="bg-negative/10 border border-negative/30 rounded-[var(--radius-md)] px-4 py-2.5 text-sm text-negative">
@@ -82,7 +104,9 @@ export function AccountFormModal({ account, onClose }: Props) {
 
         {/* Type selector */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-text-secondary">{t('accounts.accountType')}</label>
+          <label className="text-sm font-medium text-text-secondary">
+            {t('accounts.accountType')}
+          </label>
           <div className="flex gap-2">
             {(['MAIN', 'SUB'] as const).map((t_) => (
               <button
@@ -132,7 +156,9 @@ export function AccountFormModal({ account, onClose }: Props) {
                 type="button"
                 onClick={() => setColor(c)}
                 className={`w-8 h-8 rounded-full transition-all ${
-                  color === c ? 'ring-2 ring-offset-2 ring-offset-surface-base ring-brand scale-110' : 'hover:scale-110'
+                  color === c
+                    ? 'ring-2 ring-offset-2 ring-offset-surface-base ring-brand scale-110'
+                    : 'hover:scale-110'
                 }`}
                 style={{ backgroundColor: c }}
               />

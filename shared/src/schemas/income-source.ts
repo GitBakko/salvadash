@@ -11,10 +11,12 @@ export const updateIncomeSourceSchema = z.object({
 });
 
 export const reorderIncomeSourcesSchema = z.object({
-  sources: z.array(z.object({
-    id: z.string(),
-    sortOrder: z.number().int().min(0),
-  })),
+  sources: z.array(
+    z.object({
+      id: z.string(),
+      sortOrder: z.number().int().min(0),
+    }),
+  ),
 });
 
 export type CreateIncomeSourceInput = z.infer<typeof createIncomeSourceSchema>;

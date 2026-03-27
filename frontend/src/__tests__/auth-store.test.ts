@@ -109,8 +109,11 @@ describe('useAuthStore', () => {
       vi.mocked(api.post).mockResolvedValue({ success: true });
 
       const result = await useAuthStore.getState().register({
-        name: 'Test', email: 'test@test.com', password: 'Pass1234!',
-        confirmPassword: 'Pass1234!', inviteCode: 'ABC123',
+        name: 'Test',
+        email: 'test@test.com',
+        password: 'Pass1234!',
+        confirmPassword: 'Pass1234!',
+        inviteCode: 'ABC123',
       });
 
       expect(result.success).toBe(true);
@@ -120,8 +123,11 @@ describe('useAuthStore', () => {
       vi.mocked(api.post).mockResolvedValue({ success: false, error: 'Email taken' });
 
       const result = await useAuthStore.getState().register({
-        name: 'Test', email: 'taken@test.com', password: 'Pass1234!',
-        confirmPassword: 'Pass1234!', inviteCode: 'ABC123',
+        name: 'Test',
+        email: 'taken@test.com',
+        password: 'Pass1234!',
+        confirmPassword: 'Pass1234!',
+        inviteCode: 'ABC123',
       });
 
       expect(result.success).toBe(false);

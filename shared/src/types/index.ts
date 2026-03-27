@@ -108,7 +108,13 @@ export interface DashboardData {
   avgMonthlyYTD: number;
   bestMonth: { month: string; delta: number } | null;
   growthYTD: number;
-  accountBreakdown: { accountId: string; name: string; amount: number; percent: number; color: string | null }[];
+  accountBreakdown: {
+    accountId: string;
+    name: string;
+    amount: number;
+    percent: number;
+    color: string | null;
+  }[];
   recentEntries: EntryListItem[];
   sparklineData: number[];
 }

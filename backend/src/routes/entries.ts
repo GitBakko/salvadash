@@ -78,9 +78,10 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
     const withDeltas = formatted.map((entry, i) => {
       const prev = formatted[i + 1]; // previous chronologically (sorted desc)
       const delta = prev ? entry.total - prev.total : null;
-      const deltaPercent = prev && prev.total !== 0
-        ? Math.round(((entry.total - prev.total) / prev.total) * 10000) / 100
-        : null;
+      const deltaPercent =
+        prev && prev.total !== 0
+          ? Math.round(((entry.total - prev.total) / prev.total) * 10000) / 100
+          : null;
       return { ...entry, delta, deltaPercent };
     });
 
@@ -127,7 +128,9 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = createEntrySchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 
@@ -137,7 +140,9 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     // Verify user has at least 1 account
     const accountCount = await prisma.account.count({ where: { userId, isActive: true } });
     if (accountCount === 0) {
-      res.status(400).json({ success: false, error: 'You need at least one active account to create entries' });
+      res
+        .status(400)
+        .json({ success: false, error: 'You need at least one active account to create entries' });
       return;
     }
 
@@ -158,7 +163,9 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       ).map((s) => s.id);
       const invalidSources = incomes.filter((i) => !userSourceIds.includes(i.incomeSourceId));
       if (invalidSources.length > 0) {
-        res.status(400).json({ success: false, error: 'One or more income source IDs are invalid' });
+        res
+          .status(400)
+          .json({ success: false, error: 'One or more income source IDs are invalid' });
         return;
       }
     }
@@ -197,7 +204,9 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = updateEntrySchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 
@@ -231,7 +240,9 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
       ).map((s) => s.id);
       const invalid = incomes.filter((i) => !userSourceIds.includes(i.incomeSourceId));
       if (invalid.length > 0) {
-        res.status(400).json({ success: false, error: 'One or more income source IDs are invalid' });
+        res
+          .status(400)
+          .json({ success: false, error: 'One or more income source IDs are invalid' });
         return;
       }
     }

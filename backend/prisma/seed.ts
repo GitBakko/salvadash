@@ -15,8 +15,17 @@ const env = (key: string, fallback?: string): string => {
 // ─── Account & Income configuration ───────────────────────
 const MAIN_ACCOUNTS = ['Bancoposta', 'ING Direct'];
 const SUB_ACCOUNTS = [
-  'Yap', 'Satispay', 'Postepay', 'Capital.com', 'Oval',
-  'Binance', 'Coinbase', 'Moneyfarm', 'Directa', 'Generali', 'PayPal',
+  'Yap',
+  'Satispay',
+  'Postepay',
+  'Capital.com',
+  'Oval',
+  'Binance',
+  'Coinbase',
+  'Moneyfarm',
+  'Directa',
+  'Generali',
+  'PayPal',
 ];
 
 // Case-insensitive name lookup: lowercase → canonical name

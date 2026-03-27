@@ -96,17 +96,17 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      DATABASE_URL: "postgresql://salvadash:salvadash_test@localhost:5432/salvadash_test?schema=public"
+      DATABASE_URL: 'postgresql://salvadash:salvadash_test@localhost:5432/salvadash_test?schema=public'
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
         with:
-          version: "9"
+          version: '9'
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile

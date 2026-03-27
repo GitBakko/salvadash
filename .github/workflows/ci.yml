@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "20"
-  PNPM_VERSION: "9"
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
 
 jobs:
   # ─── Lint & Format Check ──────────────────────────────────
@@ -89,12 +89,12 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: "postgresql://salvadash:salvadash_test@localhost:5432/salvadash_test?schema=public"
-      JWT_ACCESS_SECRET: "ci-test-access-secret"
-      JWT_REFRESH_SECRET: "ci-test-refresh-secret"
-      JWT_ACCESS_EXPIRES_IN: "15m"
-      JWT_REFRESH_EXPIRES_IN: "7d"
-      NODE_ENV: "test"
+      DATABASE_URL: 'postgresql://salvadash:salvadash_test@localhost:5432/salvadash_test?schema=public'
+      JWT_ACCESS_SECRET: 'ci-test-access-secret'
+      JWT_REFRESH_SECRET: 'ci-test-refresh-secret'
+      JWT_ACCESS_EXPIRES_IN: '15m'
+      JWT_REFRESH_EXPIRES_IN: '7d'
+      NODE_ENV: 'test'
 
     steps:
       - uses: actions/checkout@v4

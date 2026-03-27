@@ -126,52 +126,63 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
 
 // ─── POST /notifications/broadcast — Admin broadcast ────────
 
-router.post('/broadcast', requireRole('ADMIN', 'ROOT'), async (req: Request, res: Response): Promise<void> => {
-  try {
-    const parsed = sendNotificationSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
-
-    const { userId, type, title, body } = parsed.data;
-
-    if (userId) {
-      // Send to specific user
-      const targetUser = await prisma.user.findUnique({ where: { id: userId } });
-      if (!targetUser) {
-        res.status(404).json({ success: false, error: 'Target user not found' });
+router.post(
+  '/broadcast',
+  requireRole('ADMIN', 'ROOT'),
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const parsed = sendNotificationSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res
+          .status(400)
+          .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
         return;
       }
 
-      await prisma.notification.create({
-        data: { userId, type, title, body },
-      });
+      const { userId, type, title, body } = parsed.data;
 
-      // Send push notification
-      sendPushToUser(userId, { title, body, tag: type }).catch(() => {});
+      if (userId) {
+        // Send to specific user
+        const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+        if (!targetUser) {
+          res.status(404).json({ success: false, error: 'Target user not found' });
+          return;
+        }
 
-      res.status(201).json({ success: true, data: { message: 'Notification sent', count: 1 } });
-    } else {
-      // Broadcast to all active users
-      const users = await prisma.user.findMany({
-        where: { isActive: true },
-        select: { id: true },
-      });
+        await prisma.notification.create({
+          data: { userId, type, title, body },
+        });
 
-      await prisma.notification.createMany({
-        data: users.map((u) => ({ userId: u.id, type, title, body })),
-      });
+        // Send push notification
+        sendPushToUser(userId, { title, body, tag: type }).catch(() => {});
 
-      // Send push to all users
-      sendPushToUsers(users.map((u) => u.id), { title, body, tag: type }).catch(() => {});
+        res.status(201).json({ success: true, data: { message: 'Notification sent', count: 1 } });
+      } else {
+        // Broadcast to all active users
+        const users = await prisma.user.findMany({
+          where: { isActive: true },
+          select: { id: true },
+        });
 
-      res.status(201).json({ success: true, data: { message: 'Broadcast sent', count: users.length } });
+        await prisma.notification.createMany({
+          data: users.map((u) => ({ userId: u.id, type, title, body })),
+        });
+
+        // Send push to all users
+        sendPushToUsers(
+          users.map((u) => u.id),
+          { title, body, tag: type },
+        ).catch(() => {});
+
+        res
+          .status(201)
+          .json({ success: true, data: { message: 'Broadcast sent', count: users.length } });
+      }
+    } catch (err) {
+      console.error('Broadcast notification error:', err);
+      res.status(500).json({ success: false, error: 'Internal server error' });
     }
-  } catch (err) {
-    console.error('Broadcast notification error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  },
+);
 
 export default router;

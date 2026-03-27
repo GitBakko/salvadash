@@ -49,12 +49,8 @@ function VerifyEmailPage() {
 
           <div className="space-y-2">
             <h2 className="font-heading text-lg font-semibold">{t('auth.verifyEmail')}</h2>
-            <p className="text-text-secondary text-sm">
-              {t('auth.verifyEmailDesc')}
-            </p>
-            {email && (
-              <p className="text-brand font-medium text-sm">{email}</p>
-            )}
+            <p className="text-text-secondary text-sm">{t('auth.verifyEmailDesc')}</p>
+            {email && <p className="text-brand font-medium text-sm">{email}</p>}
           </div>
 
           <div className="space-y-3">

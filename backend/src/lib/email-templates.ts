@@ -3,10 +3,17 @@ import { config } from '../config/index.js';
 
 // ─── Email Verification ────────────────────────────────────
 
-export async function sendVerificationEmail(to: string, name: string, token: string): Promise<void> {
+export async function sendVerificationEmail(
+  to: string,
+  name: string,
+  token: string,
+): Promise<void> {
   const verifyUrl = `${config.appUrl}/verify-email?token=${encodeURIComponent(token)}`;
 
-  await sendEmail(to, 'SalvaDash — Verifica il tuo indirizzo email', `
+  await sendEmail(
+    to,
+    'SalvaDash — Verifica il tuo indirizzo email',
+    `
     <div style="font-family: 'Inter', Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #0a0a0f; color: #ffffff; padding: 32px; border-radius: 16px;">
       <h1 style="font-family: 'Space Grotesk', sans-serif; color: #00d4a0; font-size: 24px; margin-bottom: 8px;">SalvaDash</h1>
       <p style="color: #94a3b8; margin-bottom: 24px;">Benvenuto/a, ${escapeHtml(name)}!</p>
@@ -23,15 +30,23 @@ export async function sendVerificationEmail(to: string, name: string, token: str
         Link diretto: <a href="${verifyUrl}" style="color: #4d9fff;">${verifyUrl}</a>
       </p>
     </div>
-  `);
+  `,
+  );
 }
 
 // ─── Password Reset ────────────────────────────────────────
 
-export async function sendPasswordResetEmail(to: string, name: string, token: string): Promise<void> {
+export async function sendPasswordResetEmail(
+  to: string,
+  name: string,
+  token: string,
+): Promise<void> {
   const resetUrl = `${config.appUrl}/reset-password?token=${encodeURIComponent(token)}`;
 
-  await sendEmail(to, 'SalvaDash — Reset Password', `
+  await sendEmail(
+    to,
+    'SalvaDash — Reset Password',
+    `
     <div style="font-family: 'Inter', Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #0a0a0f; color: #ffffff; padding: 32px; border-radius: 16px;">
       <h1 style="font-family: 'Space Grotesk', sans-serif; color: #00d4a0; font-size: 24px; margin-bottom: 8px;">SalvaDash</h1>
       <p style="color: #94a3b8; margin-bottom: 24px;">Ciao ${escapeHtml(name)},</p>
@@ -48,7 +63,8 @@ export async function sendPasswordResetEmail(to: string, name: string, token: st
         Se non hai richiesto il reset, puoi ignorare questa email.
       </p>
     </div>
-  `);
+  `,
+  );
 }
 
 // ─── Helpers ────────────────────────────────────────────────

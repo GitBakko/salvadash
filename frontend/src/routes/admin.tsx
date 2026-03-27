@@ -87,9 +87,21 @@ function AdminPage() {
             }`}
           >
             <span className="icon text-base mr-1">
-              {tab === 'users' ? 'group' : tab === 'invites' ? 'vpn_key' : tab === 'notify' ? 'campaign' : 'backup'}
+              {tab === 'users'
+                ? 'group'
+                : tab === 'invites'
+                  ? 'vpn_key'
+                  : tab === 'notify'
+                    ? 'campaign'
+                    : 'backup'}
             </span>
-            {tab === 'users' ? t('admin.users') : tab === 'invites' ? t('admin.inviteCodes') : tab === 'notify' ? t('notifications.broadcast') : t('backup.backups')}
+            {tab === 'users'
+              ? t('admin.users')
+              : tab === 'invites'
+                ? t('admin.inviteCodes')
+                : tab === 'notify'
+                  ? t('notifications.broadcast')
+                  : t('backup.backups')}
           </button>
         ))}
       </div>
@@ -103,10 +115,7 @@ function AdminPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 10 }}
           >
-            <UsersSection
-              selectedUserId={selectedUserId}
-              onSelectUser={setSelectedUserId}
-            />
+            <UsersSection selectedUserId={selectedUserId} onSelectUser={setSelectedUserId} />
           </motion.div>
         ) : activeTab === 'invites' ? (
           <motion.div
@@ -141,10 +150,7 @@ function AdminPage() {
       {/* User Detail Sheet */}
       <AnimatePresence>
         {selectedUserId && (
-          <UserDetailSheet
-            userId={selectedUserId}
-            onClose={() => setSelectedUserId(null)}
-          />
+          <UserDetailSheet userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
         )}
       </AnimatePresence>
     </div>
@@ -171,9 +177,24 @@ function OverviewCards() {
 
   const kpis = [
     { icon: 'group', label: t('admin.totalUsers'), value: data.totalUsers, color: 'text-brand' },
-    { icon: 'receipt_long', label: t('admin.totalEntries'), value: data.totalEntries, color: 'text-gold' },
-    { icon: 'trending_up', label: t('admin.avgGrowth'), value: formatCurrency(data.avgGrowth), color: data.avgGrowth >= 0 ? 'text-brand' : 'text-red-400' },
-    { icon: 'person_check', label: t('admin.activeUsers'), value: data.activeUsers30d, color: 'text-brand' },
+    {
+      icon: 'receipt_long',
+      label: t('admin.totalEntries'),
+      value: data.totalEntries,
+      color: 'text-gold',
+    },
+    {
+      icon: 'trending_up',
+      label: t('admin.avgGrowth'),
+      value: formatCurrency(data.avgGrowth),
+      color: data.avgGrowth >= 0 ? 'text-brand' : 'text-red-400',
+    },
+    {
+      icon: 'person_check',
+      label: t('admin.activeUsers'),
+      value: data.activeUsers30d,
+      color: 'text-brand',
+    },
   ];
 
   return (
@@ -218,7 +239,9 @@ function UsersSection({
       {/* Search + Filter */}
       <div className="flex gap-2">
         <div className="flex-1 relative">
-          <span className="icon text-text-muted absolute left-3 top-1/2 -translate-y-1/2 text-lg">search</span>
+          <span className="icon text-text-muted absolute left-3 top-1/2 -translate-y-1/2 text-lg">
+            search
+          </span>
           <input
             type="text"
             value={search}
@@ -269,20 +292,26 @@ function UsersSection({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 min-w-0">
                     {/* Avatar */}
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
-                      u.isActive ? 'bg-brand/15 text-brand' : 'bg-surface-3 text-text-muted'
-                    }`}>
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                        u.isActive ? 'bg-brand/15 text-brand' : 'bg-surface-3 text-text-muted'
+                      }`}
+                    >
                       {u.name.charAt(0).toUpperCase()}
                     </div>
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-sm truncate">{u.name}</p>
-                        <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${ROLE_BG[u.role]}`}>
+                        <span
+                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${ROLE_BG[u.role]}`}
+                        >
                           {u.role}
                         </span>
                         {!u.isActive && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/15 text-red-400">OFF</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/15 text-red-400">
+                            OFF
+                          </span>
                         )}
                       </div>
                       <p className="text-xs text-text-muted truncate">{u.email}</p>
@@ -290,8 +319,12 @@ function UsersSection({
                   </div>
 
                   <div className="text-right shrink-0 ml-2">
-                    <p className="text-sm font-bold font-heading">{formatCurrency(u.totalSavings)}</p>
-                    <p className="text-[10px] text-text-muted">{u.entriesCount} {t('admin.entries')}</p>
+                    <p className="text-sm font-bold font-heading">
+                      {formatCurrency(u.totalSavings)}
+                    </p>
+                    <p className="text-[10px] text-text-muted">
+                      {u.entriesCount} {t('admin.entries')}
+                    </p>
                   </div>
                 </div>
               </Card>
@@ -342,7 +375,11 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
 
   const formatDate = (d: string | null) => {
     if (!d) return t('admin.never');
-    return new Date(d).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
+    return new Date(d).toLocaleDateString('it-IT', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
   };
 
   return (
@@ -378,9 +415,11 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
           <div className="space-y-5">
             {/* Header */}
             <div className="flex items-center gap-3">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
-                user.isActive ? 'bg-brand/15 text-brand' : 'bg-surface-3 text-text-muted'
-              }`}>
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
+                  user.isActive ? 'bg-brand/15 text-brand' : 'bg-surface-3 text-text-muted'
+                }`}
+              >
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -397,12 +436,38 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-3">
-              <StatItem icon="savings" label={t('admin.savings')} value={formatCurrency(user.totalSavings)} />
-              <StatItem icon="receipt_long" label={t('admin.entries')} value={String(user.entriesCount)} />
-              <StatItem icon="account_balance" label={t('admin.accounts')} value={String(user.accountsCount)} />
-              <StatItem icon="calendar_month" label={t('admin.memberSince')} value={formatDate(user.createdAt)} small />
-              <StatItem icon="event" label={t('admin.lastEntry')} value={formatDate(user.lastEntryDate)} small />
-              <StatItem icon="language" label={t('settings.language')} value={user.language.toUpperCase()} />
+              <StatItem
+                icon="savings"
+                label={t('admin.savings')}
+                value={formatCurrency(user.totalSavings)}
+              />
+              <StatItem
+                icon="receipt_long"
+                label={t('admin.entries')}
+                value={String(user.entriesCount)}
+              />
+              <StatItem
+                icon="account_balance"
+                label={t('admin.accounts')}
+                value={String(user.accountsCount)}
+              />
+              <StatItem
+                icon="calendar_month"
+                label={t('admin.memberSince')}
+                value={formatDate(user.createdAt)}
+                small
+              />
+              <StatItem
+                icon="event"
+                label={t('admin.lastEntry')}
+                value={formatDate(user.lastEntryDate)}
+                small
+              />
+              <StatItem
+                icon="language"
+                label={t('settings.language')}
+                value={user.language.toUpperCase()}
+              />
             </div>
 
             {/* Actions */}
@@ -497,7 +562,17 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
   );
 }
 
-function StatItem({ icon, label, value, small }: { icon: string; label: string; value: string; small?: boolean }) {
+function StatItem({
+  icon,
+  label,
+  value,
+  small,
+}: {
+  icon: string;
+  label: string;
+  value: string;
+  small?: boolean;
+}) {
   return (
     <div className="bg-surface-2 rounded-xl p-2.5">
       <div className="flex items-center gap-1.5 mb-0.5">
@@ -523,12 +598,17 @@ function InviteCodesSection() {
 
   const formatDate = (d: string | null) => {
     if (!d) return '—';
-    return new Date(d).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
+    return new Date(d).toLocaleDateString('it-IT', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
   };
 
   const getStatusBadge = (code: { isActive: boolean; usedAt: string | null }) => {
     if (code.usedAt) return { label: t('admin.used'), className: 'bg-brand/15 text-brand' };
-    if (!code.isActive) return { label: t('admin.inactive'), className: 'bg-red-500/15 text-red-400' };
+    if (!code.isActive)
+      return { label: t('admin.inactive'), className: 'bg-red-500/15 text-red-400' };
     return { label: t('admin.active'), className: 'bg-gold/15 text-gold' };
   };
 
@@ -571,7 +651,9 @@ function InviteCodesSection() {
                   <div className="flex items-center justify-between">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <code className="font-mono text-sm font-bold text-brand tracking-wider">{code.code}</code>
+                        <code className="font-mono text-sm font-bold text-brand tracking-wider">
+                          {code.code}
+                        </code>
                         <span className={`text-[10px] px-1.5 py-0.5 rounded ${status.className}`}>
                           {status.label}
                         </span>
@@ -625,7 +707,12 @@ function BroadcastSection() {
   const handleSend = () => {
     if (!title.trim() || !body.trim()) return;
     broadcast.mutate(
-      { type, title: title.trim(), body: body.trim(), ...(targetUserId ? { userId: targetUserId } : {}) },
+      {
+        type,
+        title: title.trim(),
+        body: body.trim(),
+        ...(targetUserId ? { userId: targetUserId } : {}),
+      },
       {
         onSuccess: () => {
           setSent(true);
@@ -643,14 +730,18 @@ function BroadcastSection() {
       <Card className="p-4 space-y-4">
         {/* Type */}
         <div>
-          <label className="text-xs text-text-muted mb-1.5 block">{t('notifications.broadcastType')}</label>
+          <label className="text-xs text-text-muted mb-1.5 block">
+            {t('notifications.broadcastType')}
+          </label>
           <div className="flex flex-wrap gap-1.5">
             {NOTIFICATION_TYPES.map((nt) => (
               <button
                 key={nt}
                 onClick={() => setType(nt)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  type === nt ? 'bg-brand/20 text-brand' : 'bg-surface-2 text-text-muted hover:text-text-primary'
+                  type === nt
+                    ? 'bg-brand/20 text-brand'
+                    : 'bg-surface-2 text-text-muted hover:text-text-primary'
                 }`}
               >
                 {t(`notifications.type${nt}`)}
@@ -661,7 +752,9 @@ function BroadcastSection() {
 
         {/* Target */}
         <div>
-          <label className="text-xs text-text-muted mb-1.5 block">{t('notifications.broadcastUser')}</label>
+          <label className="text-xs text-text-muted mb-1.5 block">
+            {t('notifications.broadcastUser')}
+          </label>
           <input
             type="text"
             value={targetUserId}
@@ -676,7 +769,9 @@ function BroadcastSection() {
 
         {/* Title */}
         <div>
-          <label className="text-xs text-text-muted mb-1.5 block">{t('notifications.broadcastTitle')}</label>
+          <label className="text-xs text-text-muted mb-1.5 block">
+            {t('notifications.broadcastTitle')}
+          </label>
           <input
             type="text"
             value={title}
@@ -688,7 +783,9 @@ function BroadcastSection() {
 
         {/* Body */}
         <div>
-          <label className="text-xs text-text-muted mb-1.5 block">{t('notifications.broadcastBody')}</label>
+          <label className="text-xs text-text-muted mb-1.5 block">
+            {t('notifications.broadcastBody')}
+          </label>
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
@@ -748,7 +845,11 @@ function BackupSection() {
 
   const [restoreConfirmId, setRestoreConfirmId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [maintenanceResult, setMaintenanceResult] = useState<{ vacuum: boolean; analyze: boolean; reindex: boolean } | null>(null);
+  const [maintenanceResult, setMaintenanceResult] = useState<{
+    vacuum: boolean;
+    analyze: boolean;
+    reindex: boolean;
+  } | null>(null);
 
   const isRoot = currentUser?.role === 'ROOT';
 
@@ -761,8 +862,11 @@ function BackupSection() {
   const formatDate = (d: string | null) => {
     if (!d) return '—';
     return new Date(d).toLocaleDateString('it-IT', {
-      day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -816,7 +920,9 @@ function BackupSection() {
         <Card className="p-3">
           <div className="flex items-center gap-2 mb-2">
             <span className="icon text-sm text-text-muted">settings</span>
-            <span className="text-xs font-medium text-text-muted uppercase tracking-wide">{t('backup.config')}</span>
+            <span className="text-xs font-medium text-text-muted uppercase tracking-wide">
+              {t('backup.config')}
+            </span>
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
@@ -825,7 +931,9 @@ function BackupSection() {
             </div>
             <div>
               <span className="text-text-muted">{t('backup.cloudEnabled')}:</span>{' '}
-              <span className={`font-medium ${backupConfig.cloudEnabled ? 'text-brand' : 'text-text-muted'}`}>
+              <span
+                className={`font-medium ${backupConfig.cloudEnabled ? 'text-brand' : 'text-text-muted'}`}
+              >
                 {backupConfig.cloudEnabled ? 'Sì' : 'No'}
               </span>
             </div>
@@ -858,11 +966,15 @@ function BackupSection() {
                 <div className="flex items-center justify-between mb-2">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${statusColor[backup.status]}`}>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${statusColor[backup.status]}`}
+                      >
                         {t(`backup.${backup.status}`)}
                       </span>
                       {backup.status === 'COMPLETED' && (
-                        <span className="text-[10px] text-text-muted">{formatSize(backup.sizeBytes)}</span>
+                        <span className="text-[10px] text-text-muted">
+                          {formatSize(backup.sizeBytes)}
+                        </span>
                       )}
                     </div>
                     <p className="text-xs text-text-muted mt-1 truncate">{backup.filename}</p>
@@ -876,7 +988,9 @@ function BackupSection() {
                       <span className="icon text-[10px]">
                         {backup.triggeredBy === 'scheduler' ? 'schedule' : 'person'}
                       </span>
-                      {backup.triggeredBy === 'scheduler' ? t('backup.scheduler') : t('backup.manual')}
+                      {backup.triggeredBy === 'scheduler'
+                        ? t('backup.scheduler')
+                        : t('backup.manual')}
                     </span>
                   </div>
 
@@ -1012,22 +1126,30 @@ function BackupSection() {
               exit={{ opacity: 0 }}
               className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-3"
             >
-              <p className="text-xs text-purple-400 font-medium mb-1">{t('backup.maintenanceSuccess')}</p>
+              <p className="text-xs text-purple-400 font-medium mb-1">
+                {t('backup.maintenanceSuccess')}
+              </p>
               <div className="grid grid-cols-3 gap-2 text-[10px]">
                 <div className="flex items-center gap-1">
-                  <span className={`icon text-xs ${maintenanceResult.vacuum ? 'text-brand' : 'text-red-400'}`}>
+                  <span
+                    className={`icon text-xs ${maintenanceResult.vacuum ? 'text-brand' : 'text-red-400'}`}
+                  >
                     {maintenanceResult.vacuum ? 'check_circle' : 'cancel'}
                   </span>
                   {t('backup.vacuum')}
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className={`icon text-xs ${maintenanceResult.analyze ? 'text-brand' : 'text-red-400'}`}>
+                  <span
+                    className={`icon text-xs ${maintenanceResult.analyze ? 'text-brand' : 'text-red-400'}`}
+                  >
                     {maintenanceResult.analyze ? 'check_circle' : 'cancel'}
                   </span>
                   {t('backup.analyze')}
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className={`icon text-xs ${maintenanceResult.reindex ? 'text-brand' : 'text-red-400'}`}>
+                  <span
+                    className={`icon text-xs ${maintenanceResult.reindex ? 'text-brand' : 'text-red-400'}`}
+                  >
                     {maintenanceResult.reindex ? 'check_circle' : 'cancel'}
                   </span>
                   {t('backup.reindex')}

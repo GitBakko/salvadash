@@ -7,15 +7,74 @@ import { generateAccessToken } from '../lib/auth.js';
 // ─── Mock Prisma (hoisted so vi.mock factory can reference it) ──
 
 const mockPrisma = vi.hoisted(() => ({
-  user: { findUnique: vi.fn(), findMany: vi.fn(), count: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn() },
-  account: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), aggregate: vi.fn() },
-  entry: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
-  monthlyEntry: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), count: vi.fn() },
-  incomeSource: { findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn(), createMany: vi.fn() },
-  inviteCode: { findUnique: vi.fn(), findMany: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn() },
-  notification: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), updateMany: vi.fn(), delete: vi.fn(), count: vi.fn() },
-  backupLog: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn() },
-  pushSubscription: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), delete: vi.fn(), deleteMany: vi.fn() },
+  user: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    count: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
+  account: {
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    aggregate: vi.fn(),
+  },
+  entry: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
+  monthlyEntry: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
+  incomeSource: {
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    createMany: vi.fn(),
+  },
+  inviteCode: {
+    findUnique: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
+  notification: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    updateMany: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  },
+  backupLog: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  },
+  pushSubscription: {
+    findMany: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    delete: vi.fn(),
+    deleteMany: vi.fn(),
+  },
   $transaction: vi.fn(),
   $queryRaw: vi.fn(),
   $executeRawUnsafe: vi.fn(),
@@ -62,9 +121,7 @@ describe('API Integration Tests', () => {
 
   describe('POST /api/auth/login', () => {
     it('returns 400 on invalid input', async () => {
-      const res = await request(app)
-        .post('/api/auth/login')
-        .send({ email: 'bad', password: '' });
+      const res = await request(app).post('/api/auth/login').send({ email: 'bad', password: '' });
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
     });
@@ -89,14 +146,19 @@ describe('API Integration Tests', () => {
       mockPrisma.user.findUnique
         .mockResolvedValueOnce({ id: 'u1', role: 'BASE', isActive: true }) // authenticate middleware
         .mockResolvedValueOnce({
-          id: 'u1', name: 'Test', email: 'test@test.com', username: 'test',
-          role: 'BASE', language: 'it', currency: 'EUR', emailVerified: true,
-          isActive: true, createdAt: new Date(),
+          id: 'u1',
+          name: 'Test',
+          email: 'test@test.com',
+          username: 'test',
+          role: 'BASE',
+          language: 'it',
+          currency: 'EUR',
+          emailVerified: true,
+          isActive: true,
+          createdAt: new Date(),
         });
 
-      const res = await request(app)
-        .get('/api/auth/me')
-        .set('Cookie', authCookies('u1', 'BASE'));
+      const res = await request(app).get('/api/auth/me').set('Cookie', authCookies('u1', 'BASE'));
       expect(res.status).toBe(200);
       expect(res.body.data.user.id).toBe('u1');
     });
@@ -113,12 +175,18 @@ describe('API Integration Tests', () => {
     it('returns accounts list', async () => {
       mockPrisma.user.findUnique.mockResolvedValue({ id: 'u1', role: 'BASE', isActive: true });
       mockPrisma.account.findMany.mockResolvedValue([
-        { id: 'a1', name: 'Conto A', type: 'MAIN', icon: null, color: null, isActive: true, sortOrder: 0 },
+        {
+          id: 'a1',
+          name: 'Conto A',
+          type: 'MAIN',
+          icon: null,
+          color: null,
+          isActive: true,
+          sortOrder: 0,
+        },
       ]);
 
-      const res = await request(app)
-        .get('/api/accounts')
-        .set('Cookie', authCookies('u1', 'BASE'));
+      const res = await request(app).get('/api/accounts').set('Cookie', authCookies('u1', 'BASE'));
       expect(res.status).toBe(200);
       expect(res.body.data).toHaveLength(1);
       expect(res.body.data[0].name).toBe('Conto A');
@@ -130,7 +198,13 @@ describe('API Integration Tests', () => {
       mockPrisma.user.findUnique.mockResolvedValue({ id: 'u1', role: 'BASE', isActive: true });
       mockPrisma.account.aggregate.mockResolvedValue({ _max: { sortOrder: null } });
       mockPrisma.account.create.mockResolvedValue({
-        id: 'a2', name: 'New Bank', type: 'MAIN', icon: null, color: null, isActive: true, sortOrder: 0,
+        id: 'a2',
+        name: 'New Bank',
+        type: 'MAIN',
+        icon: null,
+        color: null,
+        isActive: true,
+        sortOrder: 0,
       });
 
       const res = await request(app)
@@ -217,8 +291,8 @@ describe('API Integration Tests', () => {
     it('returns overview for ADMIN', async () => {
       mockPrisma.user.findUnique.mockResolvedValue({ id: 'u1', role: 'ADMIN', isActive: true });
       mockPrisma.user.count
-        .mockResolvedValueOnce(5)   // totalUsers
-        .mockResolvedValueOnce(2);  // activeUsers30d
+        .mockResolvedValueOnce(5) // totalUsers
+        .mockResolvedValueOnce(2); // activeUsers30d
       mockPrisma.monthlyEntry.count.mockResolvedValue(100);
       mockPrisma.monthlyEntry.findMany.mockResolvedValue([]);
 
@@ -250,9 +324,7 @@ describe('API Integration Tests', () => {
     it('returns 403 for BASE user', async () => {
       mockPrisma.user.findUnique.mockResolvedValue({ id: 'u1', role: 'BASE', isActive: true });
 
-      const res = await request(app)
-        .get('/api/backup')
-        .set('Cookie', authCookies('u1', 'BASE'));
+      const res = await request(app).get('/api/backup').set('Cookie', authCookies('u1', 'BASE'));
       expect(res.status).toBe(403);
     });
 
@@ -260,9 +332,7 @@ describe('API Integration Tests', () => {
       mockPrisma.user.findUnique.mockResolvedValue({ id: 'u1', role: 'ADMIN', isActive: true });
       mockPrisma.backupLog.findMany.mockResolvedValue([]);
 
-      const res = await request(app)
-        .get('/api/backup')
-        .set('Cookie', authCookies('u1', 'ADMIN'));
+      const res = await request(app).get('/api/backup').set('Cookie', authCookies('u1', 'ADMIN'));
       expect(res.status).toBe(200);
       expect(res.body.data).toEqual([]);
     });
@@ -330,9 +400,7 @@ describe('API Integration Tests', () => {
     it('inactive user cannot authenticate', async () => {
       mockPrisma.user.findUnique.mockResolvedValue({ id: 'u1', role: 'BASE', isActive: false });
 
-      const res = await request(app)
-        .get('/api/accounts')
-        .set('Cookie', authCookies('u1', 'BASE'));
+      const res = await request(app).get('/api/accounts').set('Cookie', authCookies('u1', 'BASE'));
       expect(res.status).toBe(401);
     });
 

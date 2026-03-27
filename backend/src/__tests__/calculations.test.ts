@@ -3,7 +3,11 @@ import { computeDashboard, computeAnalytics, rawEntryToRow } from '../lib/calcul
 
 // ─── Test Fixtures ──────────────────────────────────────────
 
-function makeEntry(dateStr: string, balances: { name: string; amount: number; color?: string }[], incomes: { name: string; amount: number }[] = []) {
+function makeEntry(
+  dateStr: string,
+  balances: { name: string; amount: number; color?: string }[],
+  incomes: { name: string; amount: number }[] = [],
+) {
   return {
     id: `entry-${dateStr}`,
     date: new Date(dateStr),
@@ -26,11 +30,46 @@ function makeEntry(dateStr: string, balances: { name: string; amount: number; co
 }
 
 const entries = [
-  makeEntry('2025-03-01', [{ name: 'Conto A', amount: 15000 }, { name: 'Conto B', amount: 5000 }], [{ name: 'Stipendio', amount: 2000 }]),
-  makeEntry('2025-02-01', [{ name: 'Conto A', amount: 13000 }, { name: 'Conto B', amount: 4500 }], [{ name: 'Stipendio', amount: 1800 }]),
-  makeEntry('2025-01-01', [{ name: 'Conto A', amount: 12000 }, { name: 'Conto B', amount: 4000 }], [{ name: 'Stipendio', amount: 1900 }]),
-  makeEntry('2024-12-01', [{ name: 'Conto A', amount: 11000 }, { name: 'Conto B', amount: 3500 }], [{ name: 'Stipendio', amount: 1700 }]),
-  makeEntry('2024-11-01', [{ name: 'Conto A', amount: 10000 }, { name: 'Conto B', amount: 3000 }], [{ name: 'Stipendio', amount: 1600 }]),
+  makeEntry(
+    '2025-03-01',
+    [
+      { name: 'Conto A', amount: 15000 },
+      { name: 'Conto B', amount: 5000 },
+    ],
+    [{ name: 'Stipendio', amount: 2000 }],
+  ),
+  makeEntry(
+    '2025-02-01',
+    [
+      { name: 'Conto A', amount: 13000 },
+      { name: 'Conto B', amount: 4500 },
+    ],
+    [{ name: 'Stipendio', amount: 1800 }],
+  ),
+  makeEntry(
+    '2025-01-01',
+    [
+      { name: 'Conto A', amount: 12000 },
+      { name: 'Conto B', amount: 4000 },
+    ],
+    [{ name: 'Stipendio', amount: 1900 }],
+  ),
+  makeEntry(
+    '2024-12-01',
+    [
+      { name: 'Conto A', amount: 11000 },
+      { name: 'Conto B', amount: 3500 },
+    ],
+    [{ name: 'Stipendio', amount: 1700 }],
+  ),
+  makeEntry(
+    '2024-11-01',
+    [
+      { name: 'Conto A', amount: 10000 },
+      { name: 'Conto B', amount: 3000 },
+    ],
+    [{ name: 'Stipendio', amount: 1600 }],
+  ),
 ];
 
 // ─── rawEntryToRow ──────────────────────────────────────────
@@ -57,7 +96,7 @@ describe('rawEntryToRow', () => {
       })),
     };
     const row = rawEntryToRow(entry);
-    expect(row.balances[0].amount).toBe(15000.50);
+    expect(row.balances[0].amount).toBe(15000.5);
   });
 });
 
@@ -95,7 +134,9 @@ describe('computeDashboard', () => {
     const result = computeDashboard(rows, '2025');
     expect(result.sparklineData.length).toBeLessThanOrEqual(12);
     // Oldest first
-    expect(result.sparklineData[0]).toBeLessThanOrEqual(result.sparklineData[result.sparklineData.length - 1]);
+    expect(result.sparklineData[0]).toBeLessThanOrEqual(
+      result.sparklineData[result.sparklineData.length - 1],
+    );
   });
 
   it('computes growthYTD', () => {

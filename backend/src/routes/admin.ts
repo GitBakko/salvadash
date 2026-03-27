@@ -192,7 +192,9 @@ router.put('/users/:id', async (req: Request, res: Response): Promise<void> => {
     const parsed = adminUpdateUserSchema.safeParse(req.body);
 
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 

@@ -132,13 +132,20 @@ function ProfileSection() {
 
   // Change password modal
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
   const [passwordError, setPasswordError] = useState('');
   const [emailError, setEmailError] = useState('');
 
   const handleNameSave = async () => {
     const trimmed = nameValue.trim();
-    if (!trimmed || trimmed === user?.name) { setEditingName(false); return; }
+    if (!trimmed || trimmed === user?.name) {
+      setEditingName(false);
+      return;
+    }
     try {
       const updatedUser = await updateProfile.mutateAsync({ name: trimmed });
       setUser(updatedUser);
@@ -203,12 +210,13 @@ function ProfileSection() {
     }
   };
 
-  const initials = user?.name
-    ?.split(' ')
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) ?? '??';
+  const initials =
+    user?.name
+      ?.split(' ')
+      .map((w) => w[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) ?? '??';
 
   return (
     <Section title={t('settings.profile')} icon="person" delay={0.05}>
@@ -251,14 +259,24 @@ function ProfileSection() {
                 className="bg-transparent font-medium text-sm outline-none border-b border-brand/40 py-0.5 w-full"
                 autoFocus
               />
-              <button onClick={handleNameSave} className="icon text-brand text-lg shrink-0">check</button>
-              <button onClick={() => setEditingName(false)} className="icon text-text-muted text-lg shrink-0">close</button>
+              <button onClick={handleNameSave} className="icon text-brand text-lg shrink-0">
+                check
+              </button>
+              <button
+                onClick={() => setEditingName(false)}
+                className="icon text-text-muted text-lg shrink-0"
+              >
+                close
+              </button>
             </div>
           ) : (
             <div className="flex items-center gap-1.5">
               <p className="font-medium truncate">{user?.name}</p>
               <button
-                onClick={() => { setEditingName(true); setNameValue(user?.name ?? ''); }}
+                onClick={() => {
+                  setEditingName(true);
+                  setNameValue(user?.name ?? '');
+                }}
                 className="icon text-text-muted text-sm hover:text-brand transition-colors shrink-0"
               >
                 edit
@@ -284,14 +302,22 @@ function ProfileSection() {
       {/* Action Buttons */}
       <div className="flex gap-2">
         <button
-          onClick={() => { setShowEmailModal(true); setEmailForm({ newEmail: '', password: '' }); setEmailError(''); }}
+          onClick={() => {
+            setShowEmailModal(true);
+            setEmailForm({ newEmail: '', password: '' });
+            setEmailError('');
+          }}
           className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-surface-elevated rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
         >
           <span className="icon text-base">mail</span>
           {t('settings.changeEmail')}
         </button>
         <button
-          onClick={() => { setShowPasswordModal(true); setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); setPasswordError(''); }}
+          onClick={() => {
+            setShowPasswordModal(true);
+            setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            setPasswordError('');
+          }}
           className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-surface-elevated rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
         >
           <span className="icon text-base">lock</span>
@@ -300,24 +326,33 @@ function ProfileSection() {
       </div>
 
       {/* Change Email Modal */}
-      <Modal isOpen={showEmailModal} onClose={() => setShowEmailModal(false)} title={t('settings.changeEmail')} size="sm">
+      <Modal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        title={t('settings.changeEmail')}
+        size="sm"
+      >
         <div className="space-y-3">
           <Input
             label={t('settings.newEmail')}
             type="email"
             value={emailForm.newEmail}
-            onChange={(e) => { setEmailForm((f) => ({ ...f, newEmail: e.target.value })); setEmailError(''); }}
+            onChange={(e) => {
+              setEmailForm((f) => ({ ...f, newEmail: e.target.value }));
+              setEmailError('');
+            }}
             placeholder="nuova@email.com"
           />
           <Input
             label={t('settings.confirmWithPassword')}
             type="password"
             value={emailForm.password}
-            onChange={(e) => { setEmailForm((f) => ({ ...f, password: e.target.value })); setEmailError(''); }}
+            onChange={(e) => {
+              setEmailForm((f) => ({ ...f, password: e.target.value }));
+              setEmailError('');
+            }}
           />
-          {emailError && (
-            <p className="text-sm text-negative font-medium">{emailError}</p>
-          )}
+          {emailError && <p className="text-sm text-negative font-medium">{emailError}</p>}
           <div className="flex gap-2 pt-1">
             <button
               onClick={() => setShowEmailModal(false)}
@@ -337,29 +372,41 @@ function ProfileSection() {
       </Modal>
 
       {/* Change Password Modal */}
-      <Modal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} title={t('settings.changePassword')} size="sm">
+      <Modal
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        title={t('settings.changePassword')}
+        size="sm"
+      >
         <div className="space-y-3">
           <Input
             label={t('settings.currentPassword')}
             type="password"
             value={passwordForm.currentPassword}
-            onChange={(e) => { setPasswordForm((f) => ({ ...f, currentPassword: e.target.value })); setPasswordError(''); }}
+            onChange={(e) => {
+              setPasswordForm((f) => ({ ...f, currentPassword: e.target.value }));
+              setPasswordError('');
+            }}
           />
           <Input
             label={t('settings.newPassword')}
             type="password"
             value={passwordForm.newPassword}
-            onChange={(e) => { setPasswordForm((f) => ({ ...f, newPassword: e.target.value })); setPasswordError(''); }}
+            onChange={(e) => {
+              setPasswordForm((f) => ({ ...f, newPassword: e.target.value }));
+              setPasswordError('');
+            }}
           />
           <Input
             label={t('settings.confirmNewPassword')}
             type="password"
             value={passwordForm.confirmPassword}
-            onChange={(e) => { setPasswordForm((f) => ({ ...f, confirmPassword: e.target.value })); setPasswordError(''); }}
+            onChange={(e) => {
+              setPasswordForm((f) => ({ ...f, confirmPassword: e.target.value }));
+              setPasswordError('');
+            }}
           />
-          {passwordError && (
-            <p className="text-sm text-negative font-medium">{passwordError}</p>
-          )}
+          {passwordError && <p className="text-sm text-negative font-medium">{passwordError}</p>}
           <div className="flex gap-2 pt-1">
             <button
               onClick={() => setShowPasswordModal(false)}
@@ -369,7 +416,12 @@ function ProfileSection() {
             </button>
             <button
               onClick={handlePasswordChange}
-              disabled={!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword || changePassword.isPending}
+              disabled={
+                !passwordForm.currentPassword ||
+                !passwordForm.newPassword ||
+                !passwordForm.confirmPassword ||
+                changePassword.isPending
+              }
               className="flex-1 py-2.5 rounded-lg bg-brand text-surface-base text-sm font-medium disabled:opacity-50 transition-opacity"
             >
               {t('common.save')}
@@ -515,23 +567,40 @@ function IncomeSourcesSection() {
                         className="flex-1 bg-transparent text-sm outline-none border-b border-brand/40 py-0.5"
                         autoFocus
                       />
-                      <button onClick={() => handleUpdate(source.id)} className="icon text-brand text-lg">check</button>
-                      <button onClick={() => setEditingId(null)} className="icon text-text-muted text-lg">close</button>
+                      <button
+                        onClick={() => handleUpdate(source.id)}
+                        className="icon text-brand text-lg"
+                      >
+                        check
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="icon text-text-muted text-lg"
+                      >
+                        close
+                      </button>
                     </>
                   ) : (
                     <>
-                      <span className={`flex-1 text-sm ${!source.isActive ? 'text-text-muted line-through' : ''}`}>
+                      <span
+                        className={`flex-1 text-sm ${!source.isActive ? 'text-text-muted line-through' : ''}`}
+                      >
                         {source.name}
                       </span>
                       <button
                         onClick={() => handleToggle(source.id, source.isActive)}
                         className={`icon text-lg ${source.isActive ? 'text-brand' : 'text-text-muted'}`}
-                        title={source.isActive ? t('incomeSources.active') : t('incomeSources.inactive')}
+                        title={
+                          source.isActive ? t('incomeSources.active') : t('incomeSources.inactive')
+                        }
                       >
                         {source.isActive ? 'toggle_on' : 'toggle_off'}
                       </button>
                       <button
-                        onClick={() => { setEditingId(source.id); setEditName(source.name); }}
+                        onClick={() => {
+                          setEditingId(source.id);
+                          setEditName(source.name);
+                        }}
                         className="icon text-text-muted text-lg hover:text-text-primary"
                       >
                         edit
@@ -675,11 +744,16 @@ function DataManagementSection() {
       const base64 = btoa(
         new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''),
       );
-      const res = await api.post<{ imported: number; skipped: number }>('/data/import', { fileBase64: base64 });
+      const res = await api.post<{ imported: number; skipped: number }>('/data/import', {
+        fileBase64: base64,
+      });
       if (res.success && res.data) {
         addToast({
           type: 'success',
-          message: t('settings.importSuccess', { imported: String(res.data.imported), skipped: String(res.data.skipped) }),
+          message: t('settings.importSuccess', {
+            imported: String(res.data.imported),
+            skipped: String(res.data.skipped),
+          }),
         });
       } else {
         addToast({ type: 'error', message: res.error ?? t('settings.importError') });
@@ -749,7 +823,15 @@ function DataManagementSection() {
       </div>
 
       {/* Reset Confirmation Modal */}
-      <Modal isOpen={showResetModal} onClose={() => { setShowResetModal(false); setResetInput(''); }} title={t('settings.resetData')} size="sm">
+      <Modal
+        isOpen={showResetModal}
+        onClose={() => {
+          setShowResetModal(false);
+          setResetInput('');
+        }}
+        title={t('settings.resetData')}
+        size="sm"
+      >
         <div className="space-y-4">
           <p className="text-sm text-negative">{t('settings.resetWarning')}</p>
           <Input
@@ -760,7 +842,10 @@ function DataManagementSection() {
           />
           <div className="flex gap-2">
             <button
-              onClick={() => { setShowResetModal(false); setResetInput(''); }}
+              onClick={() => {
+                setShowResetModal(false);
+                setResetInput('');
+              }}
               className="flex-1 py-2.5 rounded-lg bg-surface-elevated text-text-secondary text-sm font-medium"
             >
               Cancel

@@ -13,18 +13,20 @@ export const loginSchema = z.object({
   password: z.string().min(8).max(128),
 });
 
-export const registerSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email(),
-  password: z.string().min(8).max(128),
-  confirmPassword: z.string(),
-  inviteCode: z.string().min(1),
-  language: z.enum(['it', 'en']).default('it'),
-  currency: z.enum(['EUR', 'GBP', 'USD']).default('EUR'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Le password non corrispondono',
-  path: ['confirmPassword'],
-});
+export const registerSchema = z
+  .object({
+    name: z.string().min(2).max(100),
+    email: z.string().email(),
+    password: z.string().min(8).max(128),
+    confirmPassword: z.string(),
+    inviteCode: z.string().min(1),
+    language: z.enum(['it', 'en']).default('it'),
+    currency: z.enum(['EUR', 'GBP', 'USD']).default('EUR'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Le password non corrispondono',
+    path: ['confirmPassword'],
+  });
 
 export const updateProfileSchema = z.object({
   name: z.string().min(2).max(100).optional(),
@@ -32,14 +34,19 @@ export const updateProfileSchema = z.object({
   currency: z.enum(['EUR', 'GBP', 'USD']).optional(),
 });
 
-export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'La password attuale è obbligatoria'),
-  newPassword: z.string().min(8, 'La nuova password deve avere almeno 8 caratteri').max(128, 'La password è troppo lunga'),
-  confirmPassword: z.string(),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Le password non corrispondono',
-  path: ['confirmPassword'],
-});
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'La password attuale è obbligatoria'),
+    newPassword: z
+      .string()
+      .min(8, 'La nuova password deve avere almeno 8 caratteri')
+      .max(128, 'La password è troppo lunga'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Le password non corrispondono',
+    path: ['confirmPassword'],
+  });
 
 export const changeEmailSchema = z.object({
   newEmail: z.string().email('Indirizzo email non valido'),
@@ -50,14 +57,16 @@ export const forgotPasswordSchema = z.object({
   email: z.string().email(),
 });
 
-export const resetPasswordSchema = z.object({
-  token: z.string(),
-  password: z.string().min(8).max(128),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Le password non corrispondono',
-  path: ['confirmPassword'],
-});
+export const resetPasswordSchema = z
+  .object({
+    token: z.string(),
+    password: z.string().min(8).max(128),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Le password non corrispondono',
+    path: ['confirmPassword'],
+  });
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;

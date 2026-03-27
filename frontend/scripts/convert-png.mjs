@@ -18,10 +18,7 @@ const conversions = [
 ];
 
 for (const { input, output, size } of conversions) {
-  await sharp(resolve(PUBLIC, input))
-    .resize(size, size)
-    .png()
-    .toFile(resolve(PUBLIC, output));
+  await sharp(resolve(PUBLIC, input)).resize(size, size).png().toFile(resolve(PUBLIC, output));
   console.log(`✓ ${output}`);
 }
 

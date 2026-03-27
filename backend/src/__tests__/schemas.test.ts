@@ -63,7 +63,9 @@ describe('registerSchema', () => {
   });
 
   it('rejects mismatching passwords', () => {
-    expect(registerSchema.safeParse({ ...validData, confirmPassword: 'other' }).success).toBe(false);
+    expect(registerSchema.safeParse({ ...validData, confirmPassword: 'other' }).success).toBe(
+      false,
+    );
   });
 
   it('rejects short name', () => {
@@ -193,7 +195,9 @@ describe('createEntrySchema', () => {
   });
 
   it('rejects missing date', () => {
-    expect(createEntrySchema.safeParse({ balances: valid.balances, incomes: valid.incomes }).success).toBe(false);
+    expect(
+      createEntrySchema.safeParse({ balances: valid.balances, incomes: valid.incomes }).success,
+    ).toBe(false);
   });
 });
 
@@ -288,12 +292,18 @@ describe('adminUpdateUserSchema', () => {
 
 describe('createAccountSchema — color validation', () => {
   it('accepts valid hex color', () => {
-    expect(createAccountSchema.safeParse({ name: 'Test', type: 'MAIN', color: '#FF00AA' }).success).toBe(true);
+    expect(
+      createAccountSchema.safeParse({ name: 'Test', type: 'MAIN', color: '#FF00AA' }).success,
+    ).toBe(true);
   });
 
   it('rejects invalid hex color', () => {
-    expect(createAccountSchema.safeParse({ name: 'Test', type: 'MAIN', color: 'red' }).success).toBe(false);
-    expect(createAccountSchema.safeParse({ name: 'Test', type: 'MAIN', color: '#GGG' }).success).toBe(false);
+    expect(
+      createAccountSchema.safeParse({ name: 'Test', type: 'MAIN', color: 'red' }).success,
+    ).toBe(false);
+    expect(
+      createAccountSchema.safeParse({ name: 'Test', type: 'MAIN', color: '#GGG' }).success,
+    ).toBe(false);
   });
 
   it('defaults type to MAIN', () => {
@@ -307,23 +317,32 @@ describe('createAccountSchema — color validation', () => {
 
 describe('reorderAccountsSchema', () => {
   it('accepts valid reorder', () => {
-    expect(reorderAccountsSchema.safeParse({
-      accounts: [{ id: 'a1', sortOrder: 0 }, { id: 'a2', sortOrder: 1 }],
-    }).success).toBe(true);
+    expect(
+      reorderAccountsSchema.safeParse({
+        accounts: [
+          { id: 'a1', sortOrder: 0 },
+          { id: 'a2', sortOrder: 1 },
+        ],
+      }).success,
+    ).toBe(true);
   });
 
   it('rejects negative sortOrder', () => {
-    expect(reorderAccountsSchema.safeParse({
-      accounts: [{ id: 'a1', sortOrder: -1 }],
-    }).success).toBe(false);
+    expect(
+      reorderAccountsSchema.safeParse({
+        accounts: [{ id: 'a1', sortOrder: -1 }],
+      }).success,
+    ).toBe(false);
   });
 });
 
 describe('reorderIncomeSourcesSchema', () => {
   it('accepts valid reorder', () => {
-    expect(reorderIncomeSourcesSchema.safeParse({
-      sources: [{ id: 's1', sortOrder: 0 }],
-    }).success).toBe(true);
+    expect(
+      reorderIncomeSourcesSchema.safeParse({
+        sources: [{ id: 's1', sortOrder: 0 }],
+      }).success,
+    ).toBe(true);
   });
 });
 
@@ -333,24 +352,30 @@ describe('createEntrySchema — date validation', () => {
   it('rejects future date', () => {
     const futureDate = new Date();
     futureDate.setFullYear(futureDate.getFullYear() + 1);
-    expect(createEntrySchema.safeParse({
-      date: futureDate.toISOString().slice(0, 10),
-      balances: [{ accountId: 'a1', amount: 100 }],
-    }).success).toBe(false);
+    expect(
+      createEntrySchema.safeParse({
+        date: futureDate.toISOString().slice(0, 10),
+        balances: [{ accountId: 'a1', amount: 100 }],
+      }).success,
+    ).toBe(false);
   });
 
   it('rejects invalid date string', () => {
-    expect(createEntrySchema.safeParse({
-      date: 'not-a-date',
-      balances: [{ accountId: 'a1', amount: 100 }],
-    }).success).toBe(false);
+    expect(
+      createEntrySchema.safeParse({
+        date: 'not-a-date',
+        balances: [{ accountId: 'a1', amount: 100 }],
+      }).success,
+    ).toBe(false);
   });
 
   it('rejects negative balance amount', () => {
-    expect(createEntrySchema.safeParse({
-      date: '2025-01-01',
-      balances: [{ accountId: 'a1', amount: -100 }],
-    }).success).toBe(false);
+    expect(
+      createEntrySchema.safeParse({
+        date: '2025-01-01',
+        balances: [{ accountId: 'a1', amount: -100 }],
+      }).success,
+    ).toBe(false);
   });
 
   it('accepts notes', () => {
@@ -363,10 +388,12 @@ describe('createEntrySchema — date validation', () => {
   });
 
   it('rejects notes over 1000 chars', () => {
-    expect(createEntrySchema.safeParse({
-      date: '2025-01-01',
-      balances: [{ accountId: 'a1', amount: 100 }],
-      notes: 'x'.repeat(1001),
-    }).success).toBe(false);
+    expect(
+      createEntrySchema.safeParse({
+        date: '2025-01-01',
+        balances: [{ accountId: 'a1', amount: 100 }],
+        notes: 'x'.repeat(1001),
+      }).success,
+    ).toBe(false);
   });
 });

@@ -1,5 +1,9 @@
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
-import { createIncomeSourceSchema, updateIncomeSourceSchema, reorderIncomeSourcesSchema } from '@salvadash/shared';
+import {
+  createIncomeSourceSchema,
+  updateIncomeSourceSchema,
+  reorderIncomeSourcesSchema,
+} from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -37,7 +41,9 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = createIncomeSourceSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 
@@ -67,7 +73,9 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error: any) {
     if (error?.code === 'P2002') {
-      res.status(409).json({ success: false, error: 'An income source with this name already exists' });
+      res
+        .status(409)
+        .json({ success: false, error: 'An income source with this name already exists' });
       return;
     }
     console.error('POST /income-sources error:', error);
@@ -81,7 +89,9 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = updateIncomeSourceSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 
@@ -113,7 +123,9 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error: any) {
     if (error?.code === 'P2002') {
-      res.status(409).json({ success: false, error: 'An income source with this name already exists' });
+      res
+        .status(409)
+        .json({ success: false, error: 'An income source with this name already exists' });
       return;
     }
     console.error('PUT /income-sources/:id error:', error);
@@ -161,7 +173,9 @@ router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = reorderIncomeSourcesSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 

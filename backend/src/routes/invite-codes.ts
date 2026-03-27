@@ -16,7 +16,9 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = createInviteCodeSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
       return;
     }
 

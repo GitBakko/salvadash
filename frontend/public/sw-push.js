@@ -22,9 +22,7 @@ self.addEventListener('push', (event) => {
     },
   };
 
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'SalvaDash', options)
-  );
+  event.waitUntil(self.registration.showNotification(data.title || 'SalvaDash', options));
 });
 
 self.addEventListener('notificationclick', (event) => {
@@ -43,6 +41,6 @@ self.addEventListener('notificationclick', (event) => {
       }
       // Open new window
       return self.clients.openWindow(url);
-    })
+    }),
   );
 });

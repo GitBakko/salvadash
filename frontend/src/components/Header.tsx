@@ -38,7 +38,11 @@ export function Header() {
             </button>
 
             {isAdmin && (
-              <Link to="/admin" className="text-gold hover:text-gold/80 transition-colors" aria-label="Admin Dashboard">
+              <Link
+                to="/admin"
+                className="text-gold hover:text-gold/80 transition-colors"
+                aria-label="Admin Dashboard"
+              >
                 <span className="icon text-xl">shield</span>
               </Link>
             )}
@@ -48,9 +52,7 @@ export function Header() {
 
       {/* Notification Center Sheet */}
       <AnimatePresence>
-        {showNotifications && (
-          <NotificationCenter onClose={() => setShowNotifications(false)} />
-        )}
+        {showNotifications && <NotificationCenter onClose={() => setShowNotifications(false)} />}
       </AnimatePresence>
     </>
   );

@@ -30,7 +30,9 @@ export function startBackupScheduler(): void {
 
     try {
       const maintenance = await runDbMaintenance();
-      console.log(`[backup-scheduler] DB maintenance: vacuum=${maintenance.vacuum} analyze=${maintenance.analyze} reindex=${maintenance.reindex}`);
+      console.log(
+        `[backup-scheduler] DB maintenance: vacuum=${maintenance.vacuum} analyze=${maintenance.analyze} reindex=${maintenance.reindex}`,
+      );
     } catch (err) {
       console.error('[backup-scheduler] DB maintenance failed:', err);
     }

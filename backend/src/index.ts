@@ -12,10 +12,12 @@ export const app: Express = express();
 
 // ─── Middleware ─────────────────────────────────────────────
 app.use(helmet());
-app.use(cors({
-  origin: config.appUrl,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: config.appUrl,
+    credentials: true,
+  }),
+);
 app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());

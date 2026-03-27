@@ -26,12 +26,13 @@ export function BottomNav() {
   const avatarUrl = useAuthStore((s) => s.user?.avatarUrl);
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-40 glass-card border-t border-border-default" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav
+      className="fixed bottom-0 inset-x-0 z-40 glass-card border-t border-border-default"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <div className="flex items-center justify-around max-w-lg mx-auto h-16 relative">
         {navItems.map((item) => {
-          const isActive = item.path === '/'
-            ? pathname === '/'
-            : pathname.startsWith(item.path);
+          const isActive = item.path === '/' ? pathname === '/' : pathname.startsWith(item.path);
 
           if (item.isFab) {
             return (
@@ -69,11 +70,15 @@ export function BottomNav() {
                   className={`w-[22px] h-[22px] rounded-full object-cover transition-all duration-200 ${isActive ? 'ring-2 ring-brand' : 'opacity-70'}`}
                 />
               ) : (
-                <span className={`icon text-[22px] transition-colors duration-200 ${isActive ? 'text-brand' : 'text-text-muted'}`}>
+                <span
+                  className={`icon text-[22px] transition-colors duration-200 ${isActive ? 'text-brand' : 'text-text-muted'}`}
+                >
                   {item.icon}
                 </span>
               )}
-              <span className={`text-[10px] font-medium transition-colors duration-200 ${isActive ? 'text-brand' : 'text-text-muted'}`}>
+              <span
+                className={`text-[10px] font-medium transition-colors duration-200 ${isActive ? 'text-brand' : 'text-text-muted'}`}
+              >
                 {t(item.labelKey)}
               </span>
             </button>

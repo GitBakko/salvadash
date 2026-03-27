@@ -83,10 +83,10 @@ self.addEventListener('fetch', (event) => {
       }
 
       // Return synthetic response so the UI knows it's queued
-      return new Response(
-        JSON.stringify({ success: true, queued: true }),
-        { status: 202, headers: { 'Content-Type': 'application/json' } },
-      );
+      return new Response(JSON.stringify({ success: true, queued: true }), {
+        status: 202,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }),
   );
 });

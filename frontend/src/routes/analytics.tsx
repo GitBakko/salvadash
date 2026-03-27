@@ -3,8 +3,21 @@ import { useTranslation } from 'react-i18next';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
-  AreaChart, Area, LineChart, Line, PieChart, Pie, Cell,
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+  AreaChart,
+  Area,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
 } from 'recharts';
 import type { AnalyticsData } from '@salvadash/shared';
 import { useAnalytics } from '../hooks/queries';
@@ -19,7 +32,16 @@ export const Route = createFileRoute('/analytics')({
 
 const BRAND = '#00d4a0';
 const GOLD = '#ffd166';
-const CHART_COLORS = ['#00d4a0', '#ffd166', '#6c63ff', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f093fb', '#feca57'];
+const CHART_COLORS = [
+  '#00d4a0',
+  '#ffd166',
+  '#6c63ff',
+  '#ff6b6b',
+  '#4ecdc4',
+  '#45b7d1',
+  '#f093fb',
+  '#feca57',
+];
 const YEAR_COLORS = ['#00d4a0', '#ffd166', '#6c63ff', '#ff6b6b', '#4ecdc4', '#45b7d1'];
 
 // ─── Utilities ─────────────────────────────────────────────
@@ -34,7 +56,20 @@ function formatMonthLong(dateStr: string): string {
   return d.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 }
 
-const MONTH_LABELS = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+const MONTH_LABELS = [
+  'Gen',
+  'Feb',
+  'Mar',
+  'Apr',
+  'Mag',
+  'Giu',
+  'Lug',
+  'Ago',
+  'Set',
+  'Ott',
+  'Nov',
+  'Dic',
+];
 
 // ─── Custom Tooltip ────────────────────────────────────────
 
@@ -114,7 +149,15 @@ function AnalyticsPage() {
 
 // ─── Chart Section Wrapper ─────────────────────────────────
 
-function ChartSection({ title, delay, children }: { title: string; delay: number; children: React.ReactNode }) {
+function ChartSection({
+  title,
+  delay,
+  children,
+}: {
+  title: string;
+  delay: number;
+  children: React.ReactNode;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -122,7 +165,9 @@ function ChartSection({ title, delay, children }: { title: string; delay: number
       transition={{ delay }}
     >
       <Card className="p-4 overflow-hidden">
-        <p className="text-text-muted text-[10px] uppercase tracking-wider mb-3 font-semibold">{title}</p>
+        <p className="text-text-muted text-[10px] uppercase tracking-wider mb-3 font-semibold">
+          {title}
+        </p>
         {children}
       </Card>
     </motion.div>
@@ -145,8 +190,19 @@ function PatrimonyChart({ data }: { data: AnalyticsData['patrimonyOverTime'] }) 
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-          <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#666' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: '#666' }} tickLine={false} axisLine={false} tickFormatter={(v) => fmtCurrencyCompact(v)} width={55} />
+          <XAxis
+            dataKey="label"
+            tick={{ fontSize: 10, fill: '#666' }}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: '#666' }}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(v) => fmtCurrencyCompact(v)}
+            width={55}
+          />
           <Tooltip content={<ChartTooltip />} />
           <Area
             type="monotone"
@@ -228,23 +284,36 @@ function YearComparisonChart({ data }: { data: AnalyticsData['yearComparison'] }
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-            <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#666' }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: '#666' }} tickLine={false} axisLine={false} tickFormatter={(v) => fmtCurrencyCompact(v)} width={55} />
+            <XAxis
+              dataKey="month"
+              tick={{ fontSize: 10, fill: '#666' }}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              tick={{ fontSize: 10, fill: '#666' }}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(v) => fmtCurrencyCompact(v)}
+              width={55}
+            />
             <Tooltip content={<ChartTooltip />} />
-            {years.filter((y) => activeYears.has(y)).map((year, i) => (
-              <Line
-                key={year}
-                type="monotone"
-                dataKey={year}
-                name={year}
-                stroke={YEAR_COLORS[years.indexOf(year) % YEAR_COLORS.length]}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, strokeWidth: 2 }}
-                connectNulls
-                animationDuration={800}
-              />
-            ))}
+            {years
+              .filter((y) => activeYears.has(y))
+              .map((year, i) => (
+                <Line
+                  key={year}
+                  type="monotone"
+                  dataKey={year}
+                  name={year}
+                  stroke={YEAR_COLORS[years.indexOf(year) % YEAR_COLORS.length]}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 4, strokeWidth: 2 }}
+                  connectNulls
+                  animationDuration={800}
+                />
+              ))}
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -303,9 +372,14 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
             onMouseEnter={() => setActiveIndex(i)}
             onMouseLeave={() => setActiveIndex(null)}
           >
-            <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.fill }} />
+            <div
+              className="w-2.5 h-2.5 rounded-full shrink-0"
+              style={{ backgroundColor: d.fill }}
+            />
             <span className="text-text-secondary truncate flex-1">{d.name}</span>
-            <span className="font-semibold text-text-primary shrink-0">{d.percent.toFixed(1)}%</span>
+            <span className="font-semibold text-text-primary shrink-0">
+              {d.percent.toFixed(1)}%
+            </span>
           </div>
         ))}
       </div>
@@ -344,8 +418,19 @@ function IncomeBarChart({ data }: { data: AnalyticsData['monthlyIncome'] }) {
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-          <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#666' }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: '#666' }} tickLine={false} axisLine={false} tickFormatter={(v) => fmtCurrencyCompact(v)} width={55} />
+          <XAxis
+            dataKey="label"
+            tick={{ fontSize: 10, fill: '#666' }}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            tick={{ fontSize: 10, fill: '#666' }}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(v) => fmtCurrencyCompact(v)}
+            width={55}
+          />
           <Tooltip content={<ChartTooltip />} />
           {allSources.map((name, i) => (
             <Bar
@@ -409,12 +494,12 @@ function PerformanceGrid({ data, t }: { data: AnalyticsData; t: (k: string) => s
         >
           <div className="flex items-center gap-1.5 mb-1">
             <span className={`icon text-base ${item.color}`}>{item.icon}</span>
-            <span className="text-text-muted text-[10px] uppercase tracking-wider">{item.label}</span>
+            <span className="text-text-muted text-[10px] uppercase tracking-wider">
+              {item.label}
+            </span>
           </div>
           <p className="font-heading text-sm font-bold capitalize">{item.value}</p>
-          {item.sub && (
-            <p className={`text-xs ${item.color} font-semibold mt-0.5`}>{item.sub}</p>
-          )}
+          {item.sub && <p className={`text-xs ${item.color} font-semibold mt-0.5`}>{item.sub}</p>}
         </motion.div>
       ))}
     </div>

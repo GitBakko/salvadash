@@ -19,9 +19,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="relative">
           {icon && (
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
-              {icon}
-            </span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">{icon}</span>
           )}
           <input
             ref={ref}
@@ -41,9 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
         </div>
-        {error && (
-          <p className="text-xs text-negative">{error}</p>
-        )}
+        {error && <p className="text-xs text-negative">{error}</p>}
       </div>
     );
   },

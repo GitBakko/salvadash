@@ -2,7 +2,12 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAccounts, useIncomeSources, useCreateEntry, useCreateIncomeSource } from '../hooks/queries';
+import {
+  useAccounts,
+  useIncomeSources,
+  useCreateEntry,
+  useCreateIncomeSource,
+} from '../hooks/queries';
 import { Button, Input, Card } from '../components/ui';
 import { fmtCurrency } from '../lib/format';
 
@@ -42,10 +47,7 @@ function NewEntryPage() {
   const [newSourceName, setNewSourceName] = useState('');
   const [showNewSource, setShowNewSource] = useState(false);
 
-  const activeAccounts = useMemo(
-    () => (accounts ?? []).filter((a) => a.isActive),
-    [accounts],
-  );
+  const activeAccounts = useMemo(() => (accounts ?? []).filter((a) => a.isActive), [accounts]);
 
   // Live total calculation
   const liveTotal = useMemo(() => {
@@ -108,9 +110,7 @@ function NewEntryPage() {
   };
 
   const updateIncomeRow = (index: number, field: keyof IncomeRow, value: string) => {
-    setIncomeRows((prev) =>
-      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row)),
-    );
+    setIncomeRows((prev) => prev.map((row, i) => (i === index ? { ...row, [field]: value } : row)));
   };
 
   const removeIncomeRow = (index: number) => {
@@ -176,9 +176,7 @@ function NewEntryPage() {
                 <span className="icon text-sm align-middle mr-1">account_balance_wallet</span>
                 {t('entries.balances')}
               </p>
-              {errors.balances && (
-                <p className="text-xs text-negative mb-2">{errors.balances}</p>
-              )}
+              {errors.balances && <p className="text-xs text-negative mb-2">{errors.balances}</p>}
               <div className="space-y-2.5">
                 {activeAccounts.map((account, i) => (
                   <motion.div
@@ -198,9 +196,7 @@ function NewEntryPage() {
                           {account.icon}
                         </span>
                       )}
-                      <span className="text-sm text-text-secondary truncate">
-                        {account.name}
-                      </span>
+                      <span className="text-sm text-text-secondary truncate">{account.name}</span>
                     </div>
                     <div className="flex-1">
                       <input
@@ -263,9 +259,13 @@ function NewEntryPage() {
                         transition-all duration-200"
                     >
                       <option value="">{t('entries.selectSource')}</option>
-                      {(incomeSources ?? []).filter((s) => s.isActive).map((s) => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
-                      ))}
+                      {(incomeSources ?? [])
+                        .filter((s) => s.isActive)
+                        .map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
                     </select>
                     <input
                       type="number"
@@ -321,7 +321,10 @@ function NewEntryPage() {
                     <span className="icon text-lg">check</span>
                   </button>
                   <button
-                    onClick={() => { setShowNewSource(false); setNewSourceName(''); }}
+                    onClick={() => {
+                      setShowNewSource(false);
+                      setNewSourceName('');
+                    }}
                     className="shrink-0 w-8 h-8 flex items-center justify-center text-text-muted hover:text-negative transition-colors"
                   >
                     <span className="icon text-lg">close</span>
@@ -379,8 +382,12 @@ function NewEntryPage() {
             {/* Live total card */}
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-text-muted text-xs uppercase tracking-wider">{t('entries.liveTotal')}</p>
-                <p className="font-heading text-2xl font-bold text-gold">{fmtCurrency(liveTotal)}</p>
+                <p className="text-text-muted text-xs uppercase tracking-wider">
+                  {t('entries.liveTotal')}
+                </p>
+                <p className="font-heading text-2xl font-bold text-gold">
+                  {fmtCurrency(liveTotal)}
+                </p>
               </div>
               {totalIncome > 0 && (
                 <div className="text-right">
@@ -390,12 +397,7 @@ function NewEntryPage() {
               )}
             </div>
 
-            <Button
-              fullWidth
-              size="lg"
-              onClick={handleSubmit}
-              loading={createEntry.isPending}
-            >
+            <Button fullWidth size="lg" onClick={handleSubmit} loading={createEntry.isPending}>
               <span className="icon text-lg">save</span>
               {t('entries.saveEntry')}
             </Button>

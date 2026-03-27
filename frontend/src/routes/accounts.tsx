@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { motion, Reorder, AnimatePresence } from 'framer-motion';
 import type { AccountPublic } from '@salvadash/shared';
-import { useAccounts, useDeleteAccount, useUpdateAccount, useReorderAccounts } from '../hooks/queries';
+import {
+  useAccounts,
+  useDeleteAccount,
+  useUpdateAccount,
+  useReorderAccounts,
+} from '../hooks/queries';
 import { useUIStore } from '../stores/ui-store';
 import { Button, Card, Skeleton } from '../components/ui';
 import { AccountFormModal } from '../components/AccountFormModal';
@@ -15,8 +20,16 @@ export const Route = createFileRoute('/accounts')({
 // ─── Color palette for accounts ────────────────────────────
 
 const ACCOUNT_COLORS = [
-  '#00d4a0', '#4d9fff', '#ffd166', '#a78bfa', '#ff4567',
-  '#f472b6', '#38bdf8', '#facc15', '#34d399', '#fb923c',
+  '#00d4a0',
+  '#4d9fff',
+  '#ffd166',
+  '#a78bfa',
+  '#ff4567',
+  '#f472b6',
+  '#38bdf8',
+  '#facc15',
+  '#34d399',
+  '#fb923c',
 ];
 
 function getAccountColor(account: AccountPublic, index: number): string {
@@ -131,10 +144,7 @@ function AccountsPage() {
 
         <AnimatePresence>
           {showForm && (
-            <AccountFormModal
-              account={editingAccount}
-              onClose={() => setShowForm(false)}
-            />
+            <AccountFormModal account={editingAccount} onClose={() => setShowForm(false)} />
           )}
         </AnimatePresence>
       </div>
@@ -184,10 +194,7 @@ function AccountsPage() {
       {/* Form modal */}
       <AnimatePresence>
         {showForm && (
-          <AccountFormModal
-            account={editingAccount}
-            onClose={() => setShowForm(false)}
-          />
+          <AccountFormModal account={editingAccount} onClose={() => setShowForm(false)} />
         )}
       </AnimatePresence>
     </div>
@@ -205,7 +212,14 @@ interface AccountCardProps {
   isDeleting: boolean;
 }
 
-function AccountCard({ account, color, onEdit, onDelete, onToggleActive, isDeleting }: AccountCardProps) {
+function AccountCard({
+  account,
+  color,
+  onEdit,
+  onDelete,
+  onToggleActive,
+  isDeleting,
+}: AccountCardProps) {
   const { t } = useTranslation();
 
   return (
@@ -213,7 +227,9 @@ function AccountCard({ account, color, onEdit, onDelete, onToggleActive, isDelet
       <div className="flex items-center gap-3">
         {/* Drag handle + color indicator */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="icon text-text-muted text-lg cursor-grab active:cursor-grabbing">drag_indicator</span>
+          <span className="icon text-text-muted text-lg cursor-grab active:cursor-grabbing">
+            drag_indicator
+          </span>
           <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
         </div>
 

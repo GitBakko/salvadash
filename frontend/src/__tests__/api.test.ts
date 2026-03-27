@@ -24,10 +24,13 @@ describe('API client', () => {
       });
 
       const result = await api.get('/accounts');
-      expect(mockFetch).toHaveBeenCalledWith('/api/accounts', expect.objectContaining({
-        method: 'GET',
-        credentials: 'include',
-      }));
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/accounts',
+        expect.objectContaining({
+          method: 'GET',
+          credentials: 'include',
+        }),
+      );
       expect(result).toEqual({ success: true, data: [1, 2] });
     });
 
@@ -109,11 +112,23 @@ describe('API client', () => {
     it('refreshes token and retries on 401', async () => {
       // First call: 401
       mockFetch
-        .mockResolvedValueOnce({ ok: false, status: 401, json: () => Promise.resolve({ success: false }) })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          json: () => Promise.resolve({ success: false }),
+        })
         // Refresh call: success
-        .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true }) })
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ success: true }),
+        })
         // Retry original: success
-        .mockResolvedValueOnce({ ok: true, status: 200, json: () => Promise.resolve({ success: true, data: 'retried' }) });
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ success: true, data: 'retried' }),
+        });
 
       const result = await api.get('/accounts');
       expect(mockFetch).toHaveBeenCalledTimes(3);
@@ -135,8 +150,16 @@ describe('API client', () => {
 
     it('returns error when refresh fails', async () => {
       mockFetch
-        .mockResolvedValueOnce({ ok: false, status: 401, json: () => Promise.resolve({ success: false }) })
-        .mockResolvedValueOnce({ ok: false, status: 401, json: () => Promise.resolve({ success: false }) }); // refresh fails
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          json: () => Promise.resolve({ success: false }),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          json: () => Promise.resolve({ success: false }),
+        }); // refresh fails
 
       const result = await api.get('/accounts');
       expect(mockFetch).toHaveBeenCalledTimes(2); // original + refresh, no retry

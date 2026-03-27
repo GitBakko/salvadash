@@ -108,7 +108,11 @@ router.post('/import', async (req: Request, res: Response): Promise<void> => {
             const d = new Date((rawDate - 25569) * 86400 * 1000);
             entryDate = d;
           } else {
-            entryDate = new Date((entryDate as any).y, (entryDate as any).m - 1, (entryDate as any).d);
+            entryDate = new Date(
+              (entryDate as any).y,
+              (entryDate as any).m - 1,
+              (entryDate as any).d,
+            );
           }
         } else if (typeof rawDate === 'string') {
           entryDate = new Date(rawDate);
@@ -217,7 +221,14 @@ router.get('/export/csv', async (req: Request, res: Response): Promise<void> => 
     const sortedSources = [...sourceNames].sort();
 
     // Build CSV
-    const headers = ['Date', ...sortedAccounts, 'TOTAL', ...sortedSources.map((s) => `Income: ${s}`), 'Total Income', 'Notes'];
+    const headers = [
+      'Date',
+      ...sortedAccounts,
+      'TOTAL',
+      ...sortedSources.map((s) => `Income: ${s}`),
+      'Total Income',
+      'Notes',
+    ];
     const rows = entries.map((entry) => {
       const balanceMap = new Map(entry.balances.map((b) => [b.account.name, Number(b.amount)]));
       const incomeMap = new Map(entry.incomes.map((i) => [i.incomeSource.name, Number(i.amount)]));
@@ -240,17 +251,22 @@ router.get('/export/csv', async (req: Request, res: Response): Promise<void> => 
     const csvContent = [
       headers.join(','),
       ...rows.map((row) =>
-        row.map((val) => {
-          const str = String(val);
-          return str.includes(',') || str.includes('"') || str.includes('\n')
-            ? `"${str.replace(/"/g, '""')}"`
-            : str;
-        }).join(','),
+        row
+          .map((val) => {
+            const str = String(val);
+            return str.includes(',') || str.includes('"') || str.includes('\n')
+              ? `"${str.replace(/"/g, '""')}"`
+              : str;
+          })
+          .join(','),
       ),
     ].join('\n');
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="salvadash-export-${new Date().toISOString().split('T')[0]}.csv"`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="salvadash-export-${new Date().toISOString().split('T')[0]}.csv"`,
+    );
     res.send(csvContent);
   } catch (error) {
     console.error('GET /data/export/csv error:', error);
@@ -301,7 +317,10 @@ router.delete('/reset', async (req: Request, res: Response): Promise<void> => {
     const { confirm } = req.body ?? {};
 
     if (confirm !== 'RESET_ALL_DATA') {
-      res.status(400).json({ success: false, error: 'Missing confirmation. Send { confirm: "RESET_ALL_DATA" }' });
+      res.status(400).json({
+        success: false,
+        error: 'Missing confirmation. Send { confirm: "RESET_ALL_DATA" }',
+      });
       return;
     }
 

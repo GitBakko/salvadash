@@ -1,5 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { AccountPublic, AdminOverview, AdminUserListItem, AdminUserDetail, AnalyticsData, BackupInfo, BackupConfig, MaintenanceResult, DashboardData, EntryPublic, EntryListItem, InviteCodePublic, IncomeSourcePublic, NotificationPublic } from '@salvadash/shared';
+import type {
+  AccountPublic,
+  AdminOverview,
+  AdminUserListItem,
+  AdminUserDetail,
+  AnalyticsData,
+  BackupInfo,
+  BackupConfig,
+  MaintenanceResult,
+  DashboardData,
+  EntryPublic,
+  EntryListItem,
+  InviteCodePublic,
+  IncomeSourcePublic,
+  NotificationPublic,
+} from '@salvadash/shared';
 import { api } from '../lib/api';
 
 // ─── Query keys ────────────────────────────────────────────
@@ -7,7 +22,7 @@ import { api } from '../lib/api';
 export const queryKeys = {
   accounts: ['accounts'] as const,
   dashboard: (year: string) => ['dashboard', year] as const,
-  entries: (year?: string) => year ? ['entries', year] as const : ['entries'] as const,
+  entries: (year?: string) => (year ? (['entries', year] as const) : (['entries'] as const)),
   entry: (id: string) => ['entry', id] as const,
   incomeSources: ['incomeSources'] as const,
   analytics: ['analytics'] as const,
@@ -37,7 +52,12 @@ export function useAccounts() {
 export function useCreateAccount() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: { name: string; type: 'MAIN' | 'SUB'; icon?: string; color?: string }) => {
+    mutationFn: async (data: {
+      name: string;
+      type: 'MAIN' | 'SUB';
+      icon?: string;
+      color?: string;
+    }) => {
       const res = await api.post<AccountPublic>('/accounts', data);
       if (!res.success) throw new Error(res.error ?? 'Failed to create account');
       return res.data!;
@@ -49,7 +69,17 @@ export function useCreateAccount() {
 export function useUpdateAccount() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string; name?: string; type?: 'MAIN' | 'SUB'; icon?: string; color?: string; isActive?: boolean }) => {
+    mutationFn: async ({
+      id,
+      ...data
+    }: {
+      id: string;
+      name?: string;
+      type?: 'MAIN' | 'SUB';
+      icon?: string;
+      color?: string;
+      isActive?: boolean;
+    }) => {
       const res = await api.put<AccountPublic>(`/accounts/${id}`, data);
       if (!res.success) throw new Error(res.error ?? 'Failed to update account');
       return res.data!;
@@ -132,7 +162,12 @@ export function useEntry(id: string) {
 export function useCreateEntry() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: { date: string; balances: { accountId: string; amount: number }[]; incomes?: { incomeSourceId: string; amount: number }[]; notes?: string }) => {
+    mutationFn: async (data: {
+      date: string;
+      balances: { accountId: string; amount: number }[];
+      incomes?: { incomeSourceId: string; amount: number }[];
+      notes?: string;
+    }) => {
       const res = await api.post<EntryPublic>('/entries', data);
       if (!res.success) throw new Error(res.error ?? 'Failed to create entry');
       return res.data!;
@@ -147,7 +182,16 @@ export function useCreateEntry() {
 export function useUpdateEntry() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string; date?: string; balances?: { accountId: string; amount: number }[]; incomes?: { incomeSourceId: string; amount: number }[]; notes?: string }) => {
+    mutationFn: async ({
+      id,
+      ...data
+    }: {
+      id: string;
+      date?: string;
+      balances?: { accountId: string; amount: number }[];
+      incomes?: { incomeSourceId: string; amount: number }[];
+      notes?: string;
+    }) => {
       const res = await api.put<EntryPublic>(`/entries/${id}`, data);
       if (!res.success) throw new Error(res.error ?? 'Failed to update entry');
       return res.data!;
@@ -285,7 +329,14 @@ export function useAdminUser(id: string) {
 export function useAdminUpdateUser() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...data }: { id: string; role?: 'ADMIN' | 'BASE'; isActive?: boolean }) => {
+    mutationFn: async ({
+      id,
+      ...data
+    }: {
+      id: string;
+      role?: 'ADMIN' | 'BASE';
+      isActive?: boolean;
+    }) => {
       const res = await api.put(`/admin/users/${id}`, data);
       if (!res.success) throw new Error(res.error ?? 'Failed to update user');
       return res.data;
@@ -415,7 +466,10 @@ export function useDeleteNotification() {
 export function useBroadcastNotification() {
   return useMutation({
     mutationFn: async (data: { type: string; title: string; body: string; userId?: string }) => {
-      const res = await api.post<{ message: string; count: number }>('/notifications/broadcast', data);
+      const res = await api.post<{ message: string; count: number }>(
+        '/notifications/broadcast',
+        data,
+      );
       if (!res.success) throw new Error(res.error ?? 'Failed to send notification');
       return res.data!;
     },
@@ -428,7 +482,10 @@ export function useUpdateProfile() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: { name?: string; language?: string; currency?: string }) => {
-      const res = await api.put<{ user: import('@salvadash/shared').UserPublic }>('/auth/profile', data);
+      const res = await api.put<{ user: import('@salvadash/shared').UserPublic }>(
+        '/auth/profile',
+        data,
+      );
       if (!res.success) throw new Error(res.error ?? 'Failed to update profile');
       return res.data!.user;
     },
@@ -441,7 +498,11 @@ export function useUpdateProfile() {
 
 export function useChangePassword() {
   return useMutation({
-    mutationFn: async (data: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+    mutationFn: async (data: {
+      currentPassword: string;
+      newPassword: string;
+      confirmPassword: string;
+    }) => {
       const res = await api.put<{ message: string }>('/auth/change-password', data);
       if (!res.success) throw new Error(res.error ?? 'Failed to change password');
       return res.data!;
@@ -452,7 +513,10 @@ export function useChangePassword() {
 export function useChangeEmail() {
   return useMutation({
     mutationFn: async (data: { newEmail: string; password: string }) => {
-      const res = await api.put<{ user: import('@salvadash/shared').UserPublic }>('/auth/change-email', data);
+      const res = await api.put<{ user: import('@salvadash/shared').UserPublic }>(
+        '/auth/change-email',
+        data,
+      );
       if (!res.success) throw new Error(res.error ?? 'Failed to change email');
       return res.data!.user;
     },
@@ -464,7 +528,10 @@ export function useUploadAvatar() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('avatar', file);
-      const res = await api.post<{ user: import('@salvadash/shared').UserPublic }>('/auth/avatar', formData);
+      const res = await api.post<{ user: import('@salvadash/shared').UserPublic }>(
+        '/auth/avatar',
+        formData,
+      );
       if (!res.success) throw new Error(res.error ?? 'Failed to upload avatar');
       return res.data!.user;
     },
@@ -474,7 +541,9 @@ export function useUploadAvatar() {
 export function useDeleteAvatar() {
   return useMutation({
     mutationFn: async () => {
-      const res = await api.delete<{ user: import('@salvadash/shared').UserPublic }>('/auth/avatar');
+      const res = await api.delete<{ user: import('@salvadash/shared').UserPublic }>(
+        '/auth/avatar',
+      );
       if (!res.success) throw new Error(res.error ?? 'Failed to delete avatar');
       return res.data!.user;
     },

@@ -31,19 +31,19 @@ Ogni commit **deve** seguire il formato:
 
 ### Tipi ammessi
 
-| Tipo | Quando usarlo |
-|------|--------------|
-| `feat` | Nuova funzionalità |
-| `fix` | Bug fix |
-| `docs` | Solo documentazione |
-| `style` | Formattazione (no logica) |
+| Tipo       | Quando usarlo                 |
+| ---------- | ----------------------------- |
+| `feat`     | Nuova funzionalità            |
+| `fix`      | Bug fix                       |
+| `docs`     | Solo documentazione           |
+| `style`    | Formattazione (no logica)     |
 | `refactor` | Refactoring (no feat, no fix) |
-| `perf` | Miglioramento performance |
-| `test` | Aggiunta/modifica test |
-| `build` | Build system o dipendenze |
-| `ci` | Configurazione CI |
-| `chore` | Manutenzione generica |
-| `revert` | Revert di un commit |
+| `perf`     | Miglioramento performance     |
+| `test`     | Aggiunta/modifica test        |
+| `build`    | Build system o dipendenze     |
+| `ci`       | Configurazione CI             |
+| `chore`    | Manutenzione generica         |
+| `revert`   | Revert di un commit           |
 
 ### Esempi
 
@@ -97,6 +97,7 @@ Prima di aprire una PR, verifica:
 ## 🐛 Segnalare bug
 
 Usa il template "Bug Report" nelle Issues. Includi:
+
 - Comportamento atteso vs. ottenuto
 - Passi per riprodurre
 - Screenshot (se visuale)
@@ -105,6 +106,7 @@ Usa il template "Bug Report" nelle Issues. Includi:
 ## 💡 Proporre feature
 
 Usa il template "Feature Request" nelle Issues. Descrivi:
+
 - Il problema che vuoi risolvere
 - La soluzione proposta
 - Alternative considerate

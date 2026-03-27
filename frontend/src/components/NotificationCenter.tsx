@@ -144,9 +144,7 @@ function NotificationItem({
       layout
     >
       <Card
-        className={`p-3 transition-all ${
-          !notification.isRead ? 'border-brand/30 bg-brand/5' : ''
-        }`}
+        className={`p-3 transition-all ${!notification.isRead ? 'border-brand/30 bg-brand/5' : ''}`}
       >
         <div className="flex gap-3">
           {/* Icon */}
@@ -159,7 +157,9 @@ function NotificationItem({
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-sm text-text-primary truncate">{notification.title}</p>
+                  <p className="font-medium text-sm text-text-primary truncate">
+                    {notification.title}
+                  </p>
                   {!notification.isRead && (
                     <span className="w-2 h-2 rounded-full bg-brand shrink-0" />
                   )}
@@ -174,9 +174,11 @@ function NotificationItem({
 
             {/* Actions */}
             <div className="flex items-center gap-3 mt-2">
-              <span className={`text-[10px] px-1.5 py-0.5 rounded ${
-                config.color.replace('text-', 'bg-').replace(/400|muted/, '500/15')
-              } ${config.color}`}>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded ${config.color
+                  .replace('text-', 'bg-')
+                  .replace(/400|muted/, '500/15')} ${config.color}`}
+              >
                 {t(`notifications.type${notification.type}`)}
               </span>
 

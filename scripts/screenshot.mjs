@@ -15,8 +15,8 @@ const OUTPUT = 'docs/assets/hero.png';
   const page = await context.newPage();
 
   // Debug: log console messages
-  page.on('console', msg => console.log('BROWSER:', msg.text()));
-  page.on('response', res => {
+  page.on('console', (msg) => console.log('BROWSER:', msg.text()));
+  page.on('response', (res) => {
     if (res.url().includes('/api/')) console.log(`API ${res.status()} ${res.url()}`);
   });
 

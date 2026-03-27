@@ -75,9 +75,7 @@ export function computeDashboard(
   const currentTotal = currentEntry ? entryTotal(currentEntry) : 0;
 
   // Year filter (only entries with data)
-  const yearEntries = filledEntries.filter(
-    (e) => e.date.getFullYear().toString() === yearLabel,
-  );
+  const yearEntries = filledEntries.filter((e) => e.date.getFullYear().toString() === yearLabel);
 
   // Year end = latest filled entry in that year; year start = earliest
   const yearEndTotal = yearEntries[0] ? entryTotal(yearEntries[0]) : null;
@@ -93,9 +91,10 @@ export function computeDashboard(
   for (let i = 0; i < yearPoints.length - 1; i++) {
     deltas.push(yearPoints[i].total - yearPoints[i + 1].total);
   }
-  const avgMonthlyYTD = deltas.length > 0
-    ? Math.round((deltas.reduce((a, b) => a + b, 0) / deltas.length) * 100) / 100
-    : 0;
+  const avgMonthlyYTD =
+    deltas.length > 0
+      ? Math.round((deltas.reduce((a, b) => a + b, 0) / deltas.length) * 100) / 100
+      : 0;
 
   // Best month (highest positive delta)
   let bestMonth: { month: string; delta: number } | null = null;
@@ -129,9 +128,8 @@ export function computeDashboard(
     const total = entryTotal(entry);
     const prev = filledEntries[i + 1] ? entryTotal(filledEntries[i + 1]) : null;
     const delta = prev !== null ? total - prev : null;
-    const deltaPercent = prev !== null && prev !== 0
-      ? Math.round(((total - prev) / prev) * 10000) / 100
-      : null;
+    const deltaPercent =
+      prev !== null && prev !== 0 ? Math.round(((total - prev) / prev) * 10000) / 100 : null;
     return {
       id: entry.id,
       date: entry.date.toISOString().split('T')[0],
@@ -143,10 +141,7 @@ export function computeDashboard(
   });
 
   // Sparkline (last 12 totals, oldest first)
-  const sparklineData = filledEntries
-    .slice(0, 12)
-    .map(entryTotal)
-    .reverse();
+  const sparklineData = filledEntries.slice(0, 12).map(entryTotal).reverse();
 
   return {
     currentTotal,
@@ -219,9 +214,10 @@ export function computeAnalytics(entries: EntryRow[]) {
     null,
   ) ?? { date: '', delta: 0 };
 
-  const avgGrowth = deltas.length > 0
-    ? Math.round((deltas.reduce((sum, d) => sum + d.delta, 0) / deltas.length) * 100) / 100
-    : 0;
+  const avgGrowth =
+    deltas.length > 0
+      ? Math.round((deltas.reduce((sum, d) => sum + d.delta, 0) / deltas.length) * 100) / 100
+      : 0;
 
   // Best year (highest absolute growth)
   const yearGrowths: { year: number; growth: number }[] = [];
