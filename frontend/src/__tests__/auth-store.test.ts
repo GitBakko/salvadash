@@ -55,7 +55,7 @@ describe('useAuthStore', () => {
   describe('fetchUser', () => {
     it('sets user on successful fetch', async () => {
       const user = { id: 'u1', name: 'Test' };
-      vi.mocked(api.get).mockResolvedValue({ success: true, data: user });
+      vi.mocked(api.get).mockResolvedValue({ success: true, data: { user } });
 
       await useAuthStore.getState().fetchUser();
 
