@@ -50,6 +50,7 @@ export interface AccountPublic {
   color: string | null;
   isActive: boolean;
   sortOrder: number;
+  entryCount: number;
 }
 
 // ─── Income Source ─────────────────────────────────────────

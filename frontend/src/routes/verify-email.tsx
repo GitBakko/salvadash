@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
+import { CircleDollarSign, MailOpen } from 'lucide-react';
 import { api } from '../lib/api';
 import { useUIStore } from '../stores/ui-store';
 import { Button } from '../components/ui/Button';
@@ -40,12 +41,12 @@ function VerifyEmailPage() {
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <span className="icon text-brand text-[56px]">monetization_on</span>
+          <CircleDollarSign size={56} strokeWidth={1.5} className="text-brand mx-auto" />
           <h1 className="font-heading text-2xl font-bold text-brand mt-2">{t('common.appName')}</h1>
         </div>
 
         <div className="glass-card p-6 space-y-6 text-center">
-          <span className="icon text-brand text-[56px]">mark_email_unread</span>
+          <MailOpen size={56} strokeWidth={1.5} className="text-brand mx-auto" />
 
           <div className="space-y-2">
             <h2 className="font-heading text-lg font-semibold">{t('auth.verifyEmail')}</h2>

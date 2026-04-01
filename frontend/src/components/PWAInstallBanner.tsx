@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Smartphone } from 'lucide-react';
 import { useUIStore } from '../stores/ui-store';
 import { Button } from './ui/Button';
 
@@ -32,7 +33,7 @@ export function PWAInstallBanner() {
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="fixed bottom-20 left-4 right-4 z-50 glass-card p-4 flex items-center gap-3"
         >
-          <span className="icon text-brand text-3xl shrink-0">install_mobile</span>
+          <Smartphone size={32} className="text-brand shrink-0" />
 
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-text-primary">{t('pwa.installTitle')}</p>

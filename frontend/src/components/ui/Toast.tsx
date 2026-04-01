@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useUIStore, type Toast as ToastType } from '../../stores/ui-store';
 
 function ToastItem({ toast }: { toast: ToastType }) {
@@ -12,19 +14,21 @@ function ToastItem({ toast }: { toast: ToastType }) {
     return () => clearTimeout(timer);
   }, [toast.id, toast.duration, removeToast]);
 
-  const iconMap = {
-    success: 'check_circle',
-    error: 'error',
-    info: 'info',
-    warning: 'warning',
+  const iconMap: Record<string, LucideIcon> = {
+    success: CheckCircle,
+    error: AlertCircle,
+    info: Info,
+    warning: AlertTriangle,
   };
 
-  const colorMap = {
+  const colorMap: Record<string, string> = {
     success: 'text-positive',
     error: 'text-negative',
     info: 'text-info',
     warning: 'text-gold',
   };
+
+  const Icon = iconMap[toast.type];
 
   return (
     <motion.div
@@ -34,14 +38,14 @@ function ToastItem({ toast }: { toast: ToastType }) {
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl max-w-sm w-full"
     >
-      <span className={`icon text-xl ${colorMap[toast.type]}`}>{iconMap[toast.type]}</span>
+      <Icon size={22} className={colorMap[toast.type]} />
       <p className="text-sm text-text-primary flex-1">{toast.message}</p>
       <button
         onClick={() => removeToast(toast.id)}
-        className="text-text-muted hover:text-text-primary transition-colors"
+        className="p-1.5 -m-1 text-text-muted hover:text-text-primary transition-colors"
         aria-label="Dismiss"
       >
-        <span className="icon text-lg">close</span>
+        <X size={18} />
       </button>
     </motion.div>
   );

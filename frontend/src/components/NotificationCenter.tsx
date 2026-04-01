@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Bell, BellOff, Clock, Trophy, AlertTriangle, ShieldCheck, Info, X } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { NotificationPublic } from '@salvadash/shared';
 import {
   useNotifications,
@@ -11,12 +13,12 @@ import { Card, SkeletonCard } from './ui';
 
 // ─── Notification type config ──────────────────────────────
 
-const TYPE_CONFIG: Record<string, { icon: string; color: string }> = {
-  REMINDER: { icon: 'schedule', color: 'text-blue-400' },
-  MILESTONE: { icon: 'emoji_events', color: 'text-gold' },
-  ALERT: { icon: 'warning', color: 'text-orange-400' },
-  ADMIN: { icon: 'admin_panel_settings', color: 'text-brand' },
-  SYSTEM: { icon: 'info', color: 'text-text-muted' },
+const TYPE_CONFIG: Record<string, { Icon: LucideIcon; color: string }> = {
+  REMINDER: { Icon: Clock, color: 'text-blue-400' },
+  MILESTONE: { Icon: Trophy, color: 'text-gold' },
+  ALERT: { Icon: AlertTriangle, color: 'text-orange-400' },
+  ADMIN: { Icon: ShieldCheck, color: 'text-brand' },
+  SYSTEM: { Icon: Info, color: 'text-text-muted' },
 };
 
 // ─── Time ago helper ───────────────────────────────────────
@@ -71,7 +73,7 @@ export function NotificationCenter({ onClose }: { onClose: () => void }) {
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-heading text-lg font-bold text-text-primary flex items-center gap-2">
-            <span className="icon text-brand text-xl">notifications</span>
+            <Bell size={22} className="text-brand" />
             {t('notifications.title')}
           </h3>
 
@@ -95,7 +97,7 @@ export function NotificationCenter({ onClose }: { onClose: () => void }) {
           </div>
         ) : !notifications?.length ? (
           <div className="text-center py-10">
-            <span className="icon text-text-muted text-[48px]">notifications_none</span>
+            <BellOff size={48} className="text-text-muted mx-auto" strokeWidth={1.5} />
             <p className="text-text-muted mt-2 font-medium">{t('notifications.empty')}</p>
             <p className="text-text-muted text-xs mt-1">{t('notifications.emptyDesc')}</p>
           </div>
@@ -148,8 +150,8 @@ function NotificationItem({
       >
         <div className="flex gap-3">
           {/* Icon */}
-          <div className={`shrink-0 mt-0.5`}>
-            <span className={`icon text-xl ${config.color}`}>{config.icon}</span>
+          <div className="shrink-0 mt-0.5">
+            <config.Icon size={22} className={config.color} />
           </div>
 
           {/* Content */}
@@ -193,9 +195,9 @@ function NotificationItem({
 
               <button
                 onClick={onDelete}
-                className="text-[10px] text-text-muted hover:text-red-400 transition-colors ml-auto"
+                className="p-1 -m-1 text-text-muted hover:text-red-400 transition-colors ml-auto"
               >
-                <span className="icon text-sm">close</span>
+                <X size={14} />
               </button>
             </div>
           </div>

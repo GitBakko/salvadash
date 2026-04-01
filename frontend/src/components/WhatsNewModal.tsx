@@ -1,12 +1,14 @@
 import { useTranslation } from 'react-i18next';
+import { Sparkles, Bug, TrendingUp } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { APP_VERSION, changelog, type ChangelogCategoryType } from '@salvadash/shared';
 import { useMarkVersionSeen } from '../hooks/queries';
 import { Modal } from './ui';
 
-const categoryConfig: Record<ChangelogCategoryType, { icon: string; color: string; labelKey: string }> = {
-  feature: { icon: 'new_releases', color: 'text-brand', labelKey: 'version.features' },
-  fix: { icon: 'bug_report', color: 'text-negative', labelKey: 'version.fixes' },
-  improvement: { icon: 'trending_up', color: 'text-positive', labelKey: 'version.improvements' },
+const categoryConfig: Record<ChangelogCategoryType, { Icon: LucideIcon; color: string; labelKey: string }> = {
+  feature: { Icon: Sparkles, color: 'text-brand', labelKey: 'version.features' },
+  fix: { Icon: Bug, color: 'text-negative', labelKey: 'version.fixes' },
+  improvement: { Icon: TrendingUp, color: 'text-positive', labelKey: 'version.improvements' },
 };
 
 interface WhatsNewModalProps {
@@ -35,7 +37,7 @@ export function WhatsNewModal({ onClose }: WhatsNewModalProps) {
           return (
             <div key={cat.type} className="space-y-2">
               <div className="flex items-center gap-2">
-                <span className={`icon text-lg ${config.color}`}>{config.icon}</span>
+                <config.Icon size={20} className={config.color} />
                 <h3 className="font-heading text-sm font-semibold">{t(config.labelKey)}</h3>
               </div>
               <ul className="space-y-1.5 ml-7">

@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -64,7 +65,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
                   className="text-text-muted hover:text-text-primary transition-colors p-1"
                   aria-label="Close"
                 >
-                  <span className="icon text-xl">close</span>
+                  <X size={22} />
                 </button>
               </div>
             )}

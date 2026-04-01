@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
-import { motion, Reorder, AnimatePresence } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { Reorder, AnimatePresence, useDragControls, motion } from 'framer-motion';
 import type { AccountPublic } from '@salvadash/shared';
 import {
   useAccounts,
@@ -10,8 +10,9 @@ import {
   useReorderAccounts,
 } from '../hooks/queries';
 import { useUIStore } from '../stores/ui-store';
-import { Button, Card, Skeleton } from '../components/ui';
+import { Button, Card, Skeleton, Toggle } from '../components/ui';
 import { AccountFormModal } from '../components/AccountFormModal';
+import { Wallet, Plus, GripVertical, Pencil, Trash2 } from 'lucide-react';
 
 export const Route = createFileRoute('/accounts')({
   component: AccountsPage,
@@ -49,25 +50,37 @@ function AccountsPage() {
   const [editingAccount, setEditingAccount] = useState<AccountPublic | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [orderedAccounts, setOrderedAccounts] = useState<AccountPublic[] | null>(null);
+  const [orderedActive, setOrderedActive] = useState<AccountPublic[] | null>(null);
 
-  // Use ordered local state if user is dragging, otherwise server data
-  const displayAccounts = orderedAccounts ?? accounts ?? [];
+  // Split accounts into active (draggable) and inactive (locked at bottom)
+  const { activeAccounts, inactiveAccounts } = useMemo(() => {
+    const all = accounts ?? [];
+    return {
+      activeAccounts: all.filter((a) => a.isActive),
+      inactiveAccounts: all.filter((a) => !a.isActive),
+    };
+  }, [accounts]);
 
-  // Sync server data into local when it changes (and not dragging)
-  const serverAccountsKey = accounts?.map((a) => a.id).join(',');
+  const displayActive = orderedActive ?? activeAccounts;
+
+  // Sync key for resetting Reorder.Group when server data changes
+  const serverActiveKey = activeAccounts.map((a) => a.id).join(',');
 
   function handleReorder(newOrder: AccountPublic[]) {
-    setOrderedAccounts(newOrder);
+    setOrderedActive(newOrder);
   }
 
   function commitReorder() {
-    if (!orderedAccounts) return;
-    const mapped = orderedAccounts.map((a, i) => ({ id: a.id, sortOrder: i }));
+    if (!orderedActive) return;
+    // Active accounts get sortOrder 0..N, inactive keep theirs after
+    const mapped = orderedActive.map((a, i) => ({ id: a.id, sortOrder: i }));
+    inactiveAccounts.forEach((a, i) => {
+      mapped.push({ id: a.id, sortOrder: orderedActive.length + i });
+    });
     reorderAccounts.mutate(mapped, {
-      onSuccess: () => setOrderedAccounts(null),
+      onSuccess: () => setOrderedActive(null),
       onError: () => {
-        setOrderedAccounts(null);
+        setOrderedActive(null);
         addToast({ type: 'error', message: t('common.error') });
       },
     });
@@ -133,11 +146,11 @@ function AccountsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-20 text-center"
         >
-          <span className="icon text-text-muted text-[64px] mb-4">account_balance_wallet</span>
+          <Wallet size={64} className="text-text-muted mb-4" strokeWidth={1.5} />
           <h2 className="font-heading text-xl font-semibold mb-2">{t('accounts.title')}</h2>
           <p className="text-text-secondary text-sm mb-6 max-w-xs">{t('accounts.createFirst')}</p>
           <Button onClick={openCreate}>
-            <span className="icon text-lg">add</span>
+            <Plus size={20} />
             {t('accounts.addAccount')}
           </Button>
         </motion.div>
@@ -159,37 +172,49 @@ function AccountsPage() {
       <div className="flex items-center justify-between">
         <h2 className="font-heading text-xl font-semibold">{t('accounts.title')}</h2>
         <Button size="sm" onClick={openCreate}>
-          <span className="icon text-lg">add</span>
+          <Plus size={20} />
           {t('accounts.addAccount')}
         </Button>
       </div>
 
-      {/* Reorder list */}
+      {/* Active accounts — draggable */}
       <Reorder.Group
         axis="y"
-        values={displayAccounts}
+        values={displayActive}
         onReorder={handleReorder}
         className="space-y-3"
-        key={serverAccountsKey}
+        key={serverActiveKey}
       >
-        {displayAccounts.map((account, idx) => (
-          <Reorder.Item
+        {displayActive.map((account, idx) => (
+          <DraggableAccountCard
             key={account.id}
-            value={account}
+            account={account}
+            color={getAccountColor(account, idx)}
+            onEdit={() => openEdit(account)}
+            onDelete={() => handleDelete(account)}
+            onToggleActive={() => handleToggleActive(account)}
+            isDeleting={deletingId === account.id}
             onDragEnd={commitReorder}
-            whileDrag={{ scale: 1.02, boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}
-          >
+          />
+        ))}
+      </Reorder.Group>
+
+      {/* Inactive accounts — locked at bottom, not draggable */}
+      {inactiveAccounts.length > 0 && (
+        <div className="space-y-3">
+          {inactiveAccounts.map((account, idx) => (
             <AccountCard
+              key={account.id}
               account={account}
-              color={getAccountColor(account, idx)}
+              color={getAccountColor(account, activeAccounts.length + idx)}
               onEdit={() => openEdit(account)}
               onDelete={() => handleDelete(account)}
               onToggleActive={() => handleToggleActive(account)}
               isDeleting={deletingId === account.id}
             />
-          </Reorder.Item>
-        ))}
-      </Reorder.Group>
+          ))}
+        </div>
+      )}
 
       {/* Form modal */}
       <AnimatePresence>
@@ -201,7 +226,51 @@ function AccountsPage() {
   );
 }
 
-// ─── Account Card ──────────────────────────────────────────
+// ─── Draggable Account Card (active accounts) ─────────────
+
+interface DraggableAccountCardProps {
+  account: AccountPublic;
+  color: string;
+  onEdit: () => void;
+  onDelete: () => void;
+  onToggleActive: () => void;
+  isDeleting: boolean;
+  onDragEnd: () => void;
+}
+
+function DraggableAccountCard({
+  account,
+  color,
+  onEdit,
+  onDelete,
+  onToggleActive,
+  isDeleting,
+  onDragEnd,
+}: DraggableAccountCardProps) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      value={account}
+      dragListener={false}
+      dragControls={dragControls}
+      onDragEnd={onDragEnd}
+      whileDrag={{ scale: 1.02, boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}
+    >
+      <AccountCardContent
+        account={account}
+        color={color}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onToggleActive={onToggleActive}
+        isDeleting={isDeleting}
+        onGripPointerDown={(e) => dragControls.start(e)}
+      />
+    </Reorder.Item>
+  );
+}
+
+// ─── Static Account Card (inactive accounts) ──────────────
 
 interface AccountCardProps {
   account: AccountPublic;
@@ -212,24 +281,61 @@ interface AccountCardProps {
   isDeleting: boolean;
 }
 
-function AccountCard({
+function AccountCard({ account, color, onEdit, onDelete, onToggleActive, isDeleting }: AccountCardProps) {
+  return (
+    <AccountCardContent
+      account={account}
+      color={color}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onToggleActive={onToggleActive}
+      isDeleting={isDeleting}
+    />
+  );
+}
+
+// ─── Shared Card Content ──────────────────────────────────
+
+interface AccountCardContentProps {
+  account: AccountPublic;
+  color: string;
+  onEdit: () => void;
+  onDelete: () => void;
+  onToggleActive: () => void;
+  isDeleting: boolean;
+  onGripPointerDown?: (e: React.PointerEvent) => void;
+}
+
+function AccountCardContent({
   account,
   color,
   onEdit,
   onDelete,
   onToggleActive,
   isDeleting,
-}: AccountCardProps) {
+  onGripPointerDown,
+}: AccountCardContentProps) {
   const { t } = useTranslation();
+  const canDelete = account.entryCount === 0;
 
   return (
     <Card className={`p-4 ${!account.isActive ? 'opacity-50' : ''}`}>
       <div className="flex items-center gap-3">
         {/* Drag handle + color indicator */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="icon text-text-muted text-lg cursor-grab active:cursor-grabbing">
-            drag_indicator
-          </span>
+          {onGripPointerDown ? (
+            <button
+              className="p-1.5 -m-1.5 text-text-muted cursor-grab active:cursor-grabbing select-none touch-none hover:text-brand transition-colors"
+              onPointerDown={onGripPointerDown}
+              aria-label="Drag to reorder"
+            >
+              <GripVertical size={20} />
+            </button>
+          ) : (
+            <div className="p-1.5 -m-1.5 text-text-muted/30">
+              <GripVertical size={20} />
+            </div>
+          )}
           <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
         </div>
 
@@ -247,31 +353,29 @@ function AccountCard({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            onClick={onToggleActive}
-            className="p-1.5 rounded-[var(--radius-sm)] hover:bg-surface-elevated transition-colors"
-            aria-label={account.isActive ? 'Deactivate' : 'Activate'}
-          >
-            <span className={`icon text-lg ${account.isActive ? 'text-brand' : 'text-text-muted'}`}>
-              {account.isActive ? 'toggle_on' : 'toggle_off'}
-            </span>
-          </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Toggle
+            checked={account.isActive}
+            onChange={onToggleActive}
+            aria-label={account.isActive ? t('accounts.active') : t('accounts.inactive')}
+          />
           <button
             onClick={onEdit}
-            className="p-1.5 rounded-[var(--radius-sm)] hover:bg-surface-elevated transition-colors"
+            className="p-2.5 -m-1 rounded-[var(--radius-sm)] hover:bg-surface-elevated transition-colors text-text-secondary"
             aria-label={t('common.edit')}
           >
-            <span className="icon text-lg text-text-secondary">edit</span>
+            <Pencil size={18} />
           </button>
-          <button
-            onClick={onDelete}
-            disabled={isDeleting}
-            className="p-1.5 rounded-[var(--radius-sm)] hover:bg-negative/10 transition-colors disabled:opacity-50"
-            aria-label={t('common.delete')}
-          >
-            <span className="icon text-lg text-negative">delete</span>
-          </button>
+          {canDelete && (
+            <button
+              onClick={onDelete}
+              disabled={isDeleting}
+              className="p-2.5 -m-1 rounded-[var(--radius-sm)] hover:bg-negative/10 transition-colors text-negative disabled:opacity-50"
+              aria-label={t('common.delete')}
+            >
+              <Trash2 size={18} />
+            </button>
+          )}
         </div>
       </div>
     </Card>

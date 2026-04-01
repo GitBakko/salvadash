@@ -8,6 +8,8 @@ import { useDashboard } from '../hooks/queries';
 import { useCacheDashboard } from '../hooks/use-offline-sync';
 import { Card, Skeleton } from '../components/ui';
 import { fmtCurrency, fmtCurrencyCompact, fmtPercent } from '../lib/format';
+import { Lightbulb, CalendarDays, ArrowDown, TrendingUp, ArrowUp, Trophy } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/')({
   component: DashboardPage,
@@ -62,7 +64,7 @@ function DashboardPage() {
   if (!data) {
     return (
       <div className="p-4 max-w-lg mx-auto flex flex-col items-center justify-center py-20 text-center">
-        <span className="icon text-text-muted text-[64px] mb-4">insights</span>
+        <Lightbulb size={64} className="text-text-muted mb-4" strokeWidth={1.5} />
         <p className="text-text-secondary text-sm">{t('dashboard.noEntries')}</p>
       </div>
     );
@@ -161,29 +163,29 @@ function KPIGrid({
   t: (k: string, o?: Record<string, string>) => string;
   year: string;
 }) {
-  const kpis = [
+  const kpis: { label: string; value: string; Icon: LucideIcon; color: string }[] = [
     {
       label: t('dashboard.yearTotal', { year }),
       value: data.yearTotal != null ? fmtCurrency(data.yearTotal) : '—',
-      icon: 'calendar_today',
+      Icon: CalendarDays,
       color: 'text-info',
     },
     {
       label: t('dashboard.monthlyIncome'),
       value: fmtCurrency(data.monthlyIncome),
-      icon: 'arrow_downward',
+      Icon: ArrowDown,
       color: 'text-positive',
     },
     {
       label: t('dashboard.avgMonthly'),
       value: fmtCurrency(data.avgMonthlyYTD),
-      icon: 'trending_up',
+      Icon: TrendingUp,
       color: 'text-purple',
     },
     {
       label: t('dashboard.growthYTD'),
       value: fmtPercent(data.growthYTD),
-      icon: data.growthYTD >= 0 ? 'arrow_upward' : 'arrow_downward',
+      Icon: data.growthYTD >= 0 ? ArrowUp : ArrowDown,
       color: data.growthYTD >= 0 ? 'text-positive' : 'text-negative',
     },
   ];
@@ -199,7 +201,7 @@ function KPIGrid({
         >
           <Card className="p-3">
             <div className="flex items-start gap-2">
-              <span className={`icon text-lg ${kpi.color}`}>{kpi.icon}</span>
+              <kpi.Icon size={20} className={kpi.color} />
               <div className="min-w-0">
                 <p className="text-text-muted text-[10px] uppercase tracking-wider leading-tight">
                   {kpi.label}
@@ -222,7 +224,7 @@ function KPIGrid({
           <Card className="p-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="icon text-lg text-gold">emoji_events</span>
+                <Trophy size={20} className="text-gold" />
                 <div>
                   <p className="text-text-muted text-[10px] uppercase tracking-wider">
                     {t('dashboard.bestMonth')}

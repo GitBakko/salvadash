@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, type FormEvent } from 'react';
+import { CircleDollarSign, MailCheck, Mail } from 'lucide-react';
 import { api } from '../lib/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -37,7 +38,7 @@ function ForgotPasswordPage() {
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <span className="icon text-brand text-[56px]">monetization_on</span>
+          <CircleDollarSign size={56} strokeWidth={1.5} className="text-brand mx-auto" />
           <h1 className="font-heading text-2xl font-bold text-brand mt-2">{t('common.appName')}</h1>
         </div>
 
@@ -48,7 +49,7 @@ function ForgotPasswordPage() {
 
           {sent ? (
             <div className="text-center space-y-4">
-              <span className="icon text-brand text-[48px]">mark_email_read</span>
+              <MailCheck size={48} strokeWidth={1.5} className="text-brand mx-auto" />
               <p className="text-text-secondary text-sm">{t('auth.resetEmailSent')}</p>
               <Link to="/login">
                 <Button variant="secondary" fullWidth>
@@ -77,7 +78,7 @@ function ForgotPasswordPage() {
                   placeholder="email@example.com"
                   autoComplete="email"
                   required
-                  icon={<span className="icon text-lg">email</span>}
+                  icon={<Mail size={20} />}
                 />
 
                 <Button type="submit" fullWidth loading={loading}>

@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { CircleDollarSign, Bell, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
 import { useUnreadCount } from '../hooks/queries';
 import { NotificationCenter } from './NotificationCenter';
@@ -19,7 +20,7 @@ export function Header() {
       <header className="sticky top-0 z-40 glass-card border-b border-border-default px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Link to="/" className="flex items-center gap-2">
-            <span className="icon text-brand text-[28px]">monetization_on</span>
+            <CircleDollarSign size={28} className="text-brand" />
             <h1 className="font-heading text-xl font-bold text-brand">{t('common.appName')}</h1>
           </Link>
           <VersionBadge className="ml-1 self-end mb-0.5" />
@@ -28,12 +29,12 @@ export function Header() {
             {/* Notification bell */}
             <button
               onClick={() => setShowNotifications(true)}
-              className="relative text-text-muted hover:text-text-primary transition-colors"
+              className="relative p-2 -m-2 text-text-muted hover:text-text-primary transition-colors"
               aria-label={t('notifications.title')}
             >
-              <span className="icon text-xl">notifications</span>
+              <Bell size={22} />
               {!!unreadCount && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-brand text-[10px] font-bold text-surface-0 flex items-center justify-center">
+                <span className="absolute top-0 right-0 min-w-[16px] h-4 px-1 rounded-full bg-brand text-[10px] font-bold text-surface-0 flex items-center justify-center">
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
@@ -42,10 +43,10 @@ export function Header() {
             {isAdmin && (
               <Link
                 to="/admin"
-                className="text-gold hover:text-gold/80 transition-colors"
+                className="p-2 -m-2 text-gold hover:text-gold/80 transition-colors"
                 aria-label="Admin Dashboard"
               >
-                <span className="icon text-xl">shield</span>
+                <ShieldCheck size={22} />
               </Link>
             )}
           </div>

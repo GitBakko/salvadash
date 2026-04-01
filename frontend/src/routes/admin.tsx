@@ -2,6 +2,40 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useDeferredValue } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import {
+  Calendar,
+  CalendarDays,
+  CheckCircle,
+  Clock,
+  CloudOff,
+  Database,
+  Download,
+  Globe,
+  Hammer,
+  KeyRound,
+  Landmark,
+  Megaphone,
+  PiggyBank,
+  Plus,
+  Receipt,
+  RotateCcw,
+  Search,
+  Send,
+  Settings,
+  Shield,
+  ShieldCheck,
+  Timer,
+  Trash2,
+  TrendingUp,
+  User,
+  UserCheck,
+  UserX,
+  Users,
+  Wrench,
+  X,
+  XCircle,
+} from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
 import { Card, Skeleton, SkeletonCard } from '../components/ui';
 import { formatCurrency } from '@salvadash/shared';
@@ -42,6 +76,13 @@ const ROLE_BG: Record<string, string> = {
   BASE: 'bg-surface-2 text-text-muted',
 };
 
+const TAB_ICONS: Record<string, LucideIcon> = {
+  users: Users,
+  invites: KeyRound,
+  notify: Megaphone,
+  backup: Database,
+};
+
 // ─── Main Page ──────────────────────────────────────────────
 
 function AdminPage() {
@@ -67,7 +108,7 @@ function AdminPage() {
         animate={{ opacity: 1, y: 0 }}
         className="font-heading text-2xl font-bold text-text-primary flex items-center gap-2"
       >
-        <span className="icon text-gold text-[28px]">admin_panel_settings</span>
+        <ShieldCheck size={28} className="text-gold" />
         {t('admin.title')}
       </motion.h2>
 
@@ -76,34 +117,29 @@ function AdminPage() {
 
       {/* Tabs */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar">
-        {(['users', 'invites', 'notify', 'backup'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-xl font-medium text-sm transition-all whitespace-nowrap ${
-              activeTab === tab
-                ? 'bg-brand/15 text-brand'
-                : 'bg-surface-2 text-text-muted hover:text-text-primary'
-            }`}
-          >
-            <span className="icon text-base mr-1">
+        {(['users', 'invites', 'notify', 'backup'] as const).map((tab) => {
+          const TabIcon = TAB_ICONS[tab];
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-xl font-medium text-sm transition-all whitespace-nowrap flex items-center gap-1 ${
+                activeTab === tab
+                  ? 'bg-brand/15 text-brand'
+                  : 'bg-surface-2 text-text-muted hover:text-text-primary'
+              }`}
+            >
+              <TabIcon size={16} />
               {tab === 'users'
-                ? 'group'
+                ? t('admin.users')
                 : tab === 'invites'
-                  ? 'vpn_key'
+                  ? t('admin.inviteCodes')
                   : tab === 'notify'
-                    ? 'campaign'
-                    : 'backup'}
-            </span>
-            {tab === 'users'
-              ? t('admin.users')
-              : tab === 'invites'
-                ? t('admin.inviteCodes')
-                : tab === 'notify'
-                  ? t('notifications.broadcast')
-                  : t('backup.backups')}
-          </button>
-        ))}
+                    ? t('notifications.broadcast')
+                    : t('backup.backups')}
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab Content */}
@@ -175,22 +211,22 @@ function OverviewCards() {
 
   if (!data) return null;
 
-  const kpis = [
-    { icon: 'group', label: t('admin.totalUsers'), value: data.totalUsers, color: 'text-brand' },
+  const kpis: { Icon: LucideIcon; label: string; value: string | number; color: string }[] = [
+    { Icon: Users, label: t('admin.totalUsers'), value: data.totalUsers, color: 'text-brand' },
     {
-      icon: 'receipt_long',
+      Icon: Receipt,
       label: t('admin.totalEntries'),
       value: data.totalEntries,
       color: 'text-gold',
     },
     {
-      icon: 'trending_up',
+      Icon: TrendingUp,
       label: t('admin.avgGrowth'),
       value: formatCurrency(data.avgGrowth),
       color: data.avgGrowth >= 0 ? 'text-brand' : 'text-red-400',
     },
     {
-      icon: 'person_check',
+      Icon: UserCheck,
       label: t('admin.activeUsers'),
       value: data.activeUsers30d,
       color: 'text-brand',
@@ -201,14 +237,14 @@ function OverviewCards() {
     <div className="grid grid-cols-2 gap-3">
       {kpis.map((kpi, i) => (
         <motion.div
-          key={kpi.icon}
+          key={kpi.label}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
         >
           <Card className="p-3">
             <div className="flex items-center gap-2 mb-1">
-              <span className={`icon text-lg ${kpi.color}`}>{kpi.icon}</span>
+              <kpi.Icon size={20} className={kpi.color} />
               <span className="text-xs text-text-muted">{kpi.label}</span>
             </div>
             <p className="text-xl font-bold font-heading">{kpi.value}</p>
@@ -239,9 +275,10 @@ function UsersSection({
       {/* Search + Filter */}
       <div className="flex gap-2">
         <div className="flex-1 relative">
-          <span className="icon text-text-muted absolute left-3 top-1/2 -translate-y-1/2 text-lg">
-            search
-          </span>
+          <Search
+            size={20}
+            className="text-text-muted absolute left-3 top-1/2 -translate-y-1/2"
+          />
           <input
             type="text"
             value={search}
@@ -271,7 +308,7 @@ function UsersSection({
         </div>
       ) : !data?.data?.length ? (
         <Card className="p-6 text-center">
-          <span className="icon text-text-muted text-[48px]">person_off</span>
+          <UserX size={48} strokeWidth={1.5} className="text-text-muted mx-auto" />
           <p className="text-text-muted mt-2">{t('admin.noUsers')}</p>
         </Card>
       ) : (
@@ -437,34 +474,34 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-3">
               <StatItem
-                icon="savings"
+                Icon={PiggyBank}
                 label={t('admin.savings')}
                 value={formatCurrency(user.totalSavings)}
               />
               <StatItem
-                icon="receipt_long"
+                Icon={Receipt}
                 label={t('admin.entries')}
                 value={String(user.entriesCount)}
               />
               <StatItem
-                icon="account_balance"
+                Icon={Landmark}
                 label={t('admin.accounts')}
                 value={String(user.accountsCount)}
               />
               <StatItem
-                icon="calendar_month"
+                Icon={Calendar}
                 label={t('admin.memberSince')}
                 value={formatDate(user.createdAt)}
                 small
               />
               <StatItem
-                icon="event"
+                Icon={CalendarDays}
                 label={t('admin.lastEntry')}
                 value={formatDate(user.lastEntryDate)}
                 small
               />
               <StatItem
-                icon="language"
+                Icon={Globe}
                 label={t('settings.language')}
                 value={user.language.toUpperCase()}
               />
@@ -500,15 +537,13 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
                 <button
                   onClick={handleToggleActive}
                   disabled={updateUser.isPending}
-                  className={`w-full py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  className={`w-full py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-1 ${
                     user.isActive
                       ? 'bg-orange-500/15 text-orange-400 hover:bg-orange-500/25'
                       : 'bg-brand/15 text-brand hover:bg-brand/25'
                   }`}
                 >
-                  <span className="icon text-base mr-1 align-middle">
-                    {user.isActive ? 'person_off' : 'person_check'}
-                  </span>
+                  {user.isActive ? <UserX size={16} /> : <UserCheck size={16} />}
                   {user.isActive ? t('admin.deactivate') : t('admin.activate')}
                 </button>
 
@@ -518,9 +553,9 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
                     {!showDeleteConfirm ? (
                       <button
                         onClick={() => setShowDeleteConfirm(true)}
-                        className="w-full py-2.5 rounded-xl text-sm font-medium bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-all"
+                        className="w-full py-2.5 rounded-xl text-sm font-medium bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-all flex items-center justify-center gap-1"
                       >
-                        <span className="icon text-base mr-1 align-middle">delete_forever</span>
+                        <Trash2 size={16} />
                         {t('admin.deleteUser')}
                       </button>
                     ) : (
@@ -551,7 +586,7 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
             {/* ROOT protection message */}
             {isTargetRoot && (
               <div className="flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-xl p-3 text-sm text-gold">
-                <span className="icon">security</span>
+                <Shield size={20} />
                 {t('admin.rootProtected')}
               </div>
             )}
@@ -563,12 +598,12 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
 }
 
 function StatItem({
-  icon,
+  Icon,
   label,
   value,
   small,
 }: {
-  icon: string;
+  Icon: LucideIcon;
   label: string;
   value: string;
   small?: boolean;
@@ -576,7 +611,7 @@ function StatItem({
   return (
     <div className="bg-surface-2 rounded-xl p-2.5">
       <div className="flex items-center gap-1.5 mb-0.5">
-        <span className="icon text-sm text-text-muted">{icon}</span>
+        <Icon size={14} className="text-text-muted" />
         <span className="text-[10px] text-text-muted uppercase tracking-wide">{label}</span>
       </div>
       <p className={`font-bold font-heading ${small ? 'text-xs' : 'text-sm'}`}>{value}</p>
@@ -620,7 +655,7 @@ function InviteCodesSection() {
         disabled={createCode.isPending}
         className="w-full py-2.5 rounded-xl text-sm font-medium bg-brand/15 text-brand hover:bg-brand/25 transition-all flex items-center justify-center gap-1"
       >
-        <span className="icon text-lg">add</span>
+        <Plus size={20} />
         {createCode.isPending ? '...' : t('admin.generateCode')}
       </button>
 
@@ -633,7 +668,7 @@ function InviteCodesSection() {
         </div>
       ) : !codes?.length ? (
         <Card className="p-6 text-center">
-          <span className="icon text-text-muted text-[48px]">vpn_key_off</span>
+          <KeyRound size={48} strokeWidth={1.5} className="text-text-muted mx-auto opacity-50" />
           <p className="text-text-muted mt-2">{t('admin.noInviteCodes')}</p>
         </Card>
       ) : (
@@ -661,8 +696,8 @@ function InviteCodesSection() {
                       <div className="flex items-center gap-3 mt-1 text-[10px] text-text-muted">
                         <span>{formatDate(code.createdAt)}</span>
                         {code.usedByName && (
-                          <span>
-                            <span className="icon text-[10px] align-middle">person</span>{' '}
+                          <span className="flex items-center gap-0.5">
+                            <User size={10} />
                             {code.usedByName}
                           </span>
                         )}
@@ -674,10 +709,10 @@ function InviteCodesSection() {
                       <button
                         onClick={() => deleteCode.mutate(code.id)}
                         disabled={deleteCode.isPending}
-                        className="p-1.5 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-all"
+                        className="p-2.5 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-all"
                         title={t('common.delete')}
                       >
-                        <span className="icon text-lg">close</span>
+                        <X size={20} />
                       </button>
                     )}
                   </div>
@@ -801,7 +836,7 @@ function BroadcastSection() {
           disabled={!title.trim() || !body.trim() || broadcast.isPending}
           className="w-full py-2.5 rounded-xl text-sm font-medium bg-brand/15 text-brand hover:bg-brand/25 transition-all flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="icon text-lg">send</span>
+          <Send size={20} />
           {broadcast.isPending ? '...' : t('notifications.broadcast')}
         </button>
 
@@ -812,9 +847,9 @@ function BroadcastSection() {
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="bg-brand/10 border border-brand/30 rounded-xl p-3 text-sm text-brand text-center"
+              className="bg-brand/10 border border-brand/30 rounded-xl p-3 text-sm text-brand text-center flex items-center justify-center gap-1"
             >
-              <span className="icon text-base mr-1 align-middle">check_circle</span>
+              <CheckCircle size={16} />
               {t('notifications.broadcastSentOne')}
             </motion.div>
           )}
@@ -910,7 +945,7 @@ function BackupSection() {
           disabled={createBackup.isPending}
           className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-brand/15 text-brand hover:bg-brand/25 transition-all flex items-center justify-center gap-1"
         >
-          <span className="icon text-lg">backup</span>
+          <Database size={20} />
           {createBackup.isPending ? t('backup.creating') : t('backup.createBackup')}
         </button>
       </div>
@@ -919,7 +954,7 @@ function BackupSection() {
       {backupConfig && (
         <Card className="p-3">
           <div className="flex items-center gap-2 mb-2">
-            <span className="icon text-sm text-text-muted">settings</span>
+            <Settings size={14} className="text-text-muted" />
             <span className="text-xs font-medium text-text-muted uppercase tracking-wide">
               {t('backup.config')}
             </span>
@@ -950,7 +985,7 @@ function BackupSection() {
         </div>
       ) : !backups?.length ? (
         <Card className="p-6 text-center">
-          <span className="icon text-text-muted text-[48px]">cloud_off</span>
+          <CloudOff size={48} strokeWidth={1.5} className="text-text-muted mx-auto" />
           <p className="text-text-muted mt-2">{t('backup.noBackups')}</p>
         </Card>
       ) : (
@@ -985,9 +1020,11 @@ function BackupSection() {
                   <div className="flex items-center gap-3">
                     <span>{formatDate(backup.createdAt)}</span>
                     <span className="flex items-center gap-0.5">
-                      <span className="icon text-[10px]">
-                        {backup.triggeredBy === 'scheduler' ? 'schedule' : 'person'}
-                      </span>
+                      {backup.triggeredBy === 'scheduler' ? (
+                        <Clock size={10} />
+                      ) : (
+                        <User size={10} />
+                      )}
                       {backup.triggeredBy === 'scheduler'
                         ? t('backup.scheduler')
                         : t('backup.manual')}
@@ -999,30 +1036,30 @@ function BackupSection() {
                       {/* Download */}
                       <a
                         href={`/api/backup/${backup.id}/download`}
-                        className="p-1 rounded-lg text-text-muted hover:text-brand hover:bg-brand/10 transition-all"
+                        className="p-2.5 rounded-lg text-text-muted hover:text-brand hover:bg-brand/10 transition-all"
                         title={t('backup.download')}
                       >
-                        <span className="icon text-base">download</span>
+                        <Download size={16} />
                       </a>
 
                       {/* Restore (ROOT only) */}
                       {isRoot && (
                         <button
                           onClick={() => setRestoreConfirmId(backup.id)}
-                          className="p-1 rounded-lg text-text-muted hover:text-gold hover:bg-gold/10 transition-all"
+                          className="p-2.5 rounded-lg text-text-muted hover:text-gold hover:bg-gold/10 transition-all"
                           title={t('backup.restore')}
                         >
-                          <span className="icon text-base">settings_backup_restore</span>
+                          <RotateCcw size={16} />
                         </button>
                       )}
 
                       {/* Delete */}
                       <button
                         onClick={() => setDeleteConfirmId(backup.id)}
-                        className="p-1 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-all"
+                        className="p-2.5 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-all"
                         title={t('common.delete')}
                       >
-                        <span className="icon text-base">delete</span>
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   )}
@@ -1093,7 +1130,7 @@ function BackupSection() {
       {/* DB Maintenance */}
       <Card className="p-4 space-y-3">
         <div className="flex items-center gap-2">
-          <span className="icon text-lg text-purple-400">engineering</span>
+          <Wrench size={20} className="text-purple-400" />
           <h3 className="font-heading font-bold text-sm">{t('backup.maintenance')}</h3>
         </div>
         <p className="text-xs text-text-muted">{t('backup.maintenanceDesc')}</p>
@@ -1104,7 +1141,7 @@ function BackupSection() {
             disabled={runMaintenance.isPending}
             className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-purple-500/15 text-purple-400 hover:bg-purple-500/25 transition-all flex items-center justify-center gap-1"
           >
-            <span className="icon text-lg">build</span>
+            <Hammer size={20} />
             {runMaintenance.isPending ? t('backup.running') : t('backup.runMaintenance')}
           </button>
           <button
@@ -1112,7 +1149,7 @@ function BackupSection() {
             disabled={runRetention.isPending}
             className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-orange-500/15 text-orange-400 hover:bg-orange-500/25 transition-all flex items-center justify-center gap-1"
           >
-            <span className="icon text-lg">auto_delete</span>
+            <Timer size={20} />
             {runRetention.isPending ? t('backup.running') : t('backup.runRetention')}
           </button>
         </div>
@@ -1131,27 +1168,27 @@ function BackupSection() {
               </p>
               <div className="grid grid-cols-3 gap-2 text-[10px]">
                 <div className="flex items-center gap-1">
-                  <span
-                    className={`icon text-xs ${maintenanceResult.vacuum ? 'text-brand' : 'text-red-400'}`}
-                  >
-                    {maintenanceResult.vacuum ? 'check_circle' : 'cancel'}
-                  </span>
+                  {maintenanceResult.vacuum ? (
+                    <CheckCircle size={12} className="text-brand" />
+                  ) : (
+                    <XCircle size={12} className="text-red-400" />
+                  )}
                   {t('backup.vacuum')}
                 </div>
                 <div className="flex items-center gap-1">
-                  <span
-                    className={`icon text-xs ${maintenanceResult.analyze ? 'text-brand' : 'text-red-400'}`}
-                  >
-                    {maintenanceResult.analyze ? 'check_circle' : 'cancel'}
-                  </span>
+                  {maintenanceResult.analyze ? (
+                    <CheckCircle size={12} className="text-brand" />
+                  ) : (
+                    <XCircle size={12} className="text-red-400" />
+                  )}
                   {t('backup.analyze')}
                 </div>
                 <div className="flex items-center gap-1">
-                  <span
-                    className={`icon text-xs ${maintenanceResult.reindex ? 'text-brand' : 'text-red-400'}`}
-                  >
-                    {maintenanceResult.reindex ? 'check_circle' : 'cancel'}
-                  </span>
+                  {maintenanceResult.reindex ? (
+                    <CheckCircle size={12} className="text-brand" />
+                  ) : (
+                    <XCircle size={12} className="text-red-400" />
+                  )}
                   {t('backup.reindex')}
                 </div>
               </div>

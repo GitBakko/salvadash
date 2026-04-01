@@ -23,6 +23,8 @@ import type { AnalyticsData } from '@salvadash/shared';
 import { useAnalytics } from '../hooks/queries';
 import { Card, Skeleton } from '../components/ui';
 import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
+import { BarChart3, TrendingUp, TrendingDown, Gauge, Trophy } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/analytics')({
   component: AnalyticsPage,
@@ -104,7 +106,7 @@ function AnalyticsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-16 text-center"
         >
-          <span className="icon text-text-muted text-[64px] mb-4">analytics</span>
+          <BarChart3 size={64} className="text-text-muted mb-4" strokeWidth={1.5} />
           <p className="text-text-secondary text-sm">{t('analytics.noData')}</p>
         </motion.div>
       </div>
@@ -451,33 +453,33 @@ function IncomeBarChart({ data }: { data: AnalyticsData['monthlyIncome'] }) {
 // ─── Performance Grid ──────────────────────────────────────
 
 function PerformanceGrid({ data, t }: { data: AnalyticsData; t: (k: string) => string }) {
-  const items = [
+  const items: { label: string; value: string; sub: string; Icon: LucideIcon; color: string }[] = [
     {
       label: t('analytics.bestMonth'),
       value: data.bestMonth.date ? formatMonthLong(data.bestMonth.date) : '—',
       sub: data.bestMonth.delta ? `+${fmtCurrency(data.bestMonth.delta)}` : '',
-      icon: 'trending_up',
+      Icon: TrendingUp,
       color: 'text-positive',
     },
     {
       label: t('analytics.worstMonth'),
       value: data.worstMonth.date ? formatMonthLong(data.worstMonth.date) : '—',
       sub: data.worstMonth.delta ? fmtCurrency(data.worstMonth.delta) : '',
-      icon: 'trending_down',
+      Icon: TrendingDown,
       color: 'text-negative',
     },
     {
       label: t('analytics.avgGrowth'),
       value: fmtCurrency(data.avgGrowth),
       sub: t('analytics.perMonth'),
-      icon: 'speed',
+      Icon: Gauge,
       color: data.avgGrowth >= 0 ? 'text-brand' : 'text-negative',
     },
     {
       label: t('analytics.bestYear'),
       value: data.bestYear.year ? String(data.bestYear.year) : '—',
       sub: data.bestYear.growth ? `+${fmtCurrency(data.bestYear.growth)}` : '',
-      icon: 'emoji_events',
+      Icon: Trophy,
       color: 'text-gold',
     },
   ];
@@ -493,7 +495,7 @@ function PerformanceGrid({ data, t }: { data: AnalyticsData; t: (k: string) => s
           className="bg-surface-elevated/30 rounded-xl p-3"
         >
           <div className="flex items-center gap-1.5 mb-1">
-            <span className={`icon text-base ${item.color}`}>{item.icon}</span>
+            <item.Icon size={16} className={item.color} />
             <span className="text-text-muted text-[10px] uppercase tracking-wider">
               {item.label}
             </span>

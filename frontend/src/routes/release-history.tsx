@@ -2,16 +2,18 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { ArrowLeft, Search, Sparkles, Bug, TrendingUp } from 'lucide-react';
 import { changelog, type ChangelogCategoryType } from '@salvadash/shared';
+import type { LucideIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/release-history')({
   component: ReleaseHistoryPage,
 });
 
-const categoryConfig: Record<ChangelogCategoryType, { icon: string; color: string; labelKey: string }> = {
-  feature: { icon: 'new_releases', color: 'text-brand', labelKey: 'version.features' },
-  fix: { icon: 'bug_report', color: 'text-negative', labelKey: 'version.fixes' },
-  improvement: { icon: 'trending_up', color: 'text-positive', labelKey: 'version.improvements' },
+const categoryConfig: Record<ChangelogCategoryType, { Icon: LucideIcon; color: string; labelKey: string }> = {
+  feature: { Icon: Sparkles, color: 'text-brand', labelKey: 'version.features' },
+  fix: { Icon: Bug, color: 'text-negative', labelKey: 'version.fixes' },
+  improvement: { Icon: TrendingUp, color: 'text-positive', labelKey: 'version.improvements' },
 };
 
 function ReleaseHistoryPage() {
@@ -35,7 +37,7 @@ function ReleaseHistoryPage() {
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link to="/settings" className="text-text-muted hover:text-text-primary transition-colors">
-          <span className="icon text-xl">arrow_back</span>
+          <ArrowLeft size={24} />
         </Link>
         <motion.h1
           initial={{ opacity: 0, y: 12 }}
@@ -49,7 +51,7 @@ function ReleaseHistoryPage() {
       {/* Search */}
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
         <div className="relative">
-          <span className="icon absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-lg">search</span>
+          <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
           <input
             type="text"
             value={search}
@@ -88,7 +90,7 @@ function ReleaseHistoryPage() {
               return (
                 <div key={cat.type} className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <span className={`icon text-base ${config.color}`}>{config.icon}</span>
+                    <config.Icon size={16} className={config.color} />
                     <span className="text-xs font-semibold text-text-secondary">{t(config.labelKey)}</span>
                   </div>
                   <ul className="space-y-1 ml-6">

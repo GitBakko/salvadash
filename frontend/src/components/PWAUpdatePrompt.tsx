@@ -1,6 +1,7 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RefreshCw } from 'lucide-react';
 import { Button } from './ui/Button';
 
 const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
@@ -43,7 +44,7 @@ export function PWAUpdatePrompt() {
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)' }}
         >
           <div className="flex items-center gap-3 max-w-lg mx-auto">
-            <span className="icon text-brand text-2xl shrink-0">system_update</span>
+            <RefreshCw size={28} className="text-brand shrink-0" />
             <p className="flex-1 text-sm text-text-primary">{t('pwa.updateAvailable')}</p>
             <Button size="sm" onClick={() => updateServiceWorker(true)}>
               {t('pwa.reload')}

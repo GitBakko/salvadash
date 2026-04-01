@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowDown, ArrowUp, ChevronRight, Trash2, CalendarDays } from 'lucide-react';
 import type { EntryListItem } from '@salvadash/shared';
 import { useEntries, useEntry, useDeleteEntry } from '../hooks/queries';
 import { Card, Skeleton, BottomSheet, Button } from '../components/ui';
@@ -123,8 +124,8 @@ function EntryCard({ entry, onTap }: { entry: EntryListItem; onTap: () => void }
               {fmtCurrency(entry.total)}
             </p>
             {entry.totalIncome > 0 && (
-              <p className="text-xs text-text-muted mt-0.5">
-                <span className="icon text-[12px] align-middle mr-0.5">arrow_downward</span>
+              <p className="text-xs text-text-muted mt-0.5 flex items-center gap-0.5">
+                <ArrowDown size={12} />
                 {fmtCurrency(entry.totalIncome)}
               </p>
             )}
@@ -137,9 +138,7 @@ function EntryCard({ entry, onTap }: { entry: EntryListItem; onTap: () => void }
                 isPositive ? 'bg-positive/15 text-positive' : 'bg-negative/15 text-negative'
               }`}
             >
-              <span className="icon text-[14px]">
-                {isPositive ? 'arrow_upward' : 'arrow_downward'}
-              </span>
+              {isPositive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
               <span>
                 {isPositive ? '+' : ''}
                 {fmtCurrency(entry.delta!)}
@@ -154,7 +153,7 @@ function EntryCard({ entry, onTap }: { entry: EntryListItem; onTap: () => void }
           )}
 
           {/* Chevron */}
-          <span className="icon text-text-muted text-lg ml-2 shrink-0">chevron_right</span>
+          <ChevronRight size={20} className="text-text-muted ml-2 shrink-0" />
         </div>
       </div>
     </Card>
@@ -273,7 +272,7 @@ function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () =
               onClick={handleDelete}
               loading={deleteEntry.isPending}
             >
-              <span className="icon text-sm">delete</span>
+              <Trash2 size={14} />
               {t('common.delete')}
             </Button>
           </div>
@@ -292,7 +291,7 @@ function EmptyState({ t }: { t: (k: string) => string }) {
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center py-16 text-center"
     >
-      <span className="icon text-text-muted text-[64px] mb-4">event_note</span>
+      <CalendarDays size={64} strokeWidth={1.5} className="text-text-muted mb-4" />
       <p className="text-text-secondary text-sm mb-1">{t('entries.noEntries')}</p>
       <p className="text-text-muted text-xs">{t('entries.noEntriesDesc')}</p>
     </motion.div>

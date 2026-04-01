@@ -8,6 +8,7 @@ import { PWAInstallBanner } from '../components/PWAInstallBanner';
 import { PWAUpdatePrompt } from '../components/PWAUpdatePrompt';
 import { WhatsNewModal } from '../components/WhatsNewModal';
 import { ToastContainer } from '../components/ui/Toast';
+import { CircleDollarSign } from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
 import { useUIStore } from '../stores/ui-store';
 import { Skeleton } from '../components/ui/Skeleton';
@@ -67,7 +68,7 @@ function RootLayout() {
     return (
       <div className="min-h-dvh bg-surface-base flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <span className="icon text-brand text-[48px] animate-pulse">monetization_on</span>
+          <CircleDollarSign size={48} className="text-brand animate-pulse" strokeWidth={1.5} />
           <Skeleton width={120} height={16} />
         </div>
       </div>

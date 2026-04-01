@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, type FormEvent } from 'react';
+import { CircleDollarSign, User, Mail, Lock, KeyRound } from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
 import { useUIStore } from '../stores/ui-store';
 import { Button } from '../components/ui/Button';
@@ -57,7 +58,7 @@ function RegisterPage() {
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <span className="icon text-brand text-[56px]">monetization_on</span>
+          <CircleDollarSign size={56} strokeWidth={1.5} className="text-brand mx-auto" />
           <h1 className="font-heading text-2xl font-bold text-brand mt-2">{t('common.appName')}</h1>
         </div>
 
@@ -79,7 +80,7 @@ function RegisterPage() {
             placeholder={t('auth.namePlaceholder')}
             autoComplete="name"
             required
-            icon={<span className="icon text-lg">person</span>}
+            icon={<User size={20} />}
           />
 
           <Input
@@ -90,7 +91,7 @@ function RegisterPage() {
             placeholder="email@example.com"
             autoComplete="email"
             required
-            icon={<span className="icon text-lg">email</span>}
+            icon={<Mail size={20} />}
           />
 
           <Input
@@ -101,7 +102,7 @@ function RegisterPage() {
             placeholder="••••••••"
             autoComplete="new-password"
             required
-            icon={<span className="icon text-lg">lock</span>}
+            icon={<Lock size={20} />}
           />
 
           <Input
@@ -112,7 +113,7 @@ function RegisterPage() {
             placeholder="••••••••"
             autoComplete="new-password"
             required
-            icon={<span className="icon text-lg">lock</span>}
+            icon={<Lock size={20} />}
           />
 
           <Input
@@ -122,7 +123,7 @@ function RegisterPage() {
             onChange={(e) => setInviteCode(e.target.value)}
             placeholder={t('auth.inviteCodePlaceholder')}
             required
-            icon={<span className="icon text-lg">vpn_key</span>}
+            icon={<KeyRound size={20} />}
           />
 
           <Button type="submit" fullWidth loading={loading}>

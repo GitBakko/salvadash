@@ -2,6 +2,31 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Banknote,
+  Bell,
+  BellOff,
+  Camera,
+  Check,
+  ChevronRight,
+  Download,
+  Euro,
+  FileJson,
+  HardDrive,
+  Info,
+  Languages,
+  Lock,
+  Mail,
+  Moon,
+  Palette,
+  Pencil,
+  Plus,
+  Sun,
+  Trash2,
+  Upload,
+  User,
+  X,
+} from 'lucide-react';
 import { CURRENCIES, type CurrencyCode, APP_VERSION } from '@salvadash/shared';
 import { useAuthStore } from '../stores/auth-store';
 import { useUIStore } from '../stores/ui-store';
@@ -20,7 +45,7 @@ import {
   useResetData,
 } from '../hooks/queries';
 import { api } from '../lib/api';
-import { Card, Input, Modal } from '../components/ui';
+import { Card, Input, Modal, Toggle } from '../components/ui';
 import { WhatsNewModal } from '../components/WhatsNewModal';
 
 export const Route = createFileRoute('/settings')({
@@ -58,7 +83,7 @@ function SettingsPage() {
       <CurrencySection />
 
       {/* Language */}
-      <Section title={t('settings.language')} icon="translate" delay={0.2}>
+      <Section title={t('settings.language')} icon={<Languages size={20} className="text-brand" />} delay={0.2}>
         <div className="flex gap-2">
           {(['it', 'en'] as const).map((lang) => (
             <button
@@ -83,7 +108,7 @@ function SettingsPage() {
       <DataManagementSection />
 
       {/* About */}
-      <Section title={t('settings.about')} icon="info" delay={0.3}>
+      <Section title={t('settings.about')} icon={<Info size={20} className="text-brand" />} delay={0.3}>
         <div className="space-y-2 text-sm text-text-secondary">
           <div className="flex justify-between">
             <span>{t('settings.version')}</span>
@@ -99,7 +124,7 @@ function SettingsPage() {
             className="flex items-center justify-between text-text-secondary hover:text-text-primary transition-colors"
           >
             <span>{t('version.releaseHistory')}</span>
-            <span className="icon text-base text-text-muted">chevron_right</span>
+            <ChevronRight size={16} className="text-text-muted" />
           </Link>
         </div>
       </Section>
@@ -238,7 +263,7 @@ function ProfileSection() {
       .slice(0, 2) ?? '??';
 
   return (
-    <Section title={t('settings.profile')} icon="person" delay={0.05}>
+    <Section title={t('settings.profile')} icon={<User size={20} className="text-brand" />} delay={0.05}>
       {/* Avatar + Info */}
       <div className="flex items-center gap-4 mb-4">
         <div className="relative group">
@@ -257,7 +282,7 @@ function ProfileSection() {
             onClick={() => avatarInputRef.current?.click()}
             className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
           >
-            <span className="icon text-white text-lg">photo_camera</span>
+            <Camera size={20} className="text-white" />
           </button>
           <input
             ref={avatarInputRef}
@@ -278,14 +303,14 @@ function ProfileSection() {
                 className="bg-transparent font-medium text-sm outline-none border-b border-brand/40 py-0.5 w-full"
                 autoFocus
               />
-              <button onClick={handleNameSave} className="icon text-brand text-lg shrink-0">
-                check
+              <button onClick={handleNameSave} className="p-2.5 text-brand shrink-0">
+                <Check size={20} />
               </button>
               <button
                 onClick={() => setEditingName(false)}
-                className="icon text-text-muted text-lg shrink-0"
+                className="p-2.5 text-text-muted shrink-0"
               >
-                close
+                <X size={20} />
               </button>
             </div>
           ) : (
@@ -296,9 +321,9 @@ function ProfileSection() {
                   setEditingName(true);
                   setNameValue(user?.name ?? '');
                 }}
-                className="icon text-text-muted text-sm hover:text-brand transition-colors shrink-0"
+                className="p-2.5 text-text-muted hover:text-brand transition-colors shrink-0"
               >
-                edit
+                <Pencil size={16} />
               </button>
             </div>
           )}
@@ -328,7 +353,7 @@ function ProfileSection() {
           }}
           className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-surface-elevated rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
         >
-          <span className="icon text-base">mail</span>
+          <Mail size={16} />
           {t('settings.changeEmail')}
         </button>
         <button
@@ -339,7 +364,7 @@ function ProfileSection() {
           }}
           className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-surface-elevated rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
         >
-          <span className="icon text-base">lock</span>
+          <Lock size={16} />
           {t('settings.changePassword')}
         </button>
       </div>
@@ -460,7 +485,7 @@ function PushSection() {
 
   if (state === 'unsupported') {
     return (
-      <Section title={t('push.title')} icon="notifications" delay={0.1}>
+      <Section title={t('push.title')} icon={<Bell size={20} className="text-brand" />} delay={0.1}>
         <p className="text-sm text-text-muted">{t('push.unsupported')}</p>
       </Section>
     );
@@ -468,7 +493,7 @@ function PushSection() {
 
   if (state === 'denied') {
     return (
-      <Section title={t('push.title')} icon="notifications_off" delay={0.1}>
+      <Section title={t('push.title')} icon={<BellOff size={20} className="text-brand" />} delay={0.1}>
         <p className="text-sm text-text-muted">{t('push.denied')}</p>
       </Section>
     );
@@ -478,28 +503,18 @@ function PushSection() {
   const isLoading = state === 'loading';
 
   return (
-    <Section title={t('push.title')} icon="notifications_active" delay={0.1}>
+    <Section title={t('push.title')} icon={<Bell size={20} className="text-brand" />} delay={0.1}>
       <p className="text-sm text-text-secondary mb-3">{t('push.description')}</p>
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">
           {isSubscribed ? t('push.enabled') : t('push.title')}
         </span>
-        <button
+        <Toggle
+          checked={isSubscribed}
+          onChange={isSubscribed ? unsubscribe : subscribe}
           disabled={isLoading}
-          onClick={isSubscribed ? unsubscribe : subscribe}
-          className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${
-            isSubscribed ? 'bg-brand' : 'bg-surface-elevated'
-          } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          role="switch"
-          aria-checked={isSubscribed}
           aria-label={t('push.title')}
-        >
-          <motion.div
-            className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-md"
-            animate={{ left: isSubscribed ? 24 : 4 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-          />
-        </button>
+        />
       </div>
     </Section>
   );
@@ -560,7 +575,7 @@ function IncomeSourcesSection() {
   };
 
   return (
-    <Section title={t('incomeSources.title')} icon="payments" delay={0.15}>
+    <Section title={t('incomeSources.title')} icon={<Banknote size={20} className="text-brand" />} delay={0.15}>
       {isLoading ? (
         <div className="h-20 animate-pulse bg-surface-elevated rounded-lg" />
       ) : (
@@ -588,15 +603,15 @@ function IncomeSourcesSection() {
                       />
                       <button
                         onClick={() => handleUpdate(source.id)}
-                        className="icon text-brand text-lg"
+                        className="p-2.5 text-brand"
                       >
-                        check
+                        <Check size={20} />
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        className="icon text-text-muted text-lg"
+                        className="p-2.5 text-text-muted"
                       >
-                        close
+                        <X size={20} />
                       </button>
                     </>
                   ) : (
@@ -606,29 +621,27 @@ function IncomeSourcesSection() {
                       >
                         {source.name}
                       </span>
-                      <button
-                        onClick={() => handleToggle(source.id, source.isActive)}
-                        className={`icon text-lg ${source.isActive ? 'text-brand' : 'text-text-muted'}`}
-                        title={
+                      <Toggle
+                        checked={source.isActive}
+                        onChange={() => handleToggle(source.id, source.isActive)}
+                        aria-label={
                           source.isActive ? t('incomeSources.active') : t('incomeSources.inactive')
                         }
-                      >
-                        {source.isActive ? 'toggle_on' : 'toggle_off'}
-                      </button>
+                      />
                       <button
                         onClick={() => {
                           setEditingId(source.id);
                           setEditName(source.name);
                         }}
-                        className="icon text-text-muted text-lg hover:text-text-primary"
+                        className="p-2.5 text-text-muted hover:text-text-primary"
                       >
-                        edit
+                        <Pencil size={20} />
                       </button>
                       <button
                         onClick={() => handleDelete(source.id)}
-                        className="icon text-text-muted text-lg hover:text-negative"
+                        className="p-2.5 text-text-muted hover:text-negative"
                       >
-                        delete
+                        <Trash2 size={20} />
                       </button>
                     </>
                   )}
@@ -654,7 +667,7 @@ function IncomeSourcesSection() {
               disabled={!newName.trim() || createSource.isPending}
               className="px-3 py-2 bg-brand text-surface-base rounded-lg text-sm font-medium disabled:opacity-50 transition-opacity"
             >
-              <span className="icon text-base">add</span>
+              <Plus size={16} />
             </button>
           </div>
         </>
@@ -684,7 +697,7 @@ function CurrencySection() {
   };
 
   return (
-    <Section title={t('settings.currency')} icon="euro" delay={0.18}>
+    <Section title={t('settings.currency')} icon={<Euro size={20} className="text-brand" />} delay={0.18}>
       <p className="text-sm text-text-secondary mb-3">{t('settings.currencyDesc')}</p>
       <div className="flex gap-2">
         {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (
@@ -713,7 +726,7 @@ function ThemeSection() {
   const { theme, setTheme } = useThemeStore();
 
   return (
-    <Section title={t('settings.theme')} icon="palette" delay={0.22}>
+    <Section title={t('settings.theme')} icon={<Palette size={20} className="text-brand" />} delay={0.22}>
       <div className="flex gap-2">
         {(['dark', 'light'] as const).map((mode) => (
           <button
@@ -725,7 +738,7 @@ function ThemeSection() {
                 : 'bg-surface-elevated text-text-secondary hover:text-text-primary'
             }`}
           >
-            <span className="icon text-base">{mode === 'dark' ? 'dark_mode' : 'light_mode'}</span>
+            {mode === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
             {t(`settings.${mode}`)}
           </button>
         ))}
@@ -797,7 +810,7 @@ function DataManagementSection() {
   };
 
   return (
-    <Section title={t('settings.dataManagement')} icon="storage" delay={0.25}>
+    <Section title={t('settings.dataManagement')} icon={<HardDrive size={20} className="text-brand" />} delay={0.25}>
       <div className="space-y-3">
         {/* Export buttons */}
         <div className="flex gap-2">
@@ -805,21 +818,21 @@ function DataManagementSection() {
             onClick={handleExportCSV}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-surface-elevated rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
           >
-            <span className="icon text-base">download</span>
+            <Download size={16} />
             {t('settings.exportCSV')}
           </button>
           <button
             onClick={handleExportJSON}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-surface-elevated rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
           >
-            <span className="icon text-base">code</span>
+            <FileJson size={16} />
             {t('settings.exportJSON')}
           </button>
         </div>
 
         {/* Import */}
         <label className="flex items-center justify-center gap-2 py-2.5 bg-surface-elevated rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors cursor-pointer">
-          <span className="icon text-base">upload_file</span>
+          <Upload size={16} />
           {importing ? t('settings.importing') : t('settings.selectFile')}
           <input
             ref={fileRef}
@@ -836,7 +849,7 @@ function DataManagementSection() {
           onClick={() => setShowResetModal(true)}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium bg-negative/10 text-negative hover:bg-negative/20 transition-colors"
         >
-          <span className="icon text-base">delete_forever</span>
+          <Trash2 size={16} />
           {t('settings.resetData')}
         </button>
       </div>
@@ -892,7 +905,7 @@ function Section({
   children,
 }: {
   title: string;
-  icon: string;
+  icon: React.ReactNode;
   delay: number;
   children: React.ReactNode;
 }) {
@@ -904,7 +917,7 @@ function Section({
     >
       <Card>
         <div className="flex items-center gap-2 mb-3">
-          <span className="icon text-brand text-lg">{icon}</span>
+          {icon}
           <h2 className="font-heading text-sm font-semibold uppercase tracking-wider text-text-muted">
             {title}
           </h2>

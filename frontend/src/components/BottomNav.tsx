@@ -1,22 +1,24 @@
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
+import { Wallet, Home, Clock, Plus, BarChart3, Settings } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
 
 interface NavItem {
   path: string;
-  icon: string;
+  Icon: LucideIcon;
   labelKey: string;
   isFab?: boolean;
 }
 
 const navItems: NavItem[] = [
-  { path: '/accounts', icon: 'account_balance_wallet', labelKey: 'nav.accounts' },
-  { path: '/', icon: 'home', labelKey: 'nav.home' },
-  { path: '/history', icon: 'history', labelKey: 'nav.history' },
-  { path: '/new-entry', icon: 'add', labelKey: 'nav.newEntry', isFab: true },
-  { path: '/analytics', icon: 'analytics', labelKey: 'nav.analytics' },
-  { path: '/settings', icon: 'settings', labelKey: 'nav.settings' },
+  { path: '/accounts', Icon: Wallet, labelKey: 'nav.accounts' },
+  { path: '/', Icon: Home, labelKey: 'nav.home' },
+  { path: '/history', Icon: Clock, labelKey: 'nav.history' },
+  { path: '/new-entry', Icon: Plus, labelKey: 'nav.newEntry', isFab: true },
+  { path: '/analytics', Icon: BarChart3, labelKey: 'nav.analytics' },
+  { path: '/settings', Icon: Settings, labelKey: 'nav.settings' },
 ];
 
 export function BottomNav() {
@@ -42,7 +44,7 @@ export function BottomNav() {
                 className="relative -mt-6 w-14 h-14 rounded-full bg-brand flex items-center justify-center shadow-lg glow-brand active:scale-95 transition-transform"
                 aria-label={t(item.labelKey)}
               >
-                <span className="icon text-surface-base text-[28px]">{item.icon}</span>
+                <item.Icon size={28} className="text-surface-base" />
               </button>
             );
           }
@@ -70,11 +72,10 @@ export function BottomNav() {
                   className={`w-[22px] h-[22px] rounded-full object-cover transition-all duration-200 ${isActive ? 'ring-2 ring-brand' : 'opacity-70'}`}
                 />
               ) : (
-                <span
-                  className={`icon text-[22px] transition-colors duration-200 ${isActive ? 'text-brand' : 'text-text-muted'}`}
-                >
-                  {item.icon}
-                </span>
+                <item.Icon
+                  size={22}
+                  className={`transition-colors duration-200 ${isActive ? 'text-brand' : 'text-text-muted'}`}
+                />
               )}
               <span
                 className={`text-[10px] font-medium transition-colors duration-200 ${isActive ? 'text-brand' : 'text-text-muted'}`}

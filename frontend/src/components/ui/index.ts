@@ -5,3 +5,4 @@ export { Modal } from './Modal';
 export { BottomSheet } from './BottomSheet';
 export { Skeleton, SkeletonCard } from './Skeleton';
 export { ToastContainer } from './Toast';
+export { Toggle } from './Toggle';

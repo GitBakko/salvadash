@@ -14,6 +14,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
     const accounts = await prisma.account.findMany({
       where: { userId: req.user!.userId },
       orderBy: { sortOrder: 'asc' },
+      include: { _count: { select: { balances: true } } },
     });
 
     res.json({
@@ -26,6 +27,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
         color: a.color,
         isActive: a.isActive,
         sortOrder: a.sortOrder,
+        entryCount: a._count.balances,
       })),
     });
   } catch (error) {
@@ -80,6 +82,37 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       return;
     }
     console.error('POST /accounts error:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+// ─── PUT /accounts/reorder ──────────────────────────────────
+// NOTE: Must be before /:id to avoid Express matching "reorder" as an :id param
+
+router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const parsed = reorderAccountsSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res
+        .status(400)
+        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
+      return;
+    }
+
+    const userId = req.user!.userId;
+
+    await prisma.$transaction(
+      parsed.data.accounts.map((item) =>
+        prisma.account.updateMany({
+          where: { id: item.id, userId },
+          data: { sortOrder: item.sortOrder },
+        }),
+      ),
+    );
+
+    res.json({ success: true, message: 'Accounts reordered' });
+  } catch (error) {
+    console.error('PUT /accounts/reorder error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -166,36 +199,6 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
     res.json({ success: true, message: 'Account deleted' });
   } catch (error) {
     console.error('DELETE /accounts/:id error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
-
-// ─── PUT /accounts/reorder ──────────────────────────────────
-
-router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const parsed = reorderAccountsSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
-
-    const userId = req.user!.userId;
-
-    await prisma.$transaction(
-      parsed.data.accounts.map((item) =>
-        prisma.account.updateMany({
-          where: { id: item.id, userId },
-          data: { sortOrder: item.sortOrder },
-        }),
-      ),
-    );
-
-    res.json({ success: true, message: 'Accounts reordered' });
-  } catch (error) {
-    console.error('PUT /accounts/reorder error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });

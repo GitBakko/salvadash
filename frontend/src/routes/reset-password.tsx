@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, type FormEvent } from 'react';
+import { CircleDollarSign, AlertCircle, Lock } from 'lucide-react';
 import { api } from '../lib/api';
 import { useUIStore } from '../stores/ui-store';
 import { Button } from '../components/ui/Button';
@@ -55,7 +56,7 @@ function ResetPasswordPage() {
     return (
       <div className="min-h-dvh flex items-center justify-center p-4">
         <div className="w-full max-w-sm glass-card p-6 text-center space-y-4">
-          <span className="icon text-negative text-[48px]">error</span>
+          <AlertCircle size={48} strokeWidth={1.5} className="text-negative mx-auto" />
           <p className="text-text-secondary text-sm">{t('auth.invalidResetLink')}</p>
           <Link to="/forgot-password">
             <Button variant="secondary" fullWidth>
@@ -72,7 +73,7 @@ function ResetPasswordPage() {
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <span className="icon text-brand text-[56px]">monetization_on</span>
+          <CircleDollarSign size={56} strokeWidth={1.5} className="text-brand mx-auto" />
           <h1 className="font-heading text-2xl font-bold text-brand mt-2">{t('common.appName')}</h1>
         </div>
 
@@ -95,7 +96,7 @@ function ResetPasswordPage() {
             placeholder="••••••••"
             autoComplete="new-password"
             required
-            icon={<span className="icon text-lg">lock</span>}
+            icon={<Lock size={20} />}
           />
 
           <Input
@@ -106,7 +107,7 @@ function ResetPasswordPage() {
             placeholder="••••••••"
             autoComplete="new-password"
             required
-            icon={<span className="icon text-lg">lock</span>}
+            icon={<Lock size={20} />}
           />
 
           <Button type="submit" fullWidth loading={loading}>

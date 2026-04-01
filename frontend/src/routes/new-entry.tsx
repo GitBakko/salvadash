@@ -3,6 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  ArrowLeft,
+  Wallet,
+  Banknote,
+  Plus,
+  X,
+  Check,
+  PlusCircle,
+  StickyNote,
+  Save,
+} from 'lucide-react';
+import {
   useAccounts,
   useIncomeSources,
   useCreateEntry,
@@ -140,7 +151,7 @@ function NewEntryPage() {
           onClick={() => navigate({ to: '/' })}
           className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors"
         >
-          <span className="icon text-xl">arrow_back</span>
+          <ArrowLeft size={24} />
           <span className="text-sm">{t('common.back')}</span>
         </button>
         <h1 className="font-heading text-lg font-bold">{t('entries.newEntry')}</h1>
@@ -172,8 +183,8 @@ function NewEntryPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
             >
-              <p className="text-sm font-medium text-text-secondary mb-3">
-                <span className="icon text-sm align-middle mr-1">account_balance_wallet</span>
+              <p className="text-sm font-medium text-text-secondary mb-3 flex items-center gap-1">
+                <Wallet size={14} />
                 {t('entries.balances')}
               </p>
               {errors.balances && <p className="text-xs text-negative mb-2">{errors.balances}</p>}
@@ -186,7 +197,7 @@ function NewEntryPage() {
                     transition={{ delay: 0.06 * i }}
                     className="flex items-center gap-3"
                   >
-                    {/* Account indicator */}
+                    {/* Account indicator — DB-driven icon, keep as Material Symbols */}
                     <div className="flex items-center gap-2 min-w-0 w-28 shrink-0">
                       {account.icon && (
                         <span
@@ -227,15 +238,15 @@ function NewEntryPage() {
               transition={{ delay: 0.1 }}
             >
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium text-text-secondary">
-                  <span className="icon text-sm align-middle mr-1">payments</span>
+                <p className="text-sm font-medium text-text-secondary flex items-center gap-1">
+                  <Banknote size={14} />
                   {t('entries.incomes')}
                 </p>
                 <button
                   onClick={addIncomeRow}
                   className="text-brand text-xs font-semibold flex items-center gap-0.5 hover:text-brand-hover transition-colors"
                 >
-                  <span className="icon text-sm">add</span>
+                  <Plus size={14} />
                   {t('entries.addIncome')}
                 </button>
               </div>
@@ -286,7 +297,7 @@ function NewEntryPage() {
                       onClick={() => removeIncomeRow(i)}
                       className="shrink-0 w-8 h-8 flex items-center justify-center text-text-muted hover:text-negative transition-colors"
                     >
-                      <span className="icon text-lg">close</span>
+                      <X size={20} />
                     </button>
                   </motion.div>
                 ))}
@@ -318,7 +329,7 @@ function NewEntryPage() {
                     disabled={createSource.isPending}
                     className="shrink-0 w-8 h-8 flex items-center justify-center text-brand hover:text-brand-hover disabled:opacity-50 transition-colors"
                   >
-                    <span className="icon text-lg">check</span>
+                    <Check size={20} />
                   </button>
                   <button
                     onClick={() => {
@@ -327,7 +338,7 @@ function NewEntryPage() {
                     }}
                     className="shrink-0 w-8 h-8 flex items-center justify-center text-text-muted hover:text-negative transition-colors"
                   >
-                    <span className="icon text-lg">close</span>
+                    <X size={20} />
                   </button>
                 </motion.div>
               ) : (
@@ -335,7 +346,7 @@ function NewEntryPage() {
                   onClick={() => setShowNewSource(true)}
                   className="text-text-muted text-xs flex items-center gap-0.5 hover:text-text-secondary transition-colors mt-1"
                 >
-                  <span className="icon text-sm">add_circle_outline</span>
+                  <PlusCircle size={14} />
                   {t('entries.newSource')}
                 </button>
               )}
@@ -347,8 +358,8 @@ function NewEntryPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
             >
-              <label className="block text-sm font-medium text-text-secondary mb-1.5">
-                <span className="icon text-sm align-middle mr-1">notes</span>
+              <label className="block text-sm font-medium text-text-secondary mb-1.5 flex items-center gap-1">
+                <StickyNote size={14} />
                 {t('entries.notes')}
               </label>
               <textarea
@@ -398,7 +409,7 @@ function NewEntryPage() {
             </div>
 
             <Button fullWidth size="lg" onClick={handleSubmit} loading={createEntry.isPending}>
-              <span className="icon text-lg">save</span>
+              <Save size={20} />
               {t('entries.saveEntry')}
             </Button>
           </div>

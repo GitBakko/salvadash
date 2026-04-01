@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useState, type FormEvent } from 'react';
+import { Tag } from 'lucide-react';
 import type { AccountPublic } from '@salvadash/shared';
 import { useCreateAccount, useUpdateAccount } from '../hooks/queries';
 import { useUIStore } from '../stores/ui-store';
@@ -22,6 +23,7 @@ const COLOR_OPTIONS = [
   '#e879f9',
 ];
 
+// These are Material Symbols names stored in the DB — keep as strings
 const ICON_OPTIONS = [
   'account_balance',
   'savings',
@@ -99,7 +101,7 @@ export function AccountFormModal({ account, onClose }: Props) {
           onChange={(e) => setName(e.target.value)}
           placeholder="es. Conto Corrente"
           required
-          icon={<span className="icon text-lg">label</span>}
+          icon={<Tag size={20} />}
         />
 
         {/* Type selector */}
@@ -125,7 +127,7 @@ export function AccountFormModal({ account, onClose }: Props) {
           </div>
         </div>
 
-        {/* Icon selector */}
+        {/* Icon selector — Material Symbols (stored in DB) */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-text-secondary">Icona</label>
           <div className="grid grid-cols-6 gap-2">
