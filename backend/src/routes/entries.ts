@@ -2,7 +2,7 @@ import { Router, type Router as RouterType, type Request, type Response } from '
 import { createEntrySchema, updateEntrySchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../generated/prisma/client.js';
 
 const router: RouterType = Router();
 

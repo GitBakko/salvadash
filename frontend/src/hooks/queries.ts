@@ -14,6 +14,7 @@ import type {
   InviteCodePublic,
   IncomeSourcePublic,
   NotificationPublic,
+  ChangelogEntry,
 } from '@salvadash/shared';
 import { api } from '../lib/api';
 
@@ -34,6 +35,8 @@ export const queryKeys = {
   unreadCount: ['notifications', 'unread-count'] as const,
   backups: ['backups'] as const,
   backupConfig: ['backup', 'config'] as const,
+  version: ['version'] as const,
+  changelog: ['changelog'] as const,
 };
 
 // ─── Accounts ──────────────────────────────────────────────
@@ -641,6 +644,30 @@ export function useResetData() {
       qc.invalidateQueries({ queryKey: ['entries'] });
       qc.invalidateQueries({ queryKey: ['dashboard'] });
       qc.invalidateQueries({ queryKey: ['analytics'] });
+    },
+  });
+}
+
+// ─── Version & Changelog ───────────────────────────────────
+
+export function useChangelog() {
+  return useQuery({
+    queryKey: queryKeys.changelog,
+    queryFn: async () => {
+      const res = await api.get<{ version: string; changelog: ChangelogEntry[] }>('/version');
+      if (!res.success) throw new Error(res.error ?? 'Failed to fetch changelog');
+      return res.data!;
+    },
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
+}
+
+export function useMarkVersionSeen() {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await api.put<{ lastSeenVersion: string }>('/version/seen');
+      if (!res.success) throw new Error(res.error ?? 'Failed to mark version seen');
+      return res.data!;
     },
   });
 }

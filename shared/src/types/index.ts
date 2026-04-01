@@ -26,6 +26,7 @@ export interface UserPublic {
   avatarUrl: string | null;
   emailVerified: boolean;
   isActive: boolean;
+  lastSeenVersion: string | null;
   createdAt: string;
 }
 

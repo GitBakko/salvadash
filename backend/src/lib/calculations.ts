@@ -3,7 +3,7 @@
  * All functions are stateless — they take data in, return results out.
  */
 
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '../generated/prisma/client.js';
 
 // ─── Types ──────────────────────────────────────────────────
 

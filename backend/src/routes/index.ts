@@ -9,6 +9,7 @@ import adminRoutes from './admin.js';
 import notificationRoutes from './notifications.js';
 import pushRoutes from './push.js';
 import backupRoutes from './backup.js';
+import versionRoutes from './version.js';
 
 const router: RouterType = Router();
 
@@ -22,5 +23,6 @@ router.use('/admin', adminRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/push', pushRoutes);
 router.use('/backup', backupRoutes);
+router.use('/version', versionRoutes);
 
 export default router;

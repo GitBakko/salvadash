@@ -1,9 +1,18 @@
-import { PrismaClient, Role, AccountType } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaClient, Role, AccountType } from '../src/generated/prisma/client.js';
+import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
 import XLSX from 'xlsx';
 import path from 'path';
 
-const prisma = new PrismaClient();
+// Strip Prisma-specific ?schema= param from DATABASE_URL before passing to pg driver
+const dbUrl = new URL(process.env.DATABASE_URL!);
+const schema = dbUrl.searchParams.get('schema') || 'public';
+dbUrl.searchParams.delete('schema');
+
+const adapter = new PrismaPg(dbUrl.toString(), { schema });
+
+const prisma = new PrismaClient({ adapter });
 
 // ─── Env config (credentials ONLY from env) ───────────────
 const env = (key: string, fallback?: string): string => {

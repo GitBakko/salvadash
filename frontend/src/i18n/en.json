@@ -232,7 +232,9 @@
     "installTitle": "Install SalvaDash",
     "installText": "Add to home screen for a better experience.",
     "install": "Install",
-    "dismiss": "Not now"
+    "dismiss": "Not now",
+    "updateAvailable": "New version available!",
+    "reload": "Update"
   },
   "notifications": {
     "title": "Notifications",
@@ -301,5 +303,15 @@
     "vacuum": "Vacuum",
     "analyze": "Analyze",
     "reindex": "Reindex"
+  },
+  "version": {
+    "whatsNew": "What's New",
+    "releaseHistory": "Release History",
+    "gotIt": "Got it",
+    "features": "New Features",
+    "fixes": "Bug Fixes",
+    "improvements": "Improvements",
+    "searchPlaceholder": "Search by version, date or content...",
+    "noResults": "No results found"
   }
 }

@@ -23,6 +23,7 @@
     "react-dom": "^19.0.0",
     "react-i18next": "^15.4.0",
     "recharts": "^2.15.0",
+    "workbox-window": "^7.4.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {

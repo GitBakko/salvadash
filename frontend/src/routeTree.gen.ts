@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ReleaseHistoryRouteImport } from './routes/release-history'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as NewEntryRouteImport } from './routes/new-entry'
@@ -30,6 +31,11 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReleaseHistoryRoute = ReleaseHistoryRouteImport.update({
+  id: '/release-history',
+  path: '/release-history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/new-entry': typeof NewEntryRoute
   '/register': typeof RegisterRoute
+  '/release-history': typeof ReleaseHistoryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/new-entry': typeof NewEntryRoute
   '/register': typeof RegisterRoute
+  '/release-history': typeof ReleaseHistoryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/new-entry': typeof NewEntryRoute
   '/register': typeof RegisterRoute
+  '/release-history': typeof ReleaseHistoryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/new-entry'
     | '/register'
+    | '/release-history'
     | '/reset-password'
     | '/settings'
     | '/verify-email'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/new-entry'
     | '/register'
+    | '/release-history'
     | '/reset-password'
     | '/settings'
     | '/verify-email'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/new-entry'
     | '/register'
+    | '/release-history'
     | '/reset-password'
     | '/settings'
     | '/verify-email'
@@ -181,6 +193,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   NewEntryRoute: typeof NewEntryRoute
   RegisterRoute: typeof RegisterRoute
+  ReleaseHistoryRoute: typeof ReleaseHistoryRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SettingsRoute: typeof SettingsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
@@ -200,6 +213,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/release-history': {
+      id: '/release-history'
+      path: '/release-history'
+      fullPath: '/release-history'
+      preLoaderRoute: typeof ReleaseHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -285,6 +305,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   NewEntryRoute: NewEntryRoute,
   RegisterRoute: RegisterRoute,
+  ReleaseHistoryRoute: ReleaseHistoryRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SettingsRoute: SettingsRoute,
   VerifyEmailRoute: VerifyEmailRoute,

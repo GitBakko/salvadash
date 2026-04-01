@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/auth.js';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../generated/prisma/client.js';
 import { rawEntryToRow, computeDashboard, computeAnalytics } from '../lib/calculations.js';
 
 const router: RouterType = Router();

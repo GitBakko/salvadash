@@ -43,6 +43,19 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: res.data.user, isAuthenticated: true });
       return { success: true };
     }
+    const details = res.details as
+      | { fieldErrors?: Record<string, string[]>; formErrors?: string[] }
+      | undefined;
+    if (details?.fieldErrors) {
+      const messages = Object.entries(details.fieldErrors)
+        .flatMap(([, msgs]) => msgs);
+      if (messages.length > 0) {
+        return { success: false, error: messages.join('. ') };
+      }
+    }
+    if (details?.formErrors?.length) {
+      return { success: false, error: details.formErrors.join('. ') };
+    }
     return { success: false, error: res.error ?? 'Login failed' };
   },
 
@@ -50,6 +63,19 @@ export const useAuthStore = create<AuthState>((set) => ({
     const res = await api.post('/auth/register', data);
     if (res.success) {
       return { success: true };
+    }
+    const details = res.details as
+      | { fieldErrors?: Record<string, string[]>; formErrors?: string[] }
+      | undefined;
+    if (details?.fieldErrors) {
+      const messages = Object.entries(details.fieldErrors)
+        .flatMap(([, msgs]) => msgs);
+      if (messages.length > 0) {
+        return { success: false, error: messages.join('. ') };
+      }
+    }
+    if (details?.formErrors?.length) {
+      return { success: false, error: details.formErrors.join('. ') };
     }
     return { success: false, error: res.error ?? 'Registration failed' };
   },

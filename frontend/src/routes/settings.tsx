@@ -1,8 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CURRENCIES, type CurrencyCode } from '@salvadash/shared';
+import { CURRENCIES, type CurrencyCode, APP_VERSION } from '@salvadash/shared';
 import { useAuthStore } from '../stores/auth-store';
 import { useUIStore } from '../stores/ui-store';
 import { useThemeStore } from '../stores/theme-store';
@@ -21,6 +21,7 @@ import {
 } from '../hooks/queries';
 import { api } from '../lib/api';
 import { Card, Input, Modal } from '../components/ui';
+import { WhatsNewModal } from '../components/WhatsNewModal';
 
 export const Route = createFileRoute('/settings')({
   component: SettingsPage,
@@ -32,6 +33,7 @@ function SettingsPage() {
   const { t, i18n } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const [showWhatsNew, setShowWhatsNew] = useState(false);
 
   return (
     <div className="p-4 max-w-lg mx-auto space-y-4 pb-24">
@@ -85,8 +87,20 @@ function SettingsPage() {
         <div className="space-y-2 text-sm text-text-secondary">
           <div className="flex justify-between">
             <span>{t('settings.version')}</span>
-            <span className="font-mono text-text-muted">1.0.0</span>
+            <button
+              onClick={() => setShowWhatsNew(true)}
+              className="font-mono text-text-muted hover:text-brand transition-colors cursor-pointer"
+            >
+              v{APP_VERSION}
+            </button>
           </div>
+          <Link
+            to="/release-history"
+            className="flex items-center justify-between text-text-secondary hover:text-text-primary transition-colors"
+          >
+            <span>{t('version.releaseHistory')}</span>
+            <span className="icon text-base text-text-muted">chevron_right</span>
+          </Link>
         </div>
       </Section>
 
@@ -103,6 +117,11 @@ function SettingsPage() {
           Logout
         </button>
       </motion.div>
+
+      {/* WhatsNew Modal — rendered from WhatsNewModal component */}
+      {showWhatsNew && (
+        <WhatsNewModal onClose={() => setShowWhatsNew(false)} />
+      )}
     </div>
   );
 }

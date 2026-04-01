@@ -5,6 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../stores/auth-store';
 import { useUnreadCount } from '../hooks/queries';
 import { NotificationCenter } from './NotificationCenter';
+import { VersionBadge } from './VersionBadge';
 
 export function Header() {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ export function Header() {
             <span className="icon text-brand text-[28px]">monetization_on</span>
             <h1 className="font-heading text-xl font-bold text-brand">{t('common.appName')}</h1>
           </Link>
+          <VersionBadge className="ml-1 self-end mb-0.5" />
 
           <div className="flex items-center gap-2">
             {/* Notification bell */}

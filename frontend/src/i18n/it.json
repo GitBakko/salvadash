@@ -232,7 +232,9 @@
     "installTitle": "Installa SalvaDash",
     "installText": "Aggiungi alla schermata home per un'esperienza migliore.",
     "install": "Installa",
-    "dismiss": "Non ora"
+    "dismiss": "Non ora",
+    "updateAvailable": "Nuova versione disponibile!",
+    "reload": "Aggiorna"
   },
   "notifications": {
     "title": "Notifiche",
@@ -301,5 +303,15 @@
     "vacuum": "Vacuum",
     "analyze": "Analyze",
     "reindex": "Reindex"
+  },
+  "version": {
+    "whatsNew": "Novità",
+    "releaseHistory": "Cronologia Versioni",
+    "gotIt": "Ho capito",
+    "features": "Nuove Funzionalità",
+    "fixes": "Correzioni",
+    "improvements": "Miglioramenti",
+    "searchPlaceholder": "Cerca per versione, data o contenuto...",
+    "noResults": "Nessun risultato trovato"
   }
 }

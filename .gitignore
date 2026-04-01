@@ -6,6 +6,12 @@ dist/
 build/
 *.tsbuildinfo
 
+# ─── TSC artifacts in source dirs (from tsc -b) ───────────
+frontend/src/**/*.js
+frontend/src/**/*.js.map
+frontend/src/**/*.d.ts
+frontend/src/**/*.d.ts.map
+
 # ─── Environment ───────────────────────────────────────────
 .env
 .env.local
@@ -29,6 +35,7 @@ Desktop.ini
 
 # ─── Prisma ─────────────────────────────────────────────────
 backend/prisma/migrations/
+backend/src/generated/
 
 # ─── Logs ───────────────────────────────────────────────────
 *.log
@@ -64,3 +71,5 @@ backups/
 tmp/
 temp/
 *.tmp
+*.zip
+backend/test-pg-connection.mjs

@@ -380,6 +380,7 @@ router.get('/me', authenticate, async (req: Request, res: Response): Promise<voi
         currency: true,
         avatarUrl: true,
         emailVerified: true,
+        lastSeenVersion: true,
         createdAt: true,
       },
     });

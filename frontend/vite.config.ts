@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     TanStackRouterVite(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       workbox: {
         importScripts: ['sw-push.js', 'sw-sync.js'],
@@ -70,8 +70,20 @@ export default defineConfig({
         start_url: '/',
         categories: ['finance', 'utilities'],
         icons: [
+          { src: '/pwa-48x48.png', sizes: '48x48', type: 'image/png' },
+          { src: '/pwa-72x72.png', sizes: '72x72', type: 'image/png' },
+          { src: '/pwa-96x96.png', sizes: '96x96', type: 'image/png' },
+          { src: '/pwa-128x128.png', sizes: '128x128', type: 'image/png' },
+          { src: '/pwa-144x144.png', sizes: '144x144', type: 'image/png' },
           { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: '/pwa-384x384.png', sizes: '384x384', type: 'image/png' },
           { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          {
+            src: '/pwa-maskable-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
           {
             src: '/pwa-maskable-512x512.png',
             sizes: '512x512',
@@ -104,11 +116,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3010',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       },
       '/uploads': {
-        target: 'http://localhost:3010',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       },
     },

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && node scripts/fix-prisma-esm.mjs",
     "start": "node dist/index.js",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
@@ -18,7 +18,9 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^6.0.0",
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
+    "pg": "^8.13.0",
     "@salvadash/shared": "workspace:*",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
@@ -33,6 +35,8 @@
     "nodemailer": "^6.9.0",
     "web-push": "^3.6.7",
     "xlsx": "^0.18.5",
+    "prisma": "^7.0.0",
+    "tsx": "^4.19.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
@@ -49,13 +53,8 @@
     "@types/supertest": "^7.2.0",
     "@types/web-push": "^3.6.4",
     "@vitest/coverage-v8": "^2.1.9",
-    "prisma": "^6.0.0",
     "supertest": "^7.2.2",
-    "tsx": "^4.19.0",
     "typescript": "^5.7.0",
     "vitest": "^2.1.0"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   }
 }

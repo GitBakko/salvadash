@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth-store';
 import { useUIStore } from '../stores/ui-store';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { VersionBadge } from '../components/VersionBadge';
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
@@ -39,7 +40,7 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center p-4">
+    <div className="min-h-dvh flex items-center justify-center p-4 relative">
       <div className="w-full max-w-sm space-y-8">
         {/* Logo */}
         <div className="text-center">
@@ -105,6 +106,9 @@ function LoginPage() {
           </Link>
         </p>
       </div>
+
+      {/* Version badge */}
+      <VersionBadge className="absolute bottom-4 right-4 opacity-60" />
     </div>
   );
 }
