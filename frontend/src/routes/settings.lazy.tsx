@@ -114,7 +114,7 @@ function SettingsPage() {
             <span>{t('settings.version')}</span>
             <button
               onClick={() => setShowWhatsNew(true)}
-              className="font-mono text-text-muted hover:text-brand transition-colors cursor-pointer"
+              className="tabular-nums text-text-muted hover:text-brand transition-colors cursor-pointer"
             >
               v{APP_VERSION}
             </button>

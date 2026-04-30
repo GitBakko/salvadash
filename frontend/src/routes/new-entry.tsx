@@ -218,7 +218,7 @@ function NewEntryPage() {
                         onChange={(e) => updateBalance(account.id, e.target.value)}
                         className="w-full bg-surface-elevated/50 text-text-primary text-right
                           border border-border-default rounded-md
-                          px-3 py-2 text-sm font-mono
+                          px-3 py-2 text-sm tabular-nums
                           placeholder:text-text-muted
                           focus:outline-none focus:border-brand/60 focus:ring-1 focus:ring-brand/30
                           transition-all duration-200"
@@ -286,7 +286,7 @@ function NewEntryPage() {
                       onChange={(e) => updateIncomeRow(i, 'amount', e.target.value)}
                       className="w-24 bg-surface-elevated/50 text-text-primary text-right
                         border border-border-default rounded-md
-                        px-3 py-2 text-sm font-mono
+                        px-3 py-2 text-sm tabular-nums
                         placeholder:text-text-muted
                         focus:outline-none focus:border-brand/60 focus:ring-1 focus:ring-brand/30
                         transition-all duration-200"
