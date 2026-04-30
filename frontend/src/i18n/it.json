@@ -141,6 +141,7 @@
     "bestYear": "Anno Migliore",
     "noData": "Aggiungi almeno due rilevazioni per visualizzare le analytics.",
     "perMonth": "/mese",
+    "atLeastOneYear": "Almeno un anno deve essere attivo",
     "filter": {
       "label": "Filtra per conto",
       "allAccounts": "Tutti i conti",

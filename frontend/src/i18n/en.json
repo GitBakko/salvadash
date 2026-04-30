@@ -141,6 +141,7 @@
     "bestYear": "Best Year",
     "noData": "Add at least two entries to view analytics.",
     "perMonth": "/month",
+    "atLeastOneYear": "At least one year must be active",
     "filter": {
       "label": "Filter by account",
       "allAccounts": "All accounts",

@@ -253,6 +253,7 @@ function YearComparisonChart({
   data: AnalyticsData['yearComparison'];
   lang: string;
 }) {
+  const { t } = useTranslation();
   const years = Object.keys(data).sort();
   const [activeYears, setActiveYears] = useState<Set<string>>(() => {
     // Show last 3 years by default
@@ -270,6 +271,7 @@ function YearComparisonChart({
       return next;
     });
   };
+  const isLastActive = (year: string) => activeYears.size === 1 && activeYears.has(year);
 
   const monthLabels = useMemo(
     () =>
@@ -306,7 +308,11 @@ function YearComparisonChart({
             <button
               key={year}
               onClick={() => toggleYear(year)}
-              className="px-3 min-h-11 inline-flex items-center rounded-full text-xs font-semibold transition-all border"
+              aria-disabled={isLastActive(year) || undefined}
+              title={isLastActive(year) ? t('analytics.atLeastOneYear') : undefined}
+              className={`px-3 min-h-11 inline-flex items-center rounded-full text-xs font-semibold transition-all border ${
+                isLastActive(year) ? 'cursor-not-allowed opacity-60' : ''
+              }`}
               style={{
                 backgroundColor: active ? color + '20' : 'transparent',
                 borderColor: active ? color : 'rgba(255,255,255,0.1)',
