@@ -141,7 +141,7 @@ function HeroCard({
       <div className="relative">
         <AnimatedNumber
           value={data.currentTotal}
-          className="font-heading text-[42px] font-bold text-gold leading-tight"
+          className="font-heading text-[42px] font-bold text-text-primary leading-tight"
         />
       </div>
 
