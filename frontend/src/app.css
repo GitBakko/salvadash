@@ -49,23 +49,8 @@
   --header-height: 3.5rem; /* matches Header py-3 + content */
   --nav-height: 4rem; /* BottomNav height — drives main paddingBottom */
 
-  /* ── Chart Palette (Aurora harmonized) ─────────────────── */
-  --color-chart-1: #5b3df6; /* brand violet */
-  --color-chart-2: #3ddc97; /* aurora mint */
-  --color-chart-3: #ffb347; /* warm amber */
-  --color-chart-4: #f26d9a; /* rose */
-  --color-chart-5: #4d9fff; /* sky */
-  --color-chart-6: #a78bfa; /* lavender */
-  --color-chart-7: #ffd166; /* gold */
-  --color-chart-8: #7c63fa; /* lighter violet */
-
-  /* ── Year Palette ──────────────────────────────────────── */
-  --color-year-1: #5b3df6;
-  --color-year-2: #3ddc97;
-  --color-year-3: #ffb347;
-  --color-year-4: #f26d9a;
-  --color-year-5: #4d9fff;
-  --color-year-6: #a78bfa;
+  /* Chart + Year palettes live on :root below — Tailwind @theme tree-shakes
+     unused tokens, but these are read via JS (theme-vars.ts), not utilities. */
 
   /* ── Easing ──────────────────────────────────────────── */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
@@ -77,13 +62,53 @@
   --shadow-lg: 0 12px 32px -4px rgb(0 0 0 / 0.3);
 }
 
-/* ─── FOUC fix ──────────────────────────────────────────── */
+/* ─── FOUC fix + JS-consumed chart/year palette ─────────── */
 /* Paint surface + text colors immediately on page load, before */
 /* React hydrates. Without this, the page flashes white briefly */
 /* on cold load (especially noticeable in dark theme). */
+/* Chart + year tokens live here (not @theme) because they are */
+/* consumed via JS in lib/theme-vars.ts, not as Tailwind utilities. */
 :root {
   background-color: var(--color-surface-base);
   color: var(--color-text-primary);
+
+  /* Chart palette (Aurora harmonized) */
+  --color-chart-1: #5b3df6; /* brand violet */
+  --color-chart-2: #3ddc97; /* aurora mint */
+  --color-chart-3: #ffb347; /* warm amber */
+  --color-chart-4: #f26d9a; /* rose */
+  --color-chart-5: #4d9fff; /* sky */
+  --color-chart-6: #a78bfa; /* lavender */
+  --color-chart-7: #ffd166; /* gold */
+  --color-chart-8: #7c63fa; /* lighter violet */
+
+  /* Year palette */
+  --color-year-1: #5b3df6;
+  --color-year-2: #3ddc97;
+  --color-year-3: #ffb347;
+  --color-year-4: #f26d9a;
+  --color-year-5: #4d9fff;
+  --color-year-6: #a78bfa;
+}
+
+html.light {
+  /* Chart palette light overrides — all ≥3:1 on #FAFAFD */
+  --color-chart-1: #4f30e8; /* 6.90 */
+  --color-chart-2: #0a8a50; /* 4.23 */
+  --color-chart-3: #b86e00; /* 3.83 */
+  --color-chart-4: #c2185b; /* 5.64 */
+  --color-chart-5: #1d4ed8; /* 6.43 */
+  --color-chart-6: #6d28d9; /* 6.82 */
+  --color-chart-7: #a37200; /* 4.06 */
+  --color-chart-8: #6b4ef0; /* deeper violet companion */
+
+  /* Year palette light overrides */
+  --color-year-1: #4f30e8;
+  --color-year-2: #0a8a50;
+  --color-year-3: #b86e00;
+  --color-year-4: #c2185b;
+  --color-year-5: #1d4ed8;
+  --color-year-6: #6d28d9;
 }
 
 /* ─── Glass Card Utility ────────────────────────────────── */
@@ -147,23 +172,7 @@ html.light {
   --color-info: #2563eb; /* 4.96:1 on #FAFAFD — AA */
   --color-purple: var(--color-brand);
 
-  /* ── Chart Palette (light overrides — all ≥3:1 on #FAFAFD) ── */
-  --color-chart-1: #4f30e8; /* 6.90 */
-  --color-chart-2: #0a8a50; /* 4.23 */
-  --color-chart-3: #b86e00; /* 3.83 */
-  --color-chart-4: #c2185b; /* 5.64 */
-  --color-chart-5: #1d4ed8; /* 6.43 */
-  --color-chart-6: #6d28d9; /* 6.82 */
-  --color-chart-7: #a37200; /* 4.06 */
-  --color-chart-8: #6b4ef0; /* deeper violet companion */
-
-  /* ── Year Palette (light overrides) ── */
-  --color-year-1: #4f30e8;
-  --color-year-2: #0a8a50;
-  --color-year-3: #b86e00;
-  --color-year-4: #c2185b;
-  --color-year-5: #1d4ed8;
-  --color-year-6: #6d28d9;
+  /* Chart + year palette light overrides live on the html.light :root block above */
 }
 
 h1,
