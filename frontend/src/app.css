@@ -5,6 +5,7 @@
   /* ── Surface / Background ─────────────────────────────── */
   --color-surface-base: oklch(15% 0.015 175); /* tinted toward brand hue */
   --color-surface-card: rgba(31, 31, 37, 0.6);
+  --color-surface-card-solid: oklch(20% 0.01 175);
   --color-surface-elevated: rgba(42, 42, 50, 0.7);
   --color-surface-overlay: rgba(0, 0, 0, 0.6);
 
@@ -82,6 +83,15 @@
   border-radius: var(--radius-lg);
 }
 
+/* ─── Solid Card Utility ────────────────────────────────── */
+/* Same visual hierarchy as glass-card but no backdrop-filter — */
+/* used everywhere except where blur over scrolling content is desired. */
+@utility solid-card {
+  background: var(--color-surface-card-solid);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+}
+
 /* ─── Brand Glow Effect ─────────────────────────────────── */
 @utility glow-brand {
   box-shadow:
@@ -118,6 +128,7 @@ html.light {
   /* ── Surface overrides ───────────── */
   --color-surface-base: oklch(98% 0.005 165);
   --color-surface-card: rgba(255, 255, 255, 0.8);
+  --color-surface-card-solid: oklch(96% 0.005 165);
   --color-surface-elevated: rgba(240, 240, 245, 0.9);
   --color-surface-overlay: rgba(0, 0, 0, 0.3);
 
