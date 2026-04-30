@@ -17,7 +17,14 @@ export function toggleAccountId(selected: string[], id: string): string[] {
 
 export function AccountFilterBar({ accounts, selected, onChange }: AccountFilterBarProps) {
   const { t } = useTranslation();
-  const activeAccounts = accounts.filter((a) => a.isActive);
+  // Alphabetical sort (case- and accent-insensitive). The user's drag-drop
+  // custom order is preserved everywhere else (e.g. /accounts, dashboard
+  // breakdown); in the FILTER context, alphabetical scanning is faster.
+  // .slice() to avoid mutating the prop (frozen reference from query cache).
+  const activeAccounts = accounts
+    .filter((a) => a.isActive)
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
   const selectedSet = new Set(selected);
   const isAll = selected.length === 0;
 

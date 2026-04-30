@@ -151,6 +151,7 @@
       "label": "Filter by account",
       "allAccounts": "All accounts",
       "clear": "Reset",
+      "applied": "Filter: {{count}} of {{total}} accounts",
       "emptyTitle": "No data",
       "emptyBody": "The selected accounts have no recorded balances.",
       "showAll": "Show all"

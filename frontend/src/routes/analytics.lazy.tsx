@@ -25,7 +25,7 @@ import { Card, Skeleton } from '../components/ui';
 import { Delta } from '../components/ui/Delta';
 import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
 import { formatMonthShort, formatMonthLong } from '../lib/intl';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, Filter } from 'lucide-react';
 import { AccountFilterBar } from '../components/AccountFilterBar';
 import { chartPalette, yearPalette, brandColor, readVar } from '../lib/theme-vars';
 
@@ -99,6 +99,13 @@ function AnalyticsPage() {
         onChange={setSelectedAccountIds}
       />
 
+      <AppliedFilterPill
+        count={selectedAccountIds.length}
+        total={(accounts ?? []).filter((a) => a.isActive).length}
+        onClear={() => setSelectedAccountIds([])}
+        t={t}
+      />
+
       {/* Filter active but produced empty results */}
       {isFilterActive && !hasFilteredData ? (
         <motion.div
@@ -154,6 +161,45 @@ function AnalyticsPage() {
           </ChartSection>
         </div>
       )}
+    </div>
+  );
+}
+
+// ─── Applied Filter Pill ───────────────────────────────────
+//
+// Surfaces the active multi-account filter state above the charts. The chip
+// strip in AccountFilterBar overflows horizontally with many accounts, so the
+// user can't tell at a glance which/how many filters are active without
+// scrolling. This pill is the at-a-glance summary + a one-tap reset.
+
+function AppliedFilterPill({
+  count,
+  total,
+  onClear,
+  t,
+}: {
+  count: number;
+  total: number;
+  onClear: () => void;
+  t: (k: string, opts?: Record<string, unknown>) => string;
+}) {
+  if (count === 0) return null;
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/12 border border-brand/30 text-brand text-xs font-semibold"
+    >
+      <Filter size={12} strokeWidth={2.5} aria-hidden="true" />
+      <span>{t('analytics.filter.applied', { count, total })}</span>
+      <button
+        type="button"
+        onClick={onClear}
+        className="ml-1 -mr-1 px-2 py-0.5 rounded-full hover:bg-brand/20 transition-colors text-[10px] uppercase tracking-wider"
+        aria-label={t('analytics.filter.clear')}
+      >
+        {t('analytics.filter.clear')}
+      </button>
     </div>
   );
 }

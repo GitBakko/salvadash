@@ -151,6 +151,7 @@
       "label": "Filtra per conto",
       "allAccounts": "Tutti i conti",
       "clear": "Reset",
+      "applied": "Filtro: {{count}} di {{total}} conti",
       "emptyTitle": "Nessun dato",
       "emptyBody": "I conti selezionati non hanno rilevazioni con saldo.",
       "showAll": "Mostra tutti"
