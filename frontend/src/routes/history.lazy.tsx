@@ -1,8 +1,8 @@
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowDown, ArrowUp, ChevronRight, Trash2, CalendarDays } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronRight, Pencil, Trash2, CalendarDays } from 'lucide-react';
 import type { EntryListItem } from '@salvadash/shared';
 import { useEntries, useEntry, useDeleteEntry } from '../hooks/queries';
 import { Card, Skeleton, BottomSheet, Button } from '../components/ui';
@@ -172,6 +172,7 @@ function EntryCard({
 
 function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () => void }) {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const { data: entry, isLoading } = useEntry(entryId);
   const deleteEntry = useDeleteEntry();
 
@@ -180,6 +181,11 @@ function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () =
     deleteEntry.mutate(entryId, {
       onSuccess: () => onClose(),
     });
+  };
+
+  const handleEdit = () => {
+    onClose();
+    navigate({ to: '/new-entry', search: { id: entryId } });
   };
 
   return (
@@ -274,6 +280,10 @@ function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () =
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
+            <Button variant="secondary" fullWidth onClick={handleEdit}>
+              <Pencil size={14} />
+              {t('common.edit')}
+            </Button>
             <Button
               variant="danger"
               fullWidth

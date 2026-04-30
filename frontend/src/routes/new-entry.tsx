@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { z } from 'zod';
 import {
   ArrowLeft,
   Wallet,
@@ -17,14 +18,21 @@ import {
   useAccounts,
   useIncomeSources,
   useCreateEntry,
+  useUpdateEntry,
+  useEntry,
   useCreateIncomeSource,
 } from '../hooks/queries';
-import { Button, Input, Card } from '../components/ui';
+import { Button, Input, Skeleton } from '../components/ui';
 import { AccountIcon } from '../components/AccountIcon';
 import { fmtCurrency } from '../lib/format';
 
+const searchSchema = z.object({
+  id: z.string().optional(),
+});
+
 export const Route = createFileRoute('/new-entry')({
   component: NewEntryPage,
+  validateSearch: searchSchema,
 });
 
 // ─── Utilities ─────────────────────────────────────────────
@@ -45,9 +53,13 @@ interface IncomeRow {
 function NewEntryPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { id: editId } = Route.useSearch();
+  const isEditing = !!editId;
   const { data: accounts, isLoading: loadingAccounts } = useAccounts();
   const { data: incomeSources, isLoading: loadingSources } = useIncomeSources();
+  const { data: editingEntry, isLoading: loadingEditEntry } = useEntry(editId ?? '');
   const createEntry = useCreateEntry();
+  const updateEntry = useUpdateEntry();
   const createSource = useCreateIncomeSource();
 
   // Form state
@@ -58,6 +70,25 @@ function NewEntryPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [newSourceName, setNewSourceName] = useState('');
   const [showNewSource, setShowNewSource] = useState(false);
+
+  // Pre-fill form when editing entry loads
+  useEffect(() => {
+    if (!isEditing || !editingEntry) return;
+    setDate(editingEntry.date.slice(0, 10));
+    const bals: Record<string, string> = {};
+    for (const b of editingEntry.balances) {
+      bals[b.accountId] = String(b.amount);
+    }
+    setBalances(bals);
+    setIncomeRows(
+      editingEntry.incomes.map((i) => ({
+        sourceId: i.incomeSourceId,
+        amount: String(i.amount),
+      })),
+    );
+    setNotes(editingEntry.notes ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing, editingEntry?.id]);
 
   const activeAccounts = useMemo(() => (accounts ?? []).filter((a) => a.isActive), [accounts]);
 
@@ -100,17 +131,23 @@ function NewEntryPage() {
       .filter((r) => r.sourceId && r.amount && parseFloat(r.amount) > 0)
       .map((r) => ({ incomeSourceId: r.sourceId, amount: parseFloat(r.amount) }));
 
-    createEntry.mutate(
-      {
-        date,
-        balances: balanceEntries,
-        incomes: incomeEntries.length > 0 ? incomeEntries : undefined,
-        notes: notes.trim() || undefined,
-      },
-      {
-        onSuccess: () => navigate({ to: '/history' }),
-      },
-    );
+    const payload = {
+      date,
+      balances: balanceEntries,
+      incomes: incomeEntries.length > 0 ? incomeEntries : undefined,
+      notes: notes.trim() || undefined,
+    };
+
+    if (isEditing && editId) {
+      updateEntry.mutate(
+        { id: editId, ...payload },
+        { onSuccess: () => navigate({ to: '/history' }) },
+      );
+    } else {
+      createEntry.mutate(payload, {
+        onSuccess: () => navigate({ to: '/' }),
+      });
+    }
   };
 
   const updateBalance = (accountId: string, value: string) => {
@@ -144,18 +181,31 @@ function NewEntryPage() {
 
   const isLoading = loadingAccounts || loadingSources;
 
+  // Skeleton when loading the entry to edit
+  if (isEditing && loadingEditEntry) {
+    return (
+      <div className="p-4 max-w-lg mx-auto space-y-3">
+        <Skeleton className="h-8 w-40 mb-4" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[100dvh] flex flex-col bg-surface-base">
       {/* Top bar */}
       <div className="flex items-center justify-between p-4 border-b border-border-default">
         <button
-          onClick={() => navigate({ to: '/' })}
+          onClick={() => navigate({ to: isEditing ? '/history' : '/' })}
           className="flex items-center gap-1 text-text-secondary hover:text-text-primary transition-colors"
         >
           <ArrowLeft size={24} />
           <span className="text-sm">{t('common.back')}</span>
         </button>
-        <h1 className="font-heading text-lg font-bold">{t('entries.newEntry')}</h1>
+        <h1 className="font-heading text-lg font-bold">
+          {isEditing ? t('entries.editEntry') : t('entries.newEntry')}
+        </h1>
         <div className="w-16" /> {/* Spacer */}
       </div>
 
@@ -406,9 +456,14 @@ function NewEntryPage() {
               )}
             </div>
 
-            <Button fullWidth size="lg" onClick={handleSubmit} loading={createEntry.isPending}>
+            <Button
+              fullWidth
+              size="lg"
+              onClick={handleSubmit}
+              loading={createEntry.isPending || updateEntry.isPending}
+            >
               <Save size={20} />
-              {t('entries.saveEntry')}
+              {isEditing ? t('common.save') : t('entries.saveEntry')}
             </Button>
           </div>
         </motion.div>
