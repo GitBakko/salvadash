@@ -1,6 +1,7 @@
 import { createRootRoute, Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { APP_VERSION } from '@salvadash/shared';
 import { Header } from '../components/Header';
 import { BottomNav } from '../components/BottomNav';
@@ -24,6 +25,7 @@ const AUTH_PATHS = ['/login', '/register', '/forgot-password', '/verify-email', 
 const FULLSCREEN_PATHS = ['/new-entry'];
 
 function RootLayout() {
+  const { t } = useTranslation();
   const { isLoading, isAuthenticated, fetchUser, user } = useAuthStore();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -99,9 +101,15 @@ function RootLayout() {
   // But show shell if authenticated
   return (
     <div className="min-h-dvh bg-surface-base text-text-primary flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-brand focus:text-surface-base focus:px-3 focus:py-2 focus:rounded-md"
+      >
+        {t('common.skipToContent')}
+      </a>
       <Header />
 
-      <main className="flex-1 overflow-y-auto pb-20">
+      <main id="main" tabIndex={-1} className="flex-1 overflow-y-auto pb-20">
         <AnimatePresence mode="wait">
           <motion.div
             key={pathname}

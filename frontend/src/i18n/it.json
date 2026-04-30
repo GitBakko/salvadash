@@ -14,7 +14,8 @@
     "noData": "Nessun dato",
     "error": "Errore",
     "success": "Operazione riuscita",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "skipToContent": "Salta al contenuto"
   },
   "nav": {
     "accounts": "Conti",

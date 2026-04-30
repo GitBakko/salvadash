@@ -14,7 +14,8 @@
     "noData": "No data",
     "error": "Error",
     "success": "Operation successful",
-    "retry": "Retry"
+    "retry": "Retry",
+    "skipToContent": "Skip to content"
   },
   "nav": {
     "accounts": "Accounts",
