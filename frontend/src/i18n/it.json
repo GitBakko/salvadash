@@ -70,7 +70,9 @@
     "passwordResetSuccess": "Password reimpostata con successo!",
     "resetPasswordError": "Errore nel reset della password. Il link potrebbe essere scaduto.",
     "invalidResetLink": "Link di reset non valido o mancante.",
-    "requestNewLink": "Richiedi un nuovo link"
+    "requestNewLink": "Richiedi un nuovo link",
+    "tagline": "Il tuo patrimonio.\nUn colpo d'occhio.",
+    "taglineSub": "Traccia i tuoi risparmi mese dopo mese."
   },
   "dashboard": {
     "currentTotal": "Totale Attuale",

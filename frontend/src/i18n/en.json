@@ -70,7 +70,9 @@
     "passwordResetSuccess": "Password reset successful!",
     "resetPasswordError": "Password reset failed. The link may have expired.",
     "invalidResetLink": "Invalid or missing reset link.",
-    "requestNewLink": "Request a new link"
+    "requestNewLink": "Request a new link",
+    "tagline": "Your wealth.\nAt a glance.",
+    "taglineSub": "Track your savings month after month."
   },
   "dashboard": {
     "currentTotal": "Current Total",
