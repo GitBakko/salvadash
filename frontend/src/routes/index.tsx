@@ -8,6 +8,7 @@ import { useDashboard } from '../hooks/queries';
 import { useCacheDashboard } from '../hooks/use-offline-sync';
 import { Card, Skeleton } from '../components/ui';
 import { fmtCurrency, fmtCurrencyCompact, fmtPercent } from '../lib/format';
+import { formatMonthShort } from '../lib/intl';
 import { Lightbulb, CalendarDays, ArrowDown, TrendingUp, ArrowUp, Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -40,17 +41,10 @@ function AnimatedNumber({ value, className }: { value: number; className?: strin
   );
 }
 
-// ─── Utilities ─────────────────────────────────────────────
-
-function formatMonth(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleString('it-IT', { month: 'short', year: '2-digit' });
-}
-
 // ─── Dashboard Page ────────────────────────────────────────
 
 function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(String(currentYear));
   const { data, isLoading } = useDashboard(year);
@@ -90,7 +84,7 @@ function DashboardPage() {
       </div>
 
       {/* Hero KPI */}
-      <HeroCard data={data} t={t} />
+      <HeroCard data={data} t={t} lang={i18n.language} />
 
       {/* Secondary KPIs */}
       <KPIGrid data={data} t={t} year={year} />
@@ -102,7 +96,9 @@ function DashboardPage() {
       {data.accountBreakdown.length > 0 && <AccountBreakdown data={data} t={t} />}
 
       {/* Recent entries */}
-      {data.recentEntries.length > 0 && <RecentEntries entries={data.recentEntries} t={t} />}
+      {data.recentEntries.length > 0 && (
+        <RecentEntries entries={data.recentEntries} t={t} lang={i18n.language} />
+      )}
     </div>
   );
 }
@@ -112,9 +108,11 @@ function DashboardPage() {
 function HeroCard({
   data,
   t,
+  lang,
 }: {
   data: DashboardData;
   t: (k: string, o?: Record<string, string>) => string;
+  lang: string;
 }) {
   return (
     <motion.div
@@ -137,7 +135,7 @@ function HeroCard({
 
       {data.currentEntry && (
         <p className="text-text-muted text-xs mt-1 relative">
-          {formatMonth(data.currentEntry.date)}
+          {formatMonthShort(data.currentEntry.date, lang)}
           {data.currentEntry.delta != null && (
             <span
               className={`ml-2 ${data.currentEntry.delta >= 0 ? 'text-positive' : 'text-negative'}`}
@@ -323,9 +321,11 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
 function RecentEntries({
   entries,
   t,
+  lang,
 }: {
   entries: DashboardData['recentEntries'];
   t: (k: string) => string;
+  lang: string;
 }) {
   return (
     <motion.div
@@ -340,7 +340,7 @@ function RecentEntries({
         {entries.map((entry) => (
           <div key={entry.id} className="flex items-center justify-between px-4 py-3">
             <div>
-              <p className="text-sm font-medium capitalize">{formatMonth(entry.date)}</p>
+              <p className="text-sm font-medium capitalize">{formatMonthShort(entry.date, lang)}</p>
               <p className="text-xs text-text-muted">{fmtCurrency(entry.total)}</p>
             </div>
             {entry.delta != null && (

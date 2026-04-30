@@ -23,6 +23,7 @@ import type { AnalyticsData } from '@salvadash/shared';
 import { useAnalytics, useAccounts } from '../hooks/queries';
 import { Card, Skeleton } from '../components/ui';
 import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
+import { formatMonthShort, formatMonthLong } from '../lib/intl';
 import { BarChart3, TrendingUp, TrendingDown, Gauge, Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AccountFilterBar } from '../components/AccountFilterBar';
@@ -48,16 +49,6 @@ const CHART_COLORS = [
 const YEAR_COLORS = ['#00d4a0', '#ffd166', '#6c63ff', '#ff6b6b', '#4ecdc4', '#45b7d1'];
 
 // ─── Utilities ─────────────────────────────────────────────
-
-function formatMonth(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('it-IT', { month: 'short', year: '2-digit' });
-}
-
-function formatMonthLong(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-}
 
 const MONTH_LABELS = [
   'Gen',
@@ -93,7 +84,7 @@ function ChartTooltip({ active, payload, label }: any) {
 // ─── Analytics Page ────────────────────────────────────────
 
 function AnalyticsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const { data: accounts } = useAccounts();
   const { data, isLoading } = useAnalytics(selectedAccountIds);
@@ -157,7 +148,7 @@ function AnalyticsPage() {
         <div className="space-y-5 mt-4">
           {/* Patrimony over time — AreaChart */}
           <ChartSection title={t('analytics.patrimony')} delay={0}>
-            <PatrimonyChart data={data.patrimonyOverTime} />
+            <PatrimonyChart data={data.patrimonyOverTime} lang={i18n.language} />
           </ChartSection>
 
           {/* Year comparison — LineChart */}
@@ -175,13 +166,13 @@ function AnalyticsPage() {
           {/* Income by source — BarChart (income is not account-bound, shown unfiltered) */}
           {data.monthlyIncome.length > 0 && (
             <ChartSection title={t('analytics.incomeBySource')} delay={0.15}>
-              <IncomeBarChart data={data.monthlyIncome} />
+              <IncomeBarChart data={data.monthlyIncome} lang={i18n.language} />
             </ChartSection>
           )}
 
           {/* Performance section */}
           <ChartSection title={t('analytics.performance')} delay={0.2}>
-            <PerformanceGrid data={data} t={t} />
+            <PerformanceGrid data={data} t={t} lang={i18n.language} />
           </ChartSection>
         </div>
       )}
@@ -218,8 +209,14 @@ function ChartSection({
 
 // ─── Patrimony AreaChart ───────────────────────────────────
 
-function PatrimonyChart({ data }: { data: AnalyticsData['patrimonyOverTime'] }) {
-  const chartData = data.map((d) => ({ ...d, label: formatMonth(d.date) }));
+function PatrimonyChart({
+  data,
+  lang,
+}: {
+  data: AnalyticsData['patrimonyOverTime'];
+  lang: string;
+}) {
+  const chartData = data.map((d) => ({ ...d, label: formatMonthShort(d.date, lang) }));
 
   return (
     <div className="h-52 -mx-2">
@@ -431,7 +428,13 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
 
 // ─── Income BarChart ───────────────────────────────────────
 
-function IncomeBarChart({ data }: { data: AnalyticsData['monthlyIncome'] }) {
+function IncomeBarChart({
+  data,
+  lang,
+}: {
+  data: AnalyticsData['monthlyIncome'];
+  lang: string;
+}) {
   // Collect all source names
   const allSources = useMemo(() => {
     const set = new Set<string>();
@@ -444,14 +447,14 @@ function IncomeBarChart({ data }: { data: AnalyticsData['monthlyIncome'] }) {
   // Transform to recharts data
   const chartData = useMemo(() => {
     return data.map((m) => {
-      const point: Record<string, any> = { label: formatMonth(m.date) };
+      const point: Record<string, any> = { label: formatMonthShort(m.date, lang) };
       for (const src of allSources) {
         const found = m.sources.find((s) => s.name === src);
         point[src] = found?.amount ?? 0;
       }
       return point;
     });
-  }, [data, allSources]);
+  }, [data, allSources, lang]);
 
   if (allSources.length === 0) return null;
 
@@ -492,18 +495,26 @@ function IncomeBarChart({ data }: { data: AnalyticsData['monthlyIncome'] }) {
 
 // ─── Performance Grid ──────────────────────────────────────
 
-function PerformanceGrid({ data, t }: { data: AnalyticsData; t: (k: string) => string }) {
+function PerformanceGrid({
+  data,
+  t,
+  lang,
+}: {
+  data: AnalyticsData;
+  t: (k: string) => string;
+  lang: string;
+}) {
   const items: { label: string; value: string; sub: string; Icon: LucideIcon; color: string }[] = [
     {
       label: t('analytics.bestMonth'),
-      value: data.bestMonth.date ? formatMonthLong(data.bestMonth.date) : '—',
+      value: data.bestMonth.date ? formatMonthLong(data.bestMonth.date, lang) : '—',
       sub: data.bestMonth.delta ? `+${fmtCurrency(data.bestMonth.delta)}` : '',
       Icon: TrendingUp,
       color: 'text-positive',
     },
     {
       label: t('analytics.worstMonth'),
-      value: data.worstMonth.date ? formatMonthLong(data.worstMonth.date) : '—',
+      value: data.worstMonth.date ? formatMonthLong(data.worstMonth.date, lang) : '—',
       sub: data.worstMonth.delta ? fmtCurrency(data.worstMonth.delta) : '',
       Icon: TrendingDown,
       color: 'text-negative',
