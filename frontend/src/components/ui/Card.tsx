@@ -16,7 +16,7 @@ const paddingClasses = {
 export function Card({ children, className = '', padding = 'md', onClick }: CardProps) {
   return (
     <div
-      className={`glass-card ${paddingClasses[padding]} ${onClick ? 'cursor-pointer hover:border-brand/20 active:scale-[0.99] transition-all' : ''} ${className}`}
+      className={`glass-card ${paddingClasses[padding]} ${onClick ? 'cursor-pointer hover:border-brand/20 active:scale-[0.99] transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2' : ''} ${className}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
