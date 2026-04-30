@@ -14,6 +14,8 @@ export const config = {
   appUrl: process.env.APP_URL ?? 'http://localhost:5173',
   apiUrl: process.env.API_URL ?? 'http://localhost:3000',
 
+  databaseUrl: requireEnv('DATABASE_URL'),
+
   jwt: {
     accessSecret: requireEnv('JWT_ACCESS_SECRET'),
     refreshSecret: requireEnv('JWT_REFRESH_SECRET'),

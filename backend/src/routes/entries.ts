@@ -3,44 +3,12 @@ import { createEntrySchema, updateEntrySchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 import { Prisma } from '../generated/prisma/client.js';
+import { entryInclude, formatEntry, validateUserOwnership } from '../lib/entries-shared.js';
+import { isValidationOk } from '../lib/http.js';
 
 const router: RouterType = Router();
 
 router.use(authenticate);
-
-// ─── Helpers ────────────────────────────────────────────────
-
-function formatEntry(entry: any) {
-  const balances = (entry.balances ?? []).map((b: any) => ({
-    id: b.id,
-    accountId: b.accountId,
-    accountName: b.account?.name ?? '',
-    amount: Number(b.amount),
-  }));
-  const incomes = (entry.incomes ?? []).map((i: any) => ({
-    id: i.id,
-    incomeSourceId: i.incomeSourceId,
-    incomeSourceName: i.incomeSource?.name ?? '',
-    amount: Number(i.amount),
-  }));
-
-  return {
-    id: entry.id,
-    date: entry.date.toISOString().split('T')[0],
-    notes: entry.notes,
-    balances,
-    incomes,
-    total: balances.reduce((sum: number, b: any) => sum + b.amount, 0),
-    totalIncome: incomes.reduce((sum: number, i: any) => sum + i.amount, 0),
-    createdAt: entry.createdAt.toISOString(),
-    updatedAt: entry.updatedAt.toISOString(),
-  };
-}
-
-const entryInclude = {
-  balances: { include: { account: { select: { name: true } } } },
-  incomes: { include: { incomeSource: { select: { name: true } } } },
-};
 
 // ─── GET /entries ───────────────────────────────────────────
 
@@ -73,10 +41,9 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       prisma.monthlyEntry.count({ where }),
     ]);
 
-    // Compute deltas between consecutive entries
     const formatted = entries.map(formatEntry);
     const withDeltas = formatted.map((entry, i) => {
-      const prev = formatted[i + 1]; // previous chronologically (sorted desc)
+      const prev = formatted[i + 1];
       const delta = prev ? entry.total - prev.total : null;
       const deltaPercent =
         prev && prev.total !== 0
@@ -127,17 +94,11 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
 router.post('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = createEntrySchema.safeParse(req.body);
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
+    if (!isValidationOk(res, parsed)) return;
 
     const userId = req.user!.userId;
     const { date, balances, incomes, notes } = parsed.data;
 
-    // Verify user has at least 1 account
     const accountCount = await prisma.account.count({ where: { userId, isActive: true } });
     if (accountCount === 0) {
       res
@@ -146,29 +107,11 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Verify all accountIds belong to the user
-    const userAccountIds = (
-      await prisma.account.findMany({ where: { userId }, select: { id: true } })
-    ).map((a) => a.id);
-    const invalidAccounts = balances.filter((b) => !userAccountIds.includes(b.accountId));
-    if (invalidAccounts.length > 0) {
-      res.status(400).json({ success: false, error: 'One or more account IDs are invalid' });
-      return;
-    }
-
-    // Verify all incomeSourceIds belong to the user
-    if (incomes.length > 0) {
-      const userSourceIds = (
-        await prisma.incomeSource.findMany({ where: { userId }, select: { id: true } })
-      ).map((s) => s.id);
-      const invalidSources = incomes.filter((i) => !userSourceIds.includes(i.incomeSourceId));
-      if (invalidSources.length > 0) {
-        res
-          .status(400)
-          .json({ success: false, error: 'One or more income source IDs are invalid' });
-        return;
-      }
-    }
+    const ok = await validateUserOwnership(res, userId, {
+      accountIds: balances.map((b) => b.accountId),
+      incomeSourceIds: incomes.map((i) => i.incomeSourceId),
+    });
+    if (!ok) return;
 
     const entry = await prisma.monthlyEntry.create({
       data: {
@@ -203,12 +146,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 router.put('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = updateEntrySchema.safeParse(req.body);
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
+    if (!isValidationOk(res, parsed)) return;
 
     const userId = req.user!.userId;
     const id = req.params.id as string;
@@ -221,41 +159,19 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
 
     const { date, balances, incomes, notes } = parsed.data;
 
-    // Validate accountIds if balances provided
-    if (balances) {
-      const userAccountIds = (
-        await prisma.account.findMany({ where: { userId }, select: { id: true } })
-      ).map((a) => a.id);
-      const invalid = balances.filter((b) => !userAccountIds.includes(b.accountId));
-      if (invalid.length > 0) {
-        res.status(400).json({ success: false, error: 'One or more account IDs are invalid' });
-        return;
-      }
-    }
-
-    // Validate incomeSourceIds if incomes provided
-    if (incomes) {
-      const userSourceIds = (
-        await prisma.incomeSource.findMany({ where: { userId }, select: { id: true } })
-      ).map((s) => s.id);
-      const invalid = incomes.filter((i) => !userSourceIds.includes(i.incomeSourceId));
-      if (invalid.length > 0) {
-        res
-          .status(400)
-          .json({ success: false, error: 'One or more income source IDs are invalid' });
-        return;
-      }
-    }
+    const ok = await validateUserOwnership(res, userId, {
+      accountIds: balances?.map((b) => b.accountId),
+      incomeSourceIds: incomes?.map((i) => i.incomeSourceId),
+    });
+    if (!ok) return;
 
     const entry = await prisma.$transaction(async (tx) => {
-      // Update base fields
       const updateData: Prisma.MonthlyEntryUpdateInput = {};
       if (date !== undefined) updateData.date = new Date(date);
       if (notes !== undefined) updateData.notes = notes;
 
       await tx.monthlyEntry.update({ where: { id }, data: updateData });
 
-      // Replace balances if provided
       if (balances) {
         await tx.entryBalance.deleteMany({ where: { entryId: id } });
         await tx.entryBalance.createMany({
@@ -267,7 +183,6 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
         });
       }
 
-      // Replace incomes if provided
       if (incomes) {
         await tx.entryIncome.deleteMany({ where: { entryId: id } });
         await tx.entryIncome.createMany({

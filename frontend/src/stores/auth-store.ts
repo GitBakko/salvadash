@@ -22,6 +22,24 @@ interface AuthState {
   setUser: (user: UserPublic | null) => void;
 }
 
+interface ApiErrorResponse {
+  success: boolean;
+  error?: string;
+  details?: unknown;
+}
+
+function extractErrorMessage(res: ApiErrorResponse, fallback: string): string {
+  const details = res.details as
+    | { fieldErrors?: Record<string, string[]>; formErrors?: string[] }
+    | undefined;
+  if (details?.fieldErrors) {
+    const messages = Object.values(details.fieldErrors).flat();
+    if (messages.length > 0) return messages.join('. ');
+  }
+  if (details?.formErrors?.length) return details.formErrors.join('. ');
+  return res.error ?? fallback;
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: true,
@@ -43,41 +61,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: res.data.user, isAuthenticated: true });
       return { success: true };
     }
-    const details = res.details as
-      | { fieldErrors?: Record<string, string[]>; formErrors?: string[] }
-      | undefined;
-    if (details?.fieldErrors) {
-      const messages = Object.entries(details.fieldErrors)
-        .flatMap(([, msgs]) => msgs);
-      if (messages.length > 0) {
-        return { success: false, error: messages.join('. ') };
-      }
-    }
-    if (details?.formErrors?.length) {
-      return { success: false, error: details.formErrors.join('. ') };
-    }
-    return { success: false, error: res.error ?? 'Login failed' };
+    return { success: false, error: extractErrorMessage(res, 'Login failed') };
   },
 
   register: async (data) => {
     const res = await api.post('/auth/register', data);
-    if (res.success) {
-      return { success: true };
-    }
-    const details = res.details as
-      | { fieldErrors?: Record<string, string[]>; formErrors?: string[] }
-      | undefined;
-    if (details?.fieldErrors) {
-      const messages = Object.entries(details.fieldErrors)
-        .flatMap(([, msgs]) => msgs);
-      if (messages.length > 0) {
-        return { success: false, error: messages.join('. ') };
-      }
-    }
-    if (details?.formErrors?.length) {
-      return { success: false, error: details.formErrors.join('. ') };
-    }
-    return { success: false, error: res.error ?? 'Registration failed' };
+    if (res.success) return { success: true };
+    return { success: false, error: extractErrorMessage(res, 'Registration failed') };
   },
 
   logout: async () => {

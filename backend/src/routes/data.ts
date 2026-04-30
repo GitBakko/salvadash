@@ -2,20 +2,13 @@ import { Router, type Router as RouterType, type Request, type Response } from '
 import * as XLSX from 'xlsx';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
-import { requireRole } from '../middleware/auth.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { rawEntryToRow, computeDashboard, computeAnalytics } from '../lib/calculations.js';
+import { entryInclude } from '../lib/entries-shared.js';
 
 const router: RouterType = Router();
 
 router.use(authenticate);
-
-// ─── Dashboard Data ─────────────────────────────────────────
-
-const entryInclude = {
-  balances: { include: { account: { select: { name: true, color: true } } } },
-  incomes: { include: { incomeSource: { select: { name: true } } } },
-};
 
 router.get('/dashboard', async (req: Request, res: Response): Promise<void> => {
   try {
@@ -44,6 +37,23 @@ router.get('/analytics', async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user!.userId;
 
+    const accountIdsParam = (req.query.accountIds as string | undefined)?.trim();
+    const accountIds = accountIdsParam
+      ? accountIdsParam.split(',').map((s) => s.trim()).filter(Boolean)
+      : undefined;
+
+    // Verify ownership when filter is provided so users cannot probe other users' account IDs.
+    if (accountIds && accountIds.length > 0) {
+      const owned = await prisma.account.findMany({
+        where: { userId, id: { in: accountIds } },
+        select: { id: true },
+      });
+      if (owned.length !== new Set(accountIds).size) {
+        res.status(400).json({ success: false, error: 'One or more account IDs are invalid' });
+        return;
+      }
+    }
+
     const entries = await prisma.monthlyEntry.findMany({
       where: { userId },
       include: entryInclude,
@@ -51,7 +61,7 @@ router.get('/analytics', async (req: Request, res: Response): Promise<void> => {
     });
 
     const rows = entries.map(rawEntryToRow);
-    const analytics = computeAnalytics(rows);
+    const analytics = computeAnalytics(rows, { accountIds });
 
     res.json({ success: true, data: analytics });
   } catch (error) {

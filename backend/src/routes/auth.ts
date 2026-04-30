@@ -26,6 +26,7 @@ import {
 import { sendVerificationEmail, sendPasswordResetEmail } from '../lib/email-templates.js';
 import { authenticate } from '../middleware/auth.js';
 import type { AuthPayload } from '../middleware/auth.js';
+import { isValidationOk } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -58,12 +59,7 @@ const avatarUpload = multer({
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = registerSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
+    if (!isValidationOk(res, parsed)) return;
 
     const { name, email, password, inviteCode, language, currency } = parsed.data;
 
@@ -151,12 +147,7 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = loginSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
+    if (!isValidationOk(res, parsed)) return;
 
     const { email, password } = parsed.data;
     const user = await prisma.user.findUnique({ where: { email } });
@@ -281,12 +272,7 @@ router.post('/forgot-password', async (req: Request, res: Response): Promise<voi
 router.post('/reset-password', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = resetPasswordSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
+    if (!isValidationOk(res, parsed)) return;
 
     const { token, password } = parsed.data;
     const user = await prisma.user.findUnique({ where: { passwordResetToken: token } });

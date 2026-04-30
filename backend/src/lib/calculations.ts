@@ -3,8 +3,6 @@
  * All functions are stateless — they take data in, return results out.
  */
 
-import type { Prisma } from '../generated/prisma/client.js';
-
 // ─── Types ──────────────────────────────────────────────────
 
 interface EntryRow {
@@ -20,23 +18,41 @@ interface MonthlyPoint {
   totalIncome: number;
 }
 
+// Structural input — accepted by both Prisma payloads and test mocks.
+type DecimalLike = number | string | { toString(): string };
+
+export interface RawEntryInput {
+  id: string;
+  date: Date;
+  balances: Array<{
+    accountId: string;
+    account?: { name?: string | null; color?: string | null } | null;
+    amount: DecimalLike;
+  }>;
+  incomes: Array<{
+    incomeSourceId: string;
+    incomeSource?: { name?: string | null } | null;
+    amount: DecimalLike;
+  }>;
+}
+
 // ─── Helpers ────────────────────────────────────────────────
 
-function toNumber(d: Prisma.Decimal | number): number {
+function toNumber(d: DecimalLike): number {
   return typeof d === 'number' ? d : Number(d);
 }
 
-export function rawEntryToRow(entry: any): EntryRow {
+export function rawEntryToRow(entry: RawEntryInput): EntryRow {
   return {
     id: entry.id,
     date: entry.date,
-    balances: (entry.balances ?? []).map((b: any) => ({
+    balances: entry.balances.map((b) => ({
       accountId: b.accountId,
       accountName: b.account?.name ?? '',
       amount: toNumber(b.amount),
       color: b.account?.color ?? null,
     })),
-    incomes: (entry.incomes ?? []).map((i: any) => ({
+    incomes: entry.incomes.map((i) => ({
       incomeSourceId: i.incomeSourceId,
       incomeSourceName: i.incomeSource?.name ?? '',
       amount: toNumber(i.amount),
@@ -160,9 +176,26 @@ export function computeDashboard(
 
 // ─── Analytics Calculations ─────────────────────────────────
 
-export function computeAnalytics(entries: EntryRow[]) {
+export interface AnalyticsOptions {
+  /** When provided, only balances for these account IDs contribute to totals/breakdowns/deltas. Income is unaffected. */
+  accountIds?: string[];
+}
+
+export function computeAnalytics(entries: EntryRow[], options: AnalyticsOptions = {}) {
+  const accountFilter = options.accountIds && options.accountIds.length > 0
+    ? new Set(options.accountIds)
+    : null;
+
+  // Filter balances per entry when an account filter is active.
+  const filtered: EntryRow[] = accountFilter
+    ? entries.map((e) => ({
+        ...e,
+        balances: e.balances.filter((b) => accountFilter.has(b.accountId)),
+      }))
+    : entries;
+
   // Sort ascending by date for charts
-  const sorted = [...entries].sort((a, b) => a.date.getTime() - b.date.getTime());
+  const sorted = [...filtered].sort((a, b) => a.date.getTime() - b.date.getTime());
 
   // Patrimony over time
   const patrimonyOverTime = sorted.map((e) => ({

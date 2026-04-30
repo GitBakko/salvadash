@@ -2,6 +2,7 @@ import { Router, type Router as RouterType, type Request, type Response } from '
 import { createAccountSchema, updateAccountSchema, reorderAccountsSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
+import { isValidationOk } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -41,12 +42,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
 router.post('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = createAccountSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
+    if (!isValidationOk(res, parsed)) return;
 
     const userId = req.user!.userId;
 
@@ -92,12 +88,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = reorderAccountsSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
+    if (!isValidationOk(res, parsed)) return;
 
     const userId = req.user!.userId;
 
@@ -122,12 +113,7 @@ router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
 router.put('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = updateAccountSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
+    if (!isValidationOk(res, parsed)) return;
 
     const userId = req.user!.userId;
     const id = req.params.id as string;
