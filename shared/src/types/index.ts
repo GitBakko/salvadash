@@ -47,10 +47,12 @@ export interface AccountPublic {
   name: string;
   type: 'MAIN' | 'SUB';
   icon: string | null;
+  iconUrl: string | null;
   color: string | null;
   isActive: boolean;
   sortOrder: number;
   entryCount: number;
+  amount: number;
 }
 
 // ─── Income Source ─────────────────────────────────────────

@@ -44,4 +44,8 @@ export const config = {
     retentionDays: parseInt(process.env.BACKUP_RETENTION_DAYS ?? '10', 10),
     cloudEnabled: process.env.BACKUP_CLOUD_ENABLED === 'true',
   },
+
+  brandfetch: {
+    apiKey: process.env.BRANDFETCH_API_KEY ?? '',
+  },
 } as const;

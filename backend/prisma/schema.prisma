@@ -68,6 +68,7 @@ model Account {
   name      String
   type      AccountType @default(MAIN)
   icon      String?
+  iconUrl   String?     @map("icon_url")
   color     String?
   isActive  Boolean     @default(true)
   sortOrder Int         @default(0)
