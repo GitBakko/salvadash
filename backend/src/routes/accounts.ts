@@ -27,7 +27,10 @@ function accountIconPath(accountId: string): string {
 }
 
 function accountIconPublicUrl(accountId: string): string {
-  return `/uploads/account-icons/${accountId}.webp`;
+  // Cache-bust: same disk path on each import overwrites the same file, so the URL
+  // would otherwise stay identical and the browser keeps the old image. Append a
+  // timestamp on every successful import so <img src> is a fresh URL.
+  return `/uploads/account-icons/${accountId}.webp?v=${Date.now()}`;
 }
 
 // ─── GET /accounts ─────────────────────────────────────────
