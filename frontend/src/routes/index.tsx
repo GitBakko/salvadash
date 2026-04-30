@@ -7,6 +7,7 @@ import type { DashboardData } from '@salvadash/shared';
 import { useDashboard } from '../hooks/queries';
 import { useCacheDashboard } from '../hooks/use-offline-sync';
 import { Card, Skeleton } from '../components/ui';
+import { Delta } from '../components/ui/Delta';
 import { fmtCurrency, fmtCurrencyCompact, fmtPercent } from '../lib/format';
 import { formatMonthShort } from '../lib/intl';
 import { Lightbulb, CalendarDays, ArrowDown, TrendingUp, ArrowUp, Trophy } from 'lucide-react';
@@ -137,12 +138,11 @@ function HeroCard({
         <p className="text-text-muted text-xs mt-1 relative">
           {formatMonthShort(data.currentEntry.date, lang)}
           {data.currentEntry.delta != null && (
-            <span
-              className={`ml-2 ${data.currentEntry.delta >= 0 ? 'text-positive' : 'text-negative'}`}
-            >
-              {data.currentEntry.delta >= 0 ? '+' : ''}
-              {fmtCurrencyCompact(data.currentEntry.delta)}
-            </span>
+            <Delta
+              value={data.currentEntry.delta}
+              className="ml-2"
+              ariaPrefix={t('dashboard.deltaAria')}
+            />
           )}
         </p>
       )}
@@ -344,13 +344,10 @@ function RecentEntries({
               <p className="text-xs text-text-muted">{fmtCurrency(entry.total)}</p>
             </div>
             {entry.delta != null && (
-              <div className={`text-right ${entry.delta >= 0 ? 'text-positive' : 'text-negative'}`}>
-                <p className="text-sm font-mono font-semibold">
-                  {entry.delta >= 0 ? '+' : ''}
-                  {fmtCurrencyCompact(entry.delta)}
-                </p>
+              <div className="text-right flex flex-col items-end gap-0.5">
+                <Delta value={entry.delta} />
                 {entry.deltaPercent != null && (
-                  <p className="text-[10px]">{fmtPercent(entry.deltaPercent)}</p>
+                  <Delta value={entry.deltaPercent} variant="percent" className="text-[10px]" />
                 )}
               </div>
             )}

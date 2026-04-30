@@ -22,6 +22,7 @@ import {
 import type { AnalyticsData } from '@salvadash/shared';
 import { useAnalytics, useAccounts } from '../hooks/queries';
 import { Card, Skeleton } from '../components/ui';
+import { Delta } from '../components/ui/Delta';
 import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
 import { formatMonthShort, formatMonthLong } from '../lib/intl';
 import { BarChart3, TrendingUp, TrendingDown, Gauge, Trophy } from 'lucide-react';
@@ -503,18 +504,36 @@ function PerformanceGrid({
   t: (k: string) => string;
   lang: string;
 }) {
-  const items: { label: string; value: string; sub: string; Icon: LucideIcon; color: string }[] = [
+  type PerfItem =
+    | {
+        label: string;
+        value: string;
+        sub: string;
+        Icon: LucideIcon;
+        color: string;
+        subDelta?: undefined;
+      }
+    | {
+        label: string;
+        value: string;
+        subDelta: number;
+        Icon: LucideIcon;
+        color: string;
+        sub?: undefined;
+      };
+
+  const items: PerfItem[] = [
     {
       label: t('analytics.bestMonth'),
       value: data.bestMonth.date ? formatMonthLong(data.bestMonth.date, lang) : '—',
-      sub: data.bestMonth.delta ? `+${fmtCurrency(data.bestMonth.delta)}` : '',
+      subDelta: data.bestMonth.delta,
       Icon: TrendingUp,
       color: 'text-positive',
     },
     {
       label: t('analytics.worstMonth'),
       value: data.worstMonth.date ? formatMonthLong(data.worstMonth.date, lang) : '—',
-      sub: data.worstMonth.delta ? fmtCurrency(data.worstMonth.delta) : '',
+      subDelta: data.worstMonth.delta,
       Icon: TrendingDown,
       color: 'text-negative',
     },
@@ -528,7 +547,7 @@ function PerformanceGrid({
     {
       label: t('analytics.bestYear'),
       value: data.bestYear.year ? String(data.bestYear.year) : '—',
-      sub: data.bestYear.growth ? `+${fmtCurrency(data.bestYear.growth)}` : '',
+      subDelta: data.bestYear.growth,
       Icon: Trophy,
       color: 'text-gold',
     },
@@ -551,7 +570,11 @@ function PerformanceGrid({
             </span>
           </div>
           <p className="font-heading text-sm font-bold capitalize">{item.value}</p>
-          {item.sub && <p className={`text-xs ${item.color} font-semibold mt-0.5`}>{item.sub}</p>}
+          {item.subDelta !== undefined ? (
+            <Delta value={item.subDelta} className="mt-0.5 text-xs" />
+          ) : item.sub ? (
+            <p className={`text-xs ${item.color} font-semibold mt-0.5`}>{item.sub}</p>
+          ) : null}
         </motion.div>
       ))}
     </div>

@@ -79,7 +79,8 @@
     "bestMonth": "Mese Migliore",
     "growthYTD": "Crescita YTD",
     "recentEntries": "Ultime Rilevazioni",
-    "noEntries": "Nessuna rilevazione ancora"
+    "noEntries": "Nessuna rilevazione ancora",
+    "deltaAria": "variazione di"
   },
   "accounts": {
     "title": "I Tuoi Conti",
