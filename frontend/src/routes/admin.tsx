@@ -104,14 +104,14 @@ function AdminPage() {
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
       {/* Title */}
-      <motion.h2
+      <motion.h1
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         className="font-heading text-2xl font-bold text-text-primary flex items-center gap-2"
       >
         <ShieldCheck size={28} className="text-gold" />
         {t('admin.title')}
-      </motion.h2>
+      </motion.h1>
 
       {/* Overview KPIs */}
       <OverviewCards />

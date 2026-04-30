@@ -147,7 +147,7 @@ function AccountsPage() {
           className="flex flex-col items-center justify-center py-20 text-center"
         >
           <Wallet size={64} className="text-text-muted mb-4" strokeWidth={1.5} />
-          <h2 className="font-heading text-xl font-semibold mb-2">{t('accounts.title')}</h2>
+          <h1 className="font-heading text-xl font-semibold mb-2">{t('accounts.title')}</h1>
           <p className="text-text-secondary text-sm mb-6 max-w-xs">{t('accounts.createFirst')}</p>
           <Button onClick={openCreate}>
             <Plus size={20} />
@@ -170,7 +170,7 @@ function AccountsPage() {
     <div className="p-4 max-w-lg mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="font-heading text-xl font-semibold">{t('accounts.title')}</h2>
+        <h1 className="font-heading text-xl font-semibold">{t('accounts.title')}</h1>
         <Button size="sm" onClick={openCreate}>
           <Plus size={20} />
           {t('accounts.addAccount')}

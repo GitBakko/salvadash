@@ -581,7 +581,11 @@ function PerformanceGrid({
           </div>
           <p className="font-heading text-sm font-bold capitalize">{item.value}</p>
           {item.subDelta !== undefined ? (
-            <Delta value={item.subDelta} className="mt-0.5 text-xs" />
+            <Delta
+              value={item.subDelta}
+              className="mt-0.5 text-xs"
+              ariaPrefix={t('dashboard.deltaAria')}
+            />
           ) : item.sub ? (
             <p className={`text-xs ${item.color} font-semibold mt-0.5`}>{item.sub}</p>
           ) : null}

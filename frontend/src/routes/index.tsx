@@ -75,6 +75,7 @@ function DashboardPage() {
 
   return (
     <div className="p-4 max-w-lg mx-auto space-y-4">
+      <h1 className="sr-only">{t('nav.home')}</h1>
       {/* Year selector pills */}
       <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
         {years.map((y) => (
@@ -358,9 +359,14 @@ function RecentEntries({
             </div>
             {entry.delta != null && (
               <div className="text-right flex flex-col items-end gap-0.5">
-                <Delta value={entry.delta} />
+                <Delta value={entry.delta} ariaPrefix={t('dashboard.deltaAria')} />
                 {entry.deltaPercent != null && (
-                  <Delta value={entry.deltaPercent} variant="percent" className="text-[10px]" />
+                  <Delta
+                    value={entry.deltaPercent}
+                    variant="percent"
+                    className="text-[10px]"
+                    ariaPrefix={t('dashboard.deltaAria')}
+                  />
                 )}
               </div>
             )}

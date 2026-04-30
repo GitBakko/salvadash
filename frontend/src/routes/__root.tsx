@@ -14,6 +14,7 @@ import { useAuthStore } from '../stores/auth-store';
 import { useUIStore } from '../stores/ui-store';
 import { Skeleton } from '../components/ui/Skeleton';
 import { useOfflineSync } from '../hooks/use-offline-sync';
+import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
 import '../i18n';
 
 export const Route = createRootRoute({
@@ -32,6 +33,7 @@ function RootLayout() {
   const isAuthPage = AUTH_PATHS.some((p) => pathname.startsWith(p));
   const isFullscreen = FULLSCREEN_PATHS.some((p) => pathname.startsWith(p));
   const [showWhatsNew, setShowWhatsNew] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
 
   // Setup offline sync (SW message listener + online/offline events)
   useOfflineSync();
@@ -113,10 +115,10 @@ function RootLayout() {
         <AnimatePresence mode="wait">
           <motion.div
             key={pathname}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+            animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={reducedMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
+            transition={{ duration: reducedMotion ? 0 : 0.2, ease: 'easeInOut' }}
           >
             <Outlet />
           </motion.div>
