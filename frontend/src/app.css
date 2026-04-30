@@ -27,7 +27,7 @@
   /* ── Text ──────────────────────────────────────────────── */
   --color-text-primary: #f4f4f8;
   --color-text-secondary: #a8a8b8; /* 8.43:1 on #0A0A0F — AAA */
-  --color-text-muted: #7a7a8a; /* 4.68:1 on #0A0A0F — AA */
+  --color-text-muted: #7a7a8a; /* 4.68:1 on #0A0A0F — AA (thin margin; UI labels only, not body <18px) */
 
   /* ── Border ────────────────────────────────────────────── */
   --color-border-default: rgba(255, 255, 255, 0.08);
@@ -143,6 +143,7 @@ html.light {
   /* ── Semantic adjustments — deeper for AA on light ── */
   --color-positive: #088045; /* 4.82:1 on #FAFAFD — AA */
   --color-negative: #d11e32; /* 5.11:1 on #FAFAFD — AA */
+  --color-gold: #a37200; /* 4.06:1 on #FAFAFD — AA */
   --color-info: #2563eb; /* 4.96:1 on #FAFAFD — AA */
   --color-purple: var(--color-brand);
 
