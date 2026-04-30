@@ -7,6 +7,7 @@ import { useUIStore } from '../stores/ui-store';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
+import { AccountIcon } from './AccountIcon';
 
 const COLOR_OPTIONS = [
   '#00d4a0',
@@ -142,7 +143,7 @@ export function AccountFormModal({ account, onClose }: Props) {
                     : 'bg-surface-elevated text-text-secondary border border-transparent hover:border-border-default'
                 }`}
               >
-                <span className="icon text-xl">{ic}</span>
+                <AccountIcon name={ic} size={20} />
               </button>
             ))}
           </div>

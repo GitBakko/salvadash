@@ -20,6 +20,7 @@ import {
   useCreateIncomeSource,
 } from '../hooks/queries';
 import { Button, Input, Card } from '../components/ui';
+import { AccountIcon } from '../components/AccountIcon';
 import { fmtCurrency } from '../lib/format';
 
 export const Route = createFileRoute('/new-entry')({
@@ -197,16 +198,13 @@ function NewEntryPage() {
                     transition={{ delay: 0.06 * i }}
                     className="flex items-center gap-3"
                   >
-                    {/* Account indicator — DB-driven icon, keep as Material Symbols */}
+                    {/* Account indicator — DB-driven icon, mapped to lucide via AccountIcon */}
                     <div className="flex items-center gap-2 min-w-0 w-28 shrink-0">
-                      {account.icon && (
-                        <span
-                          className="icon text-lg"
-                          style={{ color: account.color ?? 'var(--color-brand)' }}
-                        >
-                          {account.icon}
-                        </span>
-                      )}
+                      <AccountIcon
+                        name={account.icon}
+                        size={18}
+                        color={account.color ?? 'var(--color-brand)'}
+                      />
                       <span className="text-sm text-text-secondary truncate">{account.name}</span>
                     </div>
                     <div className="flex-1">

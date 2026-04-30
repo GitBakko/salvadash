@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Layers, Check } from 'lucide-react';
 import type { AccountPublic } from '@salvadash/shared';
+import { AccountIcon } from './AccountIcon';
 import { brandColor } from '../lib/theme-vars';
 
 interface AccountFilterBarProps {
@@ -116,13 +117,11 @@ function FilterChip({
     >
       {icon}
       {!icon && materialIcon && (
-        <span
-          className="material-symbols-outlined"
-          style={{ fontSize: 16, lineHeight: 1, color: active ? accent : 'var(--color-text-secondary)' }}
-          aria-hidden="true"
-        >
-          {materialIcon}
-        </span>
+        <AccountIcon
+          name={materialIcon}
+          size={16}
+          color={active ? accent : 'var(--color-text-secondary)'}
+        />
       )}
       {!icon && !materialIcon && color && (
         <span
