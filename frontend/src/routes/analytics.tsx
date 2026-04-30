@@ -564,7 +564,7 @@ function PerformanceGrid({
           className="bg-surface-elevated/30 rounded-xl p-3"
         >
           <div className="flex items-center gap-1.5 mb-1">
-            <item.Icon size={16} className={item.color} />
+            <item.Icon size={16} className={item.color} aria-hidden="true" />
             <span className="text-text-muted text-[10px] uppercase tracking-wider">
               {item.label}
             </span>

@@ -20,7 +20,7 @@ export function Header() {
       <header className="sticky top-0 z-40 glass-card border-b border-border-default px-4 py-3">
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Link to="/" className="flex items-center gap-2">
-            <CircleDollarSign size={28} className="text-brand" />
+            <CircleDollarSign size={28} className="text-brand" aria-hidden="true" />
             <span className="font-heading text-xl font-bold text-brand">{t('common.appName')}</span>
           </Link>
           <VersionBadge className="ml-1 self-end mb-0.5" />

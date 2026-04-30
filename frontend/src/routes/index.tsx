@@ -199,7 +199,7 @@ function KPIGrid({
         >
           <Card className="p-3">
             <div className="flex items-start gap-2">
-              <kpi.Icon size={20} className={kpi.color} />
+              <kpi.Icon size={20} className={kpi.color} aria-hidden="true" />
               <div className="min-w-0">
                 <p className="text-text-muted text-[10px] uppercase tracking-wider leading-tight">
                   {kpi.label}
@@ -222,7 +222,7 @@ function KPIGrid({
           <Card className="p-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Trophy size={20} className="text-gold" />
+                <Trophy size={20} className="text-gold" aria-hidden="true" />
                 <div>
                   <p className="text-text-muted text-[10px] uppercase tracking-wider">
                     {t('dashboard.bestMonth')}
