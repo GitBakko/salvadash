@@ -61,7 +61,7 @@ function SettingsPage() {
   const [showWhatsNew, setShowWhatsNew] = useState(false);
 
   return (
-    <div className="p-4 max-w-lg mx-auto space-y-4 pb-24">
+    <div className="p-4 max-w-lg mx-auto space-y-4">
       <motion.h1
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}

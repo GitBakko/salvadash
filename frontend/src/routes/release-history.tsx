@@ -33,7 +33,7 @@ function ReleaseHistoryPage() {
   }, [search, lang]);
 
   return (
-    <div className="p-4 max-w-lg mx-auto space-y-4 pb-24">
+    <div className="p-4 max-w-lg mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link to="/settings" className="text-text-muted hover:text-text-primary transition-colors">

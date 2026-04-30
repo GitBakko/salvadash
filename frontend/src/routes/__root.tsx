@@ -111,7 +111,12 @@ function RootLayout() {
       </a>
       <Header />
 
-      <main id="main" tabIndex={-1} className="flex-1 overflow-y-auto pb-20">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="flex-1 overflow-y-auto"
+        style={{ paddingBottom: 'calc(var(--nav-height) + env(safe-area-inset-bottom) + 1rem)' }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={pathname}

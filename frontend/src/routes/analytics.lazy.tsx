@@ -82,7 +82,7 @@ function AnalyticsPage() {
   }
 
   return (
-    <div className="p-4 max-w-lg mx-auto pb-24">
+    <div className="p-4 max-w-lg mx-auto">
       <h1 className="font-heading text-2xl font-bold mb-3">{t('analytics.title')}</h1>
 
       <AccountFilterBar

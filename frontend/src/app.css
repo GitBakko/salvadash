@@ -45,6 +45,7 @@
 
   /* ── Layout ────────────────────────────────────────────── */
   --header-height: 3.5rem; /* matches Header py-3 + content */
+  --nav-height: 4rem; /* BottomNav height — drives main paddingBottom */
 
   /* ── Chart Palette ─────────────────────────────────────── */
   --color-chart-1: #00d4a0;
