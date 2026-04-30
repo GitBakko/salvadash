@@ -18,6 +18,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
     <div className="min-h-dvh md:grid md:grid-cols-[1fr_1fr]">
       {/* Sidebar — desktop only */}
       <aside
+        aria-hidden="true"
         className="hidden md:flex flex-col justify-between min-h-dvh p-12 lg:p-16 bg-surface-elevated relative overflow-hidden"
         style={{ backgroundImage: AURORA_GRADIENT }}
       >
@@ -62,7 +63,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
               {t('common.appName')}
             </h1>
             <p className="text-text-secondary text-sm mt-1">
-              Personal Savings Tracker
+              {t('auth.taglineSub')}
             </p>
           </div>
 

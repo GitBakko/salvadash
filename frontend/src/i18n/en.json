@@ -72,7 +72,8 @@
     "invalidResetLink": "Invalid or missing reset link.",
     "requestNewLink": "Request a new link",
     "tagline": "Your wealth.\nAt a glance.",
-    "taglineSub": "Track your savings month after month."
+    "taglineSub": "Track your savings month after month.",
+    "loginSuccess": "Login successful"
   },
   "dashboard": {
     "currentTotal": "Current Total",

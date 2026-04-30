@@ -31,7 +31,7 @@ function LoginPage() {
     const result = await login(email, password);
 
     if (result.success) {
-      addToast({ type: 'success', message: 'Login effettuato!' });
+      addToast({ type: 'success', message: t('auth.loginSuccess') });
       navigate({ to: '/' });
     } else {
       setError(result.error ?? t('auth.loginError'));
