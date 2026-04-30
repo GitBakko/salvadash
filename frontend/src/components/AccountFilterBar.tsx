@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Layers, Check } from 'lucide-react';
 import type { AccountPublic } from '@salvadash/shared';
+import { brandColor } from '../lib/theme-vars';
 
 interface AccountFilterBarProps {
   accounts: AccountPublic[];
@@ -99,7 +100,7 @@ function FilterChip({
   onClick,
   ariaSelected,
 }: FilterChipProps) {
-  const accent = color ?? '#00d4a0';
+  const accent = color ?? brandColor();
   return (
     <button
       type="button"
@@ -109,15 +110,15 @@ function FilterChip({
       className="shrink-0 snap-start inline-flex items-center gap-1.5 min-h-11 h-11 px-3 rounded-full text-sm font-semibold border transition-all touch-manipulation active:scale-95"
       style={{
         backgroundColor: active ? `${accent}24` : 'transparent',
-        borderColor: active ? accent : 'rgba(255,255,255,0.12)',
-        color: active ? accent : '#888',
+        borderColor: active ? accent : 'var(--color-border-default)',
+        color: active ? accent : 'var(--color-text-muted)',
       }}
     >
       {icon}
       {!icon && materialIcon && (
         <span
           className="material-symbols-outlined"
-          style={{ fontSize: 16, lineHeight: 1, color: active ? accent : '#666' }}
+          style={{ fontSize: 16, lineHeight: 1, color: active ? accent : 'var(--color-text-secondary)' }}
           aria-hidden="true"
         >
           {materialIcon}
