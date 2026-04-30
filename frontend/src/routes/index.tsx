@@ -23,24 +23,31 @@ export const Route = createFileRoute('/')({
 
 function AnimatedNumber({ value, className }: { value: number; className?: string }) {
   const reduced = usePrefersReducedMotion();
+  const firstRender = useRef(true);
+  const animate = !reduced && firstRender.current;
+
   const spring = useSpring(0, { stiffness: 60, damping: 20 });
   const display = useTransform(spring, (v) => fmtCurrency(v));
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (reduced) return;
-    spring.set(value);
-  }, [spring, value, reduced]);
+    firstRender.current = false;
+  }, []);
 
   useEffect(() => {
-    if (reduced) return;
+    if (!animate) return;
+    spring.set(value);
+  }, [animate, spring, value]);
+
+  useEffect(() => {
+    if (!animate) return;
     const unsubscribe = display.on('change', (v) => {
       if (ref.current) ref.current.textContent = v;
     });
     return unsubscribe;
-  }, [display, reduced]);
+  }, [animate, display]);
 
-  if (reduced) {
+  if (!animate) {
     return <span className={className}>{fmtCurrency(value)}</span>;
   }
 
