@@ -62,6 +62,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm db:generate
 
+      - name: Build shared (required by backend/frontend imports)
+        run: pnpm --filter shared build
+
       - name: TypeScript (shared)
         run: pnpm --filter shared exec tsc --noEmit
 
@@ -114,6 +117,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm db:generate
+
+      - name: Build shared (required by backend/frontend imports)
+        run: pnpm --filter shared build
 
       - name: Backend tests
         run: pnpm test:backend -- --reporter=verbose
