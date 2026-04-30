@@ -73,6 +73,7 @@ Prod: `pm2 start backend/ecosystem.config.json`; IIS reverse-proxy `/api`,`/uplo
 
 | Component       | Detail                                                                                          |
 | --------------- | ----------------------------------------------------------------------------------------------- |
+| Public URL      | `https://salvadash.epartner.it`                                                                 |
 | App server      | Windows Server 2019                                                                             |
 | App path        | `E:\www\salvadash\` (frontend `frontend\dist\`, backend root, `backend\uploads\`)               |
 | App runtime     | Node.js 20 + PM2 (process `salvadash-api` on `:3000`), IIS reverse-proxy on `:80`/`:443`        |
