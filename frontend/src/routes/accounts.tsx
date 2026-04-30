@@ -343,7 +343,7 @@ function AccountCardContent({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-sm truncate">{account.name}</span>
-            <span className="text-[10px] uppercase tracking-wider text-text-muted bg-surface-elevated px-1.5 py-0.5 rounded">
+            <span className="text-xs font-medium text-text-muted bg-surface-elevated px-1.5 py-0.5 rounded">
               {account.type === 'MAIN' ? t('accounts.main') : t('accounts.sub')}
             </span>
           </div>

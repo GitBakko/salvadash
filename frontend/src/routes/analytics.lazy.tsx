@@ -169,7 +169,7 @@ function ChartSection({
       transition={{ delay }}
     >
       <Card className="p-4 overflow-hidden">
-        <p className="text-text-muted text-[10px] uppercase tracking-wider mb-3 font-semibold">
+        <p className="text-text-muted text-xs font-medium mb-3">
           {title}
         </p>
         {children}
@@ -563,7 +563,7 @@ function PerformanceGrid({
         >
           <div className="flex items-center gap-1.5 mb-1">
             <item.Icon size={16} className={item.color} aria-hidden="true" />
-            <span className="text-text-muted text-[10px] uppercase tracking-wider">
+            <span className="text-text-muted text-xs font-medium">
               {item.label}
             </span>
           </div>

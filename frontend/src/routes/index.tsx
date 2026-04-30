@@ -217,7 +217,7 @@ function KPIGrid({
             <div className="flex items-start gap-2">
               <kpi.Icon size={20} className={kpi.color} aria-hidden="true" />
               <div className="min-w-0">
-                <p className="text-text-muted text-[10px] uppercase tracking-wider leading-tight">
+                <p className="text-text-muted text-xs font-medium leading-tight">
                   {kpi.label}
                 </p>
                 <p className="font-heading text-lg font-bold mt-0.5">{kpi.value}</p>
@@ -240,7 +240,7 @@ function KPIGrid({
               <div className="flex items-center gap-2">
                 <Trophy size={20} className="text-gold" aria-hidden="true" />
                 <div>
-                  <p className="text-text-muted text-[10px] uppercase tracking-wider">
+                  <p className="text-text-muted text-xs font-medium">
                     {t('dashboard.bestMonth')}
                   </p>
                   <p className="text-sm font-semibold capitalize">{data.bestMonth.month}</p>
@@ -269,7 +269,7 @@ function SparklineCard({ data }: { data: number[] }) {
       transition={{ delay: 0.3 }}
       className="solid-card p-4 overflow-hidden"
     >
-      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">Trend 12 mesi</p>
+      <p className="text-text-muted text-xs font-medium mb-2">Trend 12 mesi</p>
       <MiniSparkline values={data} className="w-full h-20" ariaLabel="Trend 12 mesi" />
     </motion.div>
   );
@@ -285,7 +285,7 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
     >
-      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">
+      <p className="text-text-muted text-xs font-medium mb-2">
         {t('accounts.title')}
       </p>
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
@@ -331,7 +331,7 @@ function RecentEntries({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">
+      <p className="text-text-muted text-xs font-medium mb-2">
         {t('dashboard.recentEntries')}
       </p>
       <Card className="divide-y divide-border-default">

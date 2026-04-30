@@ -34,7 +34,7 @@ export function AccountFilterBar({ accounts, selected, onChange }: AccountFilter
       aria-label={t('analytics.filter.label')}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-text-muted text-[10px] uppercase tracking-wider font-semibold">
+        <span className="text-text-muted text-xs font-medium">
           {t('analytics.filter.label')}
         </span>
         {!isAll && (
