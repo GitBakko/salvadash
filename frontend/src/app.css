@@ -75,7 +75,7 @@
 @utility glow-brand {
   box-shadow:
     0 0 20px var(--color-brand-glow),
-    0 0 40px rgba(0, 212, 160, 0.1);
+    0 0 40px color-mix(in oklch, var(--color-brand) 10%, transparent);
 }
 
 /* ─── Material Symbols (loaded from Google Fonts CDN) ───── */
