@@ -30,7 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-describedby={errorId}
             className={`
               w-full bg-surface-elevated/50 text-text-primary
-              border border-border-default rounded-[var(--radius-md)]
+              border border-border-default rounded-md
               px-4 py-2.5 text-sm
               placeholder:text-text-muted
               focus:outline-none focus:border-brand/60 focus:ring-1 focus:ring-brand/30

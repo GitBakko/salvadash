@@ -83,7 +83,7 @@ function ResetPasswordPage() {
           </h2>
 
           {error && (
-            <div className="bg-negative/10 border border-negative/30 rounded-[var(--radius-md)] px-4 py-2.5 text-sm text-negative">
+            <div className="bg-negative/10 border border-negative/30 rounded-md px-4 py-2.5 text-sm text-negative">
               {error}
             </div>
           )}

@@ -361,7 +361,7 @@ function AccountCardContent({
           />
           <button
             onClick={onEdit}
-            className="p-2.5 -m-1 rounded-[var(--radius-sm)] hover:bg-surface-elevated transition-colors text-text-secondary"
+            className="p-2.5 -m-1 rounded-sm hover:bg-surface-elevated transition-colors text-text-secondary"
             aria-label={t('common.edit')}
           >
             <Pencil size={18} />
@@ -370,7 +370,7 @@ function AccountCardContent({
             <button
               onClick={onDelete}
               disabled={isDeleting}
-              className="p-2.5 -m-1 rounded-[var(--radius-sm)] hover:bg-negative/10 transition-colors text-negative disabled:opacity-50"
+              className="p-2.5 -m-1 rounded-sm hover:bg-negative/10 transition-colors text-negative disabled:opacity-50"
               aria-label={t('common.delete')}
             >
               <Trash2 size={18} />

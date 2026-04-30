@@ -90,7 +90,7 @@ export function AccountFormModal({ account, onClose }: Props) {
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         {error && (
-          <div className="bg-negative/10 border border-negative/30 rounded-[var(--radius-md)] px-4 py-2.5 text-sm text-negative">
+          <div className="bg-negative/10 border border-negative/30 rounded-md px-4 py-2.5 text-sm text-negative">
             {error}
           </div>
         )}
@@ -115,7 +115,7 @@ export function AccountFormModal({ account, onClose }: Props) {
                 key={t_}
                 type="button"
                 onClick={() => setType(t_)}
-                className={`flex-1 py-2 rounded-[var(--radius-md)] text-sm font-medium transition-all ${
+                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${
                   type === t_
                     ? 'bg-brand/15 text-brand border border-brand/40'
                     : 'bg-surface-elevated text-text-secondary border border-border-default hover:border-border-active'
@@ -136,7 +136,7 @@ export function AccountFormModal({ account, onClose }: Props) {
                 key={ic}
                 type="button"
                 onClick={() => setIcon(ic)}
-                className={`p-2.5 rounded-[var(--radius-md)] flex items-center justify-center transition-all ${
+                className={`p-2.5 rounded-md flex items-center justify-center transition-all ${
                   icon === ic
                     ? 'bg-brand/15 text-brand border border-brand/40'
                     : 'bg-surface-elevated text-text-secondary border border-transparent hover:border-border-default'

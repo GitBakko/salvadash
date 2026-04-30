@@ -12,9 +12,9 @@ export function Skeleton({
   height,
 }: SkeletonProps) {
   const variantClasses = {
-    text: 'rounded-[var(--radius-sm)] h-4',
+    text: 'rounded-sm h-4',
     circular: 'rounded-full',
-    rectangular: 'rounded-[var(--radius-md)]',
+    rectangular: 'rounded-md',
   };
 
   return (
