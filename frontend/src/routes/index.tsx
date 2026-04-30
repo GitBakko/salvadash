@@ -9,7 +9,7 @@ import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
 import { Card, Skeleton } from '../components/ui';
 import { Delta } from '../components/ui/Delta';
 import { MiniSparkline } from '../components/MiniSparkline';
-import { fmtCurrency, fmtCurrencyCompact, fmtPercent } from '../lib/format';
+import { fmtCurrency, fmtCurrencyCompact, fmtCurrencyParts, fmtPercent } from '../lib/format';
 import { formatMonthShort } from '../lib/intl';
 import {
   Lightbulb,
@@ -77,7 +77,7 @@ function DashboardPage() {
       <KPIGrid data={data} t={t} year={year} />
 
       {/* Sparkline */}
-      {data.sparklineData.length > 1 && <SparklineCard data={data.sparklineData} />}
+      {data.sparklineData.length > 1 && <SparklineCard data={data.sparklineData} t={t} />}
 
       {/* Account breakdown */}
       {data.accountBreakdown.length > 0 && <AccountBreakdown data={data} t={t} />}
@@ -99,10 +99,7 @@ function HeroCard({
   data: DashboardData;
   t: (k: string, o?: Record<string, string>) => string;
 }) {
-  const formatted = fmtCurrency(data.currentTotal);
-  const lastComma = formatted.lastIndexOf(',');
-  const integerPart = lastComma >= 0 ? formatted.slice(0, lastComma) : formatted;
-  const centsPart = lastComma >= 0 ? formatted.slice(lastComma) : '';
+  const { integer: integerPart, cents: centsPart } = fmtCurrencyParts(data.currentTotal);
 
   const delta = data.currentEntry?.delta ?? null;
   const deltaPercent = data.currentEntry?.deltaPercent ?? null;
@@ -251,8 +248,9 @@ function KPIGrid({
 
 // ─── Sparkline Card ────────────────────────────────────────
 
-function SparklineCard({ data }: { data: number[] }) {
+function SparklineCard({ data, t }: { data: number[]; t: (k: string) => string }) {
   const reducedMotion = usePrefersReducedMotion();
+  const label = t('dashboard.trend12mo');
 
   return (
     <motion.div
@@ -261,8 +259,8 @@ function SparklineCard({ data }: { data: number[] }) {
       transition={{ delay: 0.3 }}
       className="solid-card p-4 overflow-hidden"
     >
-      <p className="text-text-muted text-xs font-medium mb-2">Trend 12 mesi</p>
-      <MiniSparkline values={data} className="w-full h-20" ariaLabel="Trend 12 mesi" />
+      <p className="text-text-muted text-xs font-medium mb-2">{label}</p>
+      <MiniSparkline values={data} className="w-full h-20" ariaLabel={label} />
     </motion.div>
   );
 }

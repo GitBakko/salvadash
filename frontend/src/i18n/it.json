@@ -81,7 +81,8 @@
     "growthYTD": "Crescita YTD",
     "recentEntries": "Ultime Rilevazioni",
     "noEntries": "Nessuna rilevazione ancora",
-    "deltaAria": "variazione di"
+    "deltaAria": "variazione di",
+    "trend12mo": "Trend 12 mesi"
   },
   "accounts": {
     "title": "I Tuoi Conti",

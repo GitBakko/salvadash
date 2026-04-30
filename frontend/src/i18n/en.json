@@ -81,7 +81,8 @@
     "growthYTD": "Growth YTD",
     "recentEntries": "Recent Entries",
     "noEntries": "No entries yet",
-    "deltaAria": "change of"
+    "deltaAria": "change of",
+    "trend12mo": "12-month trend"
   },
   "accounts": {
     "title": "Your Accounts",
