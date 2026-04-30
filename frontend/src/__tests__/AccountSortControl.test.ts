@@ -38,7 +38,11 @@ describe('sortAccounts', () => {
   });
 
   it('custom mode preserves input order when orderIndex is absent', () => {
-    const noOrder = [{ name: 'X', amount: 1 }, { name: 'A', amount: 2 }, { name: 'M', amount: 3 }];
+    const noOrder = [
+      { name: 'X', amount: 1 },
+      { name: 'A', amount: 2 },
+      { name: 'M', amount: 3 },
+    ];
     const out = sortAccounts(noOrder, 'custom', 'asc');
     expect(out.map((i) => i.name)).toEqual(['X', 'A', 'M']);
   });

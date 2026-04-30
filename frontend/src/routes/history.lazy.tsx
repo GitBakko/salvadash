@@ -129,9 +129,7 @@ function EntryCard({
         {/* Main content */}
         <div className="flex-1 px-3 py-3 flex items-center justify-between min-w-0">
           <div className="min-w-0">
-            <p className="text-base font-bold text-text-primary">
-              {fmtCurrency(entry.total)}
-            </p>
+            <p className="text-base font-bold text-text-primary">{fmtCurrency(entry.total)}</p>
             {entry.totalIncome > 0 && (
               <p className="text-xs text-text-muted mt-0.5 flex items-center gap-0.5">
                 <ArrowDown size={12} />

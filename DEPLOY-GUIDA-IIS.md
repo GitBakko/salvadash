@@ -17,15 +17,15 @@
 
 ## 1. Prerequisiti
 
-| Componente | Versione minima | Note |
-|---|---|---|
-| Windows Server | 2019 (o successivo) | Con accesso Administrator |
-| Node.js | 20.x LTS | Consigliato 22.x LTS |
-| pnpm | 9.x+ | Package manager |
-| PostgreSQL | 15 o 16 | Può essere sullo stesso server o remoto |
-| IIS | 10.0 | Incluso in Windows Server |
-| URL Rewrite Module | 2.1 | Modulo IIS per rewrite/proxy |
-| ARR (Application Request Routing) | 3.0 | Modulo IIS per reverse proxy |
+| Componente                        | Versione minima     | Note                                    |
+| --------------------------------- | ------------------- | --------------------------------------- |
+| Windows Server                    | 2019 (o successivo) | Con accesso Administrator               |
+| Node.js                           | 20.x LTS            | Consigliato 22.x LTS                    |
+| pnpm                              | 9.x+                | Package manager                         |
+| PostgreSQL                        | 15 o 16             | Può essere sullo stesso server o remoto |
+| IIS                               | 10.0                | Incluso in Windows Server               |
+| URL Rewrite Module                | 2.1                 | Modulo IIS per rewrite/proxy            |
+| ARR (Application Request Routing) | 3.0                 | Modulo IIS per reverse proxy            |
 
 ### File di build necessari
 
@@ -84,6 +84,7 @@ Scaricare e installare:
 **ARR 3.0** → https://www.iis.net/downloads/microsoft/application-request-routing
 
 > **IMPORTANTE**: Dopo l'installazione di ARR, abilitare il proxy:
+>
 > 1. Aprire **IIS Manager**
 > 2. Selezionare il **nodo server** (non il sito)
 > 3. Doppio click su **Application Request Routing Cache**
@@ -116,6 +117,7 @@ npm install -g pnpm pm2 pm2-windows-startup
 Scaricare e installare PostgreSQL 16 da https://www.postgresql.org/download/windows/
 
 Durante l'installazione:
+
 - Annotare la **password** del superuser `postgres`
 - Porta di default: **5432**
 
@@ -238,6 +240,7 @@ BACKUP_CLOUD_ENABLED=false
 ```
 
 > **Generare i segreti JWT** con:
+>
 > ```powershell
 > node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 > ```
@@ -363,6 +366,7 @@ Get-WebGlobalModule | Where-Object { $_.Name -like "*arr*" -or $_.Name -like "*r
 ```
 
 Se il reverse proxy non funziona, verificare:
+
 1. **IIS Manager** → nodo server → **Application Request Routing Cache**
 2. **Server Proxy Settings** → spuntare **Enable proxy** → **Apply**
 
@@ -601,13 +605,13 @@ Restart-Service -Name postgresql-x64-16
 
 ## Risoluzione problemi comuni
 
-| Problema | Causa probabile | Soluzione |
-|---|---|---|
-| 502 Bad Gateway su `/api/*` | Backend non in esecuzione | `pm2 status` → `pm2 restart salvadash-api` |
-| 404 su tutte le route | URL Rewrite non installato | Installare URL Rewrite Module |
-| Reverse proxy non funziona | ARR non abilitato | IIS Manager → ARR Cache → Enable proxy |
-| Service Worker non registrato | Manca HTTPS | Configurare certificato SSL |
-| PWA non installabile | Errore manifest o no HTTPS | Verificare DevTools → Application |
-| Database connection failed | PostgreSQL non avviato | `Get-Service postgresql*` → `Start-Service` |
-| Errore Prisma generate | Node.js non nel PATH | Riavviare terminale dopo installazione Node |
-| Asset non caricati (MIME) | Tipi MIME mancanti | Il web.config già configura i tipi necessari |
+| Problema                      | Causa probabile            | Soluzione                                    |
+| ----------------------------- | -------------------------- | -------------------------------------------- |
+| 502 Bad Gateway su `/api/*`   | Backend non in esecuzione  | `pm2 status` → `pm2 restart salvadash-api`   |
+| 404 su tutte le route         | URL Rewrite non installato | Installare URL Rewrite Module                |
+| Reverse proxy non funziona    | ARR non abilitato          | IIS Manager → ARR Cache → Enable proxy       |
+| Service Worker non registrato | Manca HTTPS                | Configurare certificato SSL                  |
+| PWA non installabile          | Errore manifest o no HTTPS | Verificare DevTools → Application            |
+| Database connection failed    | PostgreSQL non avviato     | `Get-Service postgresql*` → `Start-Service`  |
+| Errore Prisma generate        | Node.js non nel PATH       | Riavviare terminale dopo installazione Node  |
+| Asset non caricati (MIME)     | Tipi MIME mancanti         | Il web.config già configura i tipi necessari |

@@ -7,6 +7,7 @@ import path from 'path';
 import { config } from './config/index.js';
 import prisma from './lib/prisma.js';
 import { startBackupScheduler } from './lib/backup-scheduler.js';
+import { apiRateLimit } from './middleware/rate-limit.js';
 
 export const app: Express = express();
 
@@ -37,7 +38,7 @@ app.get('/api/health', async (_req, res) => {
 
 // ─── API Routes ────────────────────────────────────────────
 import apiRoutes from './routes/index.js';
-app.use('/api', apiRoutes);
+app.use('/api', apiRateLimit, apiRoutes);
 
 // ─── 404 Handler ───────────────────────────────────────────
 app.use((_req, res) => {

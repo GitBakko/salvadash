@@ -122,7 +122,7 @@ export const changelog: ChangelogEntry[] = [
         type: 'feature',
         items: [
           {
-            it: 'Migrazione completa a Lucide React: icone SVG moderne e scalabili in tutta l\'app',
+            it: "Migrazione completa a Lucide React: icone SVG moderne e scalabili in tutta l'app",
             en: 'Full migration to Lucide React: modern, scalable SVG icons throughout the app',
           },
           {
@@ -143,7 +143,7 @@ export const changelog: ChangelogEntry[] = [
             en: 'Improved touch targets on all icon buttons (min 44px per Apple HIG)',
           },
           {
-            it: 'Il drag & drop dei conti si attiva solo dal grip handle, non dall\'intero elemento',
+            it: "Il drag & drop dei conti si attiva solo dal grip handle, non dall'intero elemento",
             en: 'Account drag & drop now activates only from the grip handle, not the entire element',
           },
           {
@@ -171,11 +171,11 @@ export const changelog: ChangelogEntry[] = [
         type: 'fix',
         items: [
           {
-            it: 'Il drag & drop dei conti ora si attiva solo dal grip handle, non dall\'intero elemento',
+            it: "Il drag & drop dei conti ora si attiva solo dal grip handle, non dall'intero elemento",
             en: 'Account drag & drop now activates only from the grip handle, not the entire element',
           },
           {
-            it: 'Risolto problema ESM con Prisma 7 che impediva l\'avvio del backend in produzione',
+            it: "Risolto problema ESM con Prisma 7 che impediva l'avvio del backend in produzione",
             en: 'Fixed Prisma 7 ESM issue that prevented backend startup in production',
           },
           {
@@ -188,7 +188,7 @@ export const changelog: ChangelogEntry[] = [
         type: 'improvement',
         items: [
           {
-            it: 'Nuovo componente Toggle animato in stile iOS, utilizzato in tutta l\'app',
+            it: "Nuovo componente Toggle animato in stile iOS, utilizzato in tutta l'app",
             en: 'New animated iOS-style Toggle component, used throughout the app',
           },
           {

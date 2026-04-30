@@ -349,7 +349,14 @@ interface AccountCardProps {
   isDeleting: boolean;
 }
 
-function AccountCard({ account, color, onEdit, onDelete, onToggleActive, isDeleting }: AccountCardProps) {
+function AccountCard({
+  account,
+  color,
+  onEdit,
+  onDelete,
+  onToggleActive,
+  isDeleting,
+}: AccountCardProps) {
   return (
     <AccountCardContent
       account={account}

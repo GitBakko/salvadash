@@ -446,9 +446,7 @@ function NewEntryPage() {
                 <p className="text-text-muted text-xs uppercase tracking-wider">
                   {t('entries.liveTotal')}
                 </p>
-                <p className="text-2xl font-bold text-gold">
-                  {fmtCurrency(liveTotal)}
-                </p>
+                <p className="text-2xl font-bold text-gold">{fmtCurrency(liveTotal)}</p>
               </div>
               {totalIncome > 0 && (
                 <div className="text-right">

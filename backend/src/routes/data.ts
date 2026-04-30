@@ -39,7 +39,10 @@ router.get('/analytics', async (req: Request, res: Response): Promise<void> => {
 
     const accountIdsParam = (req.query.accountIds as string | undefined)?.trim();
     const accountIds = accountIdsParam
-      ? accountIdsParam.split(',').map((s) => s.trim()).filter(Boolean)
+      ? accountIdsParam
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
       : undefined;
 
     // Verify ownership when filter is provided so users cannot probe other users' account IDs.

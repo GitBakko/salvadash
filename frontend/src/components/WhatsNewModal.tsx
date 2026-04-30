@@ -5,7 +5,10 @@ import { APP_VERSION, changelog, type ChangelogCategoryType } from '@salvadash/s
 import { useMarkVersionSeen } from '../hooks/queries';
 import { Modal } from './ui';
 
-const categoryConfig: Record<ChangelogCategoryType, { Icon: LucideIcon; color: string; labelKey: string }> = {
+const categoryConfig: Record<
+  ChangelogCategoryType,
+  { Icon: LucideIcon; color: string; labelKey: string }
+> = {
   feature: { Icon: Sparkles, color: 'text-brand', labelKey: 'version.features' },
   fix: { Icon: Bug, color: 'text-negative', labelKey: 'version.fixes' },
   improvement: { Icon: TrendingUp, color: 'text-positive', labelKey: 'version.improvements' },
@@ -28,7 +31,12 @@ export function WhatsNewModal({ onClose }: WhatsNewModalProps) {
   }
 
   return (
-    <Modal isOpen onClose={handleClose} title={`${t('version.whatsNew')} — v${currentEntry.version}`} size="md">
+    <Modal
+      isOpen
+      onClose={handleClose}
+      title={`${t('version.whatsNew')} — v${currentEntry.version}`}
+      size="md"
+    >
       <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
         <p className="text-xs text-text-muted">{currentEntry.date}</p>
 

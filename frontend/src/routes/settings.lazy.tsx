@@ -84,7 +84,11 @@ function SettingsPage() {
       <CurrencySection />
 
       {/* Language */}
-      <Section title={t('settings.language')} icon={<Languages size={20} className="text-brand" />} delay={0.2}>
+      <Section
+        title={t('settings.language')}
+        icon={<Languages size={20} className="text-brand" />}
+        delay={0.2}
+      >
         <div className="flex gap-2">
           {(['it', 'en'] as const).map((lang) => (
             <button
@@ -109,7 +113,11 @@ function SettingsPage() {
       <DataManagementSection />
 
       {/* About */}
-      <Section title={t('settings.about')} icon={<Info size={20} className="text-brand" />} delay={0.3}>
+      <Section
+        title={t('settings.about')}
+        icon={<Info size={20} className="text-brand" />}
+        delay={0.3}
+      >
         <div className="space-y-2 text-sm text-text-secondary">
           <div className="flex justify-between">
             <span>{t('settings.version')}</span>
@@ -145,9 +153,7 @@ function SettingsPage() {
       </motion.div>
 
       {/* WhatsNew Modal — rendered from WhatsNewModal component */}
-      {showWhatsNew && (
-        <WhatsNewModal onClose={() => setShowWhatsNew(false)} />
-      )}
+      {showWhatsNew && <WhatsNewModal onClose={() => setShowWhatsNew(false)} />}
     </div>
   );
 }
@@ -264,7 +270,11 @@ function ProfileSection() {
       .slice(0, 2) ?? '??';
 
   return (
-    <Section title={t('settings.profile')} icon={<User size={20} className="text-brand" />} delay={0.05}>
+    <Section
+      title={t('settings.profile')}
+      icon={<User size={20} className="text-brand" />}
+      delay={0.05}
+    >
       {/* Avatar + Info */}
       <div className="flex items-center gap-4 mb-4">
         <div className="relative group">
@@ -494,7 +504,11 @@ function PushSection() {
 
   if (state === 'denied') {
     return (
-      <Section title={t('push.title')} icon={<BellOff size={20} className="text-brand" />} delay={0.1}>
+      <Section
+        title={t('push.title')}
+        icon={<BellOff size={20} className="text-brand" />}
+        delay={0.1}
+      >
         <p className="text-sm text-text-muted">{t('push.denied')}</p>
       </Section>
     );
@@ -576,7 +590,11 @@ function IncomeSourcesSection() {
   };
 
   return (
-    <Section title={t('incomeSources.title')} icon={<Banknote size={20} className="text-brand" />} delay={0.15}>
+    <Section
+      title={t('incomeSources.title')}
+      icon={<Banknote size={20} className="text-brand" />}
+      delay={0.15}
+    >
       {isLoading ? (
         <div className="h-20 animate-pulse bg-surface-elevated rounded-lg" />
       ) : (
@@ -602,16 +620,10 @@ function IncomeSourcesSection() {
                         className="flex-1 bg-transparent text-sm outline-none border-b border-brand/40 py-0.5"
                         autoFocus
                       />
-                      <button
-                        onClick={() => handleUpdate(source.id)}
-                        className="p-2.5 text-brand"
-                      >
+                      <button onClick={() => handleUpdate(source.id)} className="p-2.5 text-brand">
                         <Check size={20} />
                       </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="p-2.5 text-text-muted"
-                      >
+                      <button onClick={() => setEditingId(null)} className="p-2.5 text-text-muted">
                         <X size={20} />
                       </button>
                     </>
@@ -698,7 +710,11 @@ function CurrencySection() {
   };
 
   return (
-    <Section title={t('settings.currency')} icon={<Euro size={20} className="text-brand" />} delay={0.18}>
+    <Section
+      title={t('settings.currency')}
+      icon={<Euro size={20} className="text-brand" />}
+      delay={0.18}
+    >
       <p className="text-sm text-text-secondary mb-3">{t('settings.currencyDesc')}</p>
       <div className="flex gap-2">
         {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (
@@ -733,7 +749,11 @@ function ThemeSection() {
   ] as const;
 
   return (
-    <Section title={t('settings.theme')} icon={<Palette size={20} className="text-brand" />} delay={0.22}>
+    <Section
+      title={t('settings.theme')}
+      icon={<Palette size={20} className="text-brand" />}
+      delay={0.22}
+    >
       <div className="flex gap-2">
         {modes.map(({ value, Icon }) => (
           <button
@@ -817,7 +837,11 @@ function DataManagementSection() {
   };
 
   return (
-    <Section title={t('settings.dataManagement')} icon={<HardDrive size={20} className="text-brand" />} delay={0.25}>
+    <Section
+      title={t('settings.dataManagement')}
+      icon={<HardDrive size={20} className="text-brand" />}
+      delay={0.25}
+    >
       <div className="space-y-3">
         {/* Export buttons */}
         <div className="flex gap-2">

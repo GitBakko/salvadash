@@ -73,3 +73,9 @@ temp/
 *.tmp
 *.zip
 backend/test-pg-connection.mjs
+
+# ─── Knowledge graph (graphify) ────────────────────────────
+graphify-out/
+
+# ─── Release packages ──────────────────────────────────────
+dist-release/

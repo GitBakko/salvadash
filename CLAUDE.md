@@ -4,12 +4,12 @@ Personal-savings tracker PWA. Italian-first, English supported. Single-tenant pe
 
 ## Stack
 
-| Layer    | Tech                                                                                                        |
-| -------- | ----------------------------------------------------------------------------------------------------------- |
-| Frontend | React 19, Vite 6, TanStack Router (file-based) + Query, Zustand, Tailwind v4, Recharts, Dexie, i18next, PWA |
+| Layer    | Tech                                                                                                                     |
+| -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Frontend | React 19, Vite 6, TanStack Router (file-based) + Query, Zustand, Tailwind v4, Recharts, Dexie, i18next, PWA              |
 | Backend  | Express 4, Prisma 7 (`@prisma/adapter-pg`), PostgreSQL 16, JWT (httpOnly cookies), Nodemailer, web-push, node-cron, XLSX |
-| Shared   | Zod schemas + TS types — single source of truth for API contract                                            |
-| Infra    | pnpm monorepo, Docker (Postgres dev), PM2 + IIS (Windows Server prod), GitHub Actions CI                    |
+| Shared   | Zod schemas + TS types — single source of truth for API contract                                                         |
+| Infra    | pnpm monorepo, Docker (Postgres dev), PM2 + IIS (Windows Server prod), GitHub Actions CI                                 |
 
 Node ≥ 20, pnpm ≥ 9. Workspaces: `frontend`, `backend`, `shared`.
 

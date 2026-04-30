@@ -202,9 +202,8 @@ export interface AnalyticsOptions {
 }
 
 export function computeAnalytics(entries: EntryRow[], options: AnalyticsOptions = {}) {
-  const accountFilter = options.accountIds && options.accountIds.length > 0
-    ? new Set(options.accountIds)
-    : null;
+  const accountFilter =
+    options.accountIds && options.accountIds.length > 0 ? new Set(options.accountIds) : null;
 
   // Filter balances per entry when an account filter is active.
   const filtered: EntryRow[] = accountFilter

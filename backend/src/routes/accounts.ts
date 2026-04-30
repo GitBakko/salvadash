@@ -10,6 +10,7 @@ import {
 } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
+import { writeRateLimit } from '../middleware/rate-limit.js';
 import { isValidationOk } from '../lib/http.js';
 import { config } from '../config/index.js';
 
@@ -22,11 +23,28 @@ router.use(authenticate);
 const ACCOUNT_ICONS_DIR = path.resolve(import.meta.dirname, '../../uploads/account-icons');
 fs.mkdirSync(ACCOUNT_ICONS_DIR, { recursive: true });
 
+// Account IDs are CUIDs (cuid2): 24 chars, lowercase a-z + 0-9. Reject anything else
+// before it touches the filesystem or a generated URL — defends against path traversal
+// even though Prisma already validated ownership.
+const CUID_RE = /^[a-z0-9]{20,32}$/;
+
+function safeAccountId(accountId: string): string | null {
+  return CUID_RE.test(accountId) ? accountId : null;
+}
+
 function accountIconPath(accountId: string): string {
-  return path.join(ACCOUNT_ICONS_DIR, `${accountId}.webp`);
+  if (!safeAccountId(accountId)) {
+    throw new Error('Invalid account id');
+  }
+  // path.basename strips any directory components defensively (belt-and-braces).
+  const safe = path.basename(`${accountId}.webp`);
+  return path.join(ACCOUNT_ICONS_DIR, safe);
 }
 
 function accountIconPublicUrl(accountId: string): string {
+  if (!safeAccountId(accountId)) {
+    throw new Error('Invalid account id');
+  }
   // Cache-bust: same disk path on each import overwrites the same file, so the URL
   // would otherwise stay identical and the browser keeps the old image. Append a
   // timestamp on every successful import so <img src> is a fresh URL.
@@ -132,7 +150,7 @@ router.get('/search-logo', async (req: Request, res: Response): Promise<void> =>
 // ─── POST /accounts/import-logo ────────────────────────────
 // Body: { accountId, iconUrl } — downloads from CDN, resizes, extracts dominant color.
 
-router.post('/import-logo', async (req: Request, res: Response): Promise<void> => {
+router.post('/import-logo', writeRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = importLogoSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
@@ -173,7 +191,13 @@ router.post('/import-logo', async (req: Request, res: Response): Promise<void> =
       const { r, g, b } = stats.dominant;
       hex =
         '#' +
-        [r, g, b].map((c) => Math.max(0, Math.min(255, Math.round(c))).toString(16).padStart(2, '0')).join('');
+        [r, g, b]
+          .map((c) =>
+            Math.max(0, Math.min(255, Math.round(c)))
+              .toString(16)
+              .padStart(2, '0'),
+          )
+          .join('');
 
       await sharp(buf)
         .resize(256, 256, {
@@ -323,10 +347,15 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
 // ─── DELETE /accounts/:id/icon ──────────────────────────────
 // Clear icon (revert to lucide fallback). Color is preserved — user choice.
 
-router.delete('/:id/icon', async (req: Request, res: Response): Promise<void> => {
+router.delete('/:id/icon', writeRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user!.userId;
     const id = req.params.id as string;
+
+    if (!safeAccountId(id)) {
+      res.status(400).json({ success: false, error: 'Invalid account id' });
+      return;
+    }
 
     const existing = await prisma.account.findFirst({
       where: { id, userId },
@@ -355,10 +384,15 @@ router.delete('/:id/icon', async (req: Request, res: Response): Promise<void> =>
 
 // ─── DELETE /accounts/:id ───────────────────────────────────
 
-router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
+router.delete('/:id', writeRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user!.userId;
     const id = req.params.id as string;
+
+    if (!safeAccountId(id)) {
+      res.status(400).json({ success: false, error: 'Invalid account id' });
+      return;
+    }
 
     const existing = await prisma.account.findFirst({
       where: { id, userId },

@@ -2,3 +2,28 @@ dist/
 node_modules/
 pnpm-lock.yaml
 **/*.gen.ts
+
+# Auto-generated knowledge graph output
+graphify-out/
+
+# Release packages
+dist-release/
+
+# TSC build outputs in source dirs
+frontend/src/**/*.js
+frontend/src/**/*.js.map
+frontend/src/**/*.d.ts
+frontend/src/**/*.d.ts.map
+**/__tests__/*.js
+**/__tests__/*.js.map
+**/__tests__/*.d.ts
+**/__tests__/*.d.ts.map
+
+# Prisma generated client
+backend/src/generated/
+
+# Backups
+backups/
+
+# Coverage
+coverage/

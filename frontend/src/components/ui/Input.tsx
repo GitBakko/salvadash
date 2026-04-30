@@ -16,7 +16,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label htmlFor={inputId} className="block text-sm font-medium text-text-secondary">
             {label}
-            {props.required && <span aria-hidden="true" className="text-negative ml-0.5">*</span>}
+            {props.required && (
+              <span aria-hidden="true" className="text-negative ml-0.5">
+                *
+              </span>
+            )}
           </label>
         )}
         <div className="relative">

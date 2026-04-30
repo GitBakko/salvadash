@@ -164,11 +164,7 @@ function AnalyticsPage() {
             )}
 
             {/* Performance section — full width at md+ */}
-            <ChartSection
-              title={t('analytics.performance')}
-              delay={0.2}
-              className="@md:col-span-2"
-            >
+            <ChartSection title={t('analytics.performance')} delay={0.2} className="@md:col-span-2">
               <PerformanceGrid data={data} t={t} lang={i18n.language} />
             </ChartSection>
           </div>
@@ -263,10 +259,7 @@ function PatrimonyChart({
   const brand = brandColor();
   const positive = useMemo(() => readVar('--color-positive', '#5dd6b8'), []);
   const tickFill = useMemo(() => readVar('--color-text-muted', '#7a7a8a'), []);
-  const gridStroke = useMemo(
-    () => readVar('--color-border-default', 'rgba(255,255,255,0.08)'),
-    [],
-  );
+  const gridStroke = useMemo(() => readVar('--color-border-default', 'rgba(255,255,255,0.08)'), []);
   const surfaceBase = useMemo(() => readVar('--color-surface-base', '#0d0b1a'), []);
   const chartData = data.map((d) => ({ ...d, label: formatMonthShort(d.date, lang) }));
   const lastIndex = chartData.length - 1;
@@ -343,10 +336,7 @@ function YearComparisonChart({
   const { t } = useTranslation();
   const yearColors = yearPalette();
   const tickFill = useMemo(() => readVar('--color-text-muted', '#7a7a8a'), []);
-  const gridStroke = useMemo(
-    () => readVar('--color-border-default', 'rgba(255,255,255,0.08)'),
-    [],
-  );
+  const gridStroke = useMemo(() => readVar('--color-border-default', 'rgba(255,255,255,0.08)'), []);
   const years = Object.keys(data).sort();
   const [activeYears, setActiveYears] = useState<Set<string>>(() => {
     // Show last 3 years by default
@@ -506,72 +496,69 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
       </div>
       <div className="flex items-center gap-4">
         <div className="relative w-36 h-36 shrink-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={pieData}
-              dataKey="amount"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              innerRadius={42}
-              outerRadius={66}
-              paddingAngle={4}
-              animationDuration={800}
-              onMouseEnter={(_, i) => setActiveIndex(i)}
-              onMouseLeave={() => setActiveIndex(null)}
-            >
-              {pieData.map((d, i) => (
-                <Cell
-                  key={d.name}
-                  fill={d.fill}
-                  stroke="transparent"
-                  opacity={activeIndex === null || activeIndex === i ? 1 : 0.4}
-                  style={{
-                    transition: 'opacity 0.2s, filter 0.2s',
-                    filter:
-                      activeIndex === i
-                        ? `drop-shadow(0 4px 12px ${d.fill}59)`
-                        : undefined,
-                  }}
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-text-muted text-[9px] font-semibold uppercase tracking-wider">
-            Totale
-          </span>
-          <span className="text-sm font-bold tabular-nums text-text-primary leading-none mt-0.5">
-            {fmtCurrencyCompact(total)}
-          </span>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="flex-1 space-y-1.5 min-w-0">
-        {pieData.map((d, i) => (
-          <div
-            key={d.accountId ?? d.name}
-            className="flex items-center gap-2 text-sm"
-            onMouseEnter={() => setActiveIndex(i)}
-            onMouseLeave={() => setActiveIndex(null)}
-          >
-            <AccountIcon
-              iconUrl={d.iconUrl}
-              icon={d.icon}
-              name={d.name}
-              color={d.color ?? d.fill}
-              size={20}
-            />
-            <span className="text-text-secondary truncate flex-1">{d.name}</span>
-            <span className="font-semibold text-text-primary shrink-0">
-              {d.percent.toFixed(1)}%
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={pieData}
+                dataKey="amount"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={42}
+                outerRadius={66}
+                paddingAngle={4}
+                animationDuration={800}
+                onMouseEnter={(_, i) => setActiveIndex(i)}
+                onMouseLeave={() => setActiveIndex(null)}
+              >
+                {pieData.map((d, i) => (
+                  <Cell
+                    key={d.name}
+                    fill={d.fill}
+                    stroke="transparent"
+                    opacity={activeIndex === null || activeIndex === i ? 1 : 0.4}
+                    style={{
+                      transition: 'opacity 0.2s, filter 0.2s',
+                      filter: activeIndex === i ? `drop-shadow(0 4px 12px ${d.fill}59)` : undefined,
+                    }}
+                  />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span className="text-text-muted text-[9px] font-semibold uppercase tracking-wider">
+              Totale
+            </span>
+            <span className="text-sm font-bold tabular-nums text-text-primary leading-none mt-0.5">
+              {fmtCurrencyCompact(total)}
             </span>
           </div>
-        ))}
-      </div>
+        </div>
+
+        {/* Legend */}
+        <div className="flex-1 space-y-1.5 min-w-0">
+          {pieData.map((d, i) => (
+            <div
+              key={d.accountId ?? d.name}
+              className="flex items-center gap-2 text-sm"
+              onMouseEnter={() => setActiveIndex(i)}
+              onMouseLeave={() => setActiveIndex(null)}
+            >
+              <AccountIcon
+                iconUrl={d.iconUrl}
+                icon={d.icon}
+                name={d.name}
+                color={d.color ?? d.fill}
+                size={20}
+              />
+              <span className="text-text-secondary truncate flex-1">{d.name}</span>
+              <span className="font-semibold text-text-primary shrink-0">
+                {d.percent.toFixed(1)}%
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -579,19 +566,10 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
 
 // ─── Income BarChart ───────────────────────────────────────
 
-function IncomeBarChart({
-  data,
-  lang,
-}: {
-  data: AnalyticsData['monthlyIncome'];
-  lang: string;
-}) {
+function IncomeBarChart({ data, lang }: { data: AnalyticsData['monthlyIncome']; lang: string }) {
   const chartColors = chartPalette();
   const tickFill = useMemo(() => readVar('--color-text-muted', '#7a7a8a'), []);
-  const gridStroke = useMemo(
-    () => readVar('--color-border-default', 'rgba(255,255,255,0.08)'),
-    [],
-  );
+  const gridStroke = useMemo(() => readVar('--color-border-default', 'rgba(255,255,255,0.08)'), []);
   // Collect all source names
   const allSources = useMemo(() => {
     const set = new Set<string>();
@@ -717,9 +695,7 @@ function PerformanceGrid({
       {items.map((item) => (
         <div key={item.label} className="px-4 py-3 first:pl-0 last:pr-0">
           {/* Mixed-case label — uppercase is reserved for the hero per Wave 4 audit. */}
-          <p className="text-text-muted text-[11px] font-semibold leading-tight">
-            {item.label}
-          </p>
+          <p className="text-text-muted text-[11px] font-semibold leading-tight">{item.label}</p>
           <p
             className={`text-xl font-bold tracking-tight tabular-nums leading-none mt-1.5 capitalize ${item.valueColor}`}
           >

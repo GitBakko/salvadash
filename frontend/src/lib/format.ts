@@ -24,8 +24,14 @@ export function fmtCurrencyParts(n: number): { integer: string; cents: string } 
     return { integer: parts.map((p) => p.value).join(''), cents: '' };
   }
   return {
-    integer: parts.slice(0, decimalIdx).map((p) => p.value).join(''),
-    cents: parts.slice(decimalIdx).map((p) => p.value).join(''),
+    integer: parts
+      .slice(0, decimalIdx)
+      .map((p) => p.value)
+      .join(''),
+    cents: parts
+      .slice(decimalIdx)
+      .map((p) => p.value)
+      .join(''),
   };
 }
 

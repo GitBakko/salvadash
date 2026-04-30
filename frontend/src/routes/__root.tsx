@@ -85,7 +85,10 @@ function RootLayout() {
   // Auth pages — no shell
   if (isAuthPage) {
     return (
-      <div className="min-h-dvh bg-surface-base text-text-primary" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <div
+        className="min-h-dvh bg-surface-base text-text-primary"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <ToastContainer />
         <Outlet />
       </div>
@@ -95,7 +98,10 @@ function RootLayout() {
   // Fullscreen pages — no header/navbar
   if (isFullscreen) {
     return (
-      <div className="min-h-dvh bg-surface-base text-text-primary" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <div
+        className="min-h-dvh bg-surface-base text-text-primary"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
         <Outlet />
         <ToastContainer />
       </div>
@@ -105,7 +111,10 @@ function RootLayout() {
   // Not authenticated — redirect handled by individual routes
   // But show shell if authenticated
   return (
-    <div className="min-h-dvh bg-surface-base text-text-primary flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div
+      className="min-h-dvh bg-surface-base text-text-primary flex flex-col"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-brand focus:text-surface-base focus:px-3 focus:py-2 focus:rounded-md"

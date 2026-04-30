@@ -25,9 +25,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         {/* Brand block */}
         <div className="flex items-center relative">
           <CircleDollarSign size={40} strokeWidth={1.5} className="text-brand" />
-          <span className="font-heading text-xl font-bold ml-3">
-            {t('common.appName')}
-          </span>
+          <span className="font-heading text-xl font-bold ml-3">{t('common.appName')}</span>
         </div>
 
         {/* Tagline */}
@@ -35,16 +33,12 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           <h2 className="font-heading text-3xl lg:text-4xl font-bold tracking-tight leading-tight text-text-primary whitespace-pre-line">
             {t('auth.tagline')}
           </h2>
-          <p className="text-text-secondary text-sm mt-4 max-w-xs">
-            {t('auth.taglineSub')}
-          </p>
+          <p className="text-text-secondary text-sm mt-4 max-w-xs">{t('auth.taglineSub')}</p>
         </div>
 
         {/* Footer: copyright + version */}
         <div className="flex items-center justify-between relative">
-          <p className="text-text-muted text-xs">
-            &copy; {year} SalvaDash
-          </p>
+          <p className="text-text-muted text-xs">&copy; {year} SalvaDash</p>
           <VersionBadge className="opacity-60" />
         </div>
       </aside>
@@ -54,17 +48,11 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <div className="w-full max-w-sm space-y-8">
           {/* Mobile-only brand */}
           <div className="md:hidden text-center">
-            <CircleDollarSign
-              size={56}
-              strokeWidth={1.5}
-              className="text-brand mx-auto"
-            />
+            <CircleDollarSign size={56} strokeWidth={1.5} className="text-brand mx-auto" />
             <h1 className="font-heading text-2xl font-bold text-brand mt-2">
               {t('common.appName')}
             </h1>
-            <p className="text-text-secondary text-sm mt-1">
-              {t('auth.taglineSub')}
-            </p>
+            <p className="text-text-secondary text-sm mt-1">{t('auth.taglineSub')}</p>
           </div>
 
           {children}

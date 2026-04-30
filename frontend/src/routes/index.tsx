@@ -106,7 +106,8 @@ function HeroCard({
   let ariaText = '';
   if (delta != null) {
     const currencyStr = fmtCurrencyCompact(delta);
-    const signedCurrency = delta > 0 && !currencyStr.startsWith('+') ? `+${currencyStr}` : currencyStr;
+    const signedCurrency =
+      delta > 0 && !currencyStr.startsWith('+') ? `+${currencyStr}` : currencyStr;
     chipText = signedCurrency;
     if (deltaPercent != null) {
       chipText += ` · ${fmtPercent(deltaPercent)}`;
@@ -157,13 +158,10 @@ function KPIGrid({
   // tight text hierarchy. Mint variant tints the value in `text-positive`.
   const tileBase = 'bg-surface-card-solid rounded-[18px] p-4';
   const labelCls = 'text-text-muted text-[11px] font-semibold leading-tight mb-2.5';
-  const valueBase =
-    'text-[1.45rem] font-bold tracking-[-0.02em] leading-none mb-1.5 tabular-nums';
+  const valueBase = 'text-[1.45rem] font-bold tracking-[-0.02em] leading-none mb-1.5 tabular-nums';
   const ctxCls = 'text-text-muted text-[11px] font-medium leading-tight';
 
-  const monthName = data.currentEntry
-    ? formatMonthLong(data.currentEntry.date, lang)
-    : '';
+  const monthName = data.currentEntry ? formatMonthLong(data.currentEntry.date, lang) : '';
 
   const growthPositive = data.growthYTD >= 0;
   const growthValueCls = growthPositive ? 'text-positive' : 'text-negative';
@@ -306,12 +304,13 @@ function RecentEntries({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <p className="text-text-muted text-xs font-medium mb-2">
-        {t('dashboard.recentEntries')}
-      </p>
+      <p className="text-text-muted text-xs font-medium mb-2">{t('dashboard.recentEntries')}</p>
       <Card className="space-y-1">
         {entries.map((entry) => (
-          <div key={entry.id} className="flex items-center justify-between rounded-md px-3 py-2 odd:bg-surface-elevated/40">
+          <div
+            key={entry.id}
+            className="flex items-center justify-between rounded-md px-3 py-2 odd:bg-surface-elevated/40"
+          >
             <div>
               <p className="text-sm font-medium capitalize">{formatMonthShort(entry.date, lang)}</p>
               <p className="text-xs text-text-secondary">{fmtCurrency(entry.total)}</p>

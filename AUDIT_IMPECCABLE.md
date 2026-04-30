@@ -10,22 +10,22 @@ _Generated: 2026-04-30 · Scope: `frontend/`_
 
 If shown to a designer with the caption "AI made this," they would not pause. Every fingerprint from the 2024–25 AI-slop palette is present:
 
-| Tell | Where | Severity |
-|---|---|---|
-| **Cyan-on-near-black** brand `#00d4a0` on `#0a0a0f` | `app.css` `@theme` | Critical |
-| **Default dark mode with glowing accents** (`glow-brand` 20px+40px box-shadow) | `app.css`, `BottomNav` FAB, `Button` primary | Critical |
-| **Glassmorphism everywhere** (`glass-card` utility: blur 20px + 60% surface) wrapped around every Card, Header, Nav, Modal, Auth form | `app.css`, `Card.tsx`, `Header.tsx`, `BottomNav.tsx`, `login.tsx` | Critical |
-| **Hero-metric layout**: big number + small label + supporting stats (delta) + sparkline below, centered | `routes/index.tsx` `HeroCard` + `SparklineCard` | High |
-| **Identical 2×2 KPI card grid** with `icon + uppercase tracking-wider label + value` repeated four times | `routes/index.tsx` `KPIGrid`, `analytics.tsx` `PerformanceGrid` | High |
-| **Sparkline as decoration** ("Trend 12 mesi" mini chart, no axis, no scale) | `routes/index.tsx` `SparklineCard` | High |
-| **Gold metric on dark** (`#ffd166`) for the headline number | `routes/index.tsx` line 134 | Medium |
-| **Inter + Space Grotesk pair** (Inter is on the ban list; Space Grotesk is now templated) | `app.css` `--font-body`, `--font-heading` | Medium |
-| **Pure white text** `#ffffff` + **near-pure black surface** `#0a0a0f` (no hue tint) | `app.css` | Medium |
-| **Centered logo + tagline + glass form** auth screen | `routes/login.tsx`, `register.tsx`, `forgot-password.tsx` | Medium |
-| **Gradient overlay used decoratively** on hero card (`from-brand/5 to-transparent`) | `routes/index.tsx:126` | Medium |
-| **Bell + admin icon stacked top-right with badge** | `Header.tsx` | Low (templated but functional) |
-| **Spring-animated counter** on hero number | `routes/index.tsx` `AnimatedNumber` | Low |
-| **Centered everything** on auth pages, on dashboard hero, on empty states — no asymmetry | most routes | Medium |
+| Tell                                                                                                                                  | Where                                                             | Severity                       |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------ |
+| **Cyan-on-near-black** brand `#00d4a0` on `#0a0a0f`                                                                                   | `app.css` `@theme`                                                | Critical                       |
+| **Default dark mode with glowing accents** (`glow-brand` 20px+40px box-shadow)                                                        | `app.css`, `BottomNav` FAB, `Button` primary                      | Critical                       |
+| **Glassmorphism everywhere** (`glass-card` utility: blur 20px + 60% surface) wrapped around every Card, Header, Nav, Modal, Auth form | `app.css`, `Card.tsx`, `Header.tsx`, `BottomNav.tsx`, `login.tsx` | Critical                       |
+| **Hero-metric layout**: big number + small label + supporting stats (delta) + sparkline below, centered                               | `routes/index.tsx` `HeroCard` + `SparklineCard`                   | High                           |
+| **Identical 2×2 KPI card grid** with `icon + uppercase tracking-wider label + value` repeated four times                              | `routes/index.tsx` `KPIGrid`, `analytics.tsx` `PerformanceGrid`   | High                           |
+| **Sparkline as decoration** ("Trend 12 mesi" mini chart, no axis, no scale)                                                           | `routes/index.tsx` `SparklineCard`                                | High                           |
+| **Gold metric on dark** (`#ffd166`) for the headline number                                                                           | `routes/index.tsx` line 134                                       | Medium                         |
+| **Inter + Space Grotesk pair** (Inter is on the ban list; Space Grotesk is now templated)                                             | `app.css` `--font-body`, `--font-heading`                         | Medium                         |
+| **Pure white text** `#ffffff` + **near-pure black surface** `#0a0a0f` (no hue tint)                                                   | `app.css`                                                         | Medium                         |
+| **Centered logo + tagline + glass form** auth screen                                                                                  | `routes/login.tsx`, `register.tsx`, `forgot-password.tsx`         | Medium                         |
+| **Gradient overlay used decoratively** on hero card (`from-brand/5 to-transparent`)                                                   | `routes/index.tsx:126`                                            | Medium                         |
+| **Bell + admin icon stacked top-right with badge**                                                                                    | `Header.tsx`                                                      | Low (templated but functional) |
+| **Spring-animated counter** on hero number                                                                                            | `routes/index.tsx` `AnimatedNumber`                               | Low                            |
+| **Centered everything** on auth pages, on dashboard hero, on empty states — no asymmetry                                              | most routes                                                       | Medium                         |
 
 **The one differentiation that would survive a redesign**: the multi-account chip filter (newly added) and the colour-coded account breakdown. Everything else is interchangeable with any other 2024 PWA finance starter.
 
@@ -46,6 +46,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 **Quality score (0–10)**: **5.5**. Functionally correct, accessible at the API level, but visually templated, contrast-fragile in light mode, and not optimised for the platforms it targets (Mobile-first PWA).
 
 **Recommended next steps**:
+
 - Run `/normalize` to consolidate hard-coded hex into tokens.
 - Run `/harden` for light-theme contrast + touch-target fixes.
 - Run `/optimize` for code-splitting and chart lazy-load.
@@ -58,6 +59,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 ### Critical Issues
 
 #### C1. Light-theme body text contrast fails WCAG AA
+
 - **Location**: `frontend/src/app.css:103` (`--color-text-muted: #94a3b8` in `html.light`).
 - **Category**: Accessibility.
 - **Standard**: WCAG 2.1 AA — 1.4.3 Contrast (minimum) 4.5 : 1 for normal text.
@@ -67,6 +69,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden`.
 
 #### C2. Glassmorphism applied to every container
+
 - **Location**: `app.css:47` `@utility glass-card` used in `Card`, `Header`, `BottomNav`, every page card, all modals.
 - **Category**: Anti-pattern (visual identity).
 - **Description**: `backdrop-filter: blur(20px)` + `rgba(31,31,37,0.6)` + 1 px border applied to every surface. The technique is decorative, not purposeful.
@@ -75,6 +78,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: design-level rework — `/simplify` then `/normalize`.
 
 #### C3. Hardcoded brand cyan + glow recurring across modules
+
 - **Location**: `routes/index.tsx:264,271`, `analytics.tsx:35-46,229,233`, `routes/index.tsx:302,310`, `BottomNav.tsx:44`, `app.css:14-15,57-60`.
 - **Category**: Theming + anti-pattern.
 - **Description**: `#00d4a0` is repeated as a string in JSX, in CSS gradient stops, in chart Cell `fill`. The "AI palette" (cyan + neon glow on dark) is the dominant visual.
@@ -83,6 +87,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/normalize`.
 
 #### C4. AI hero-metric template
+
 - **Location**: `routes/index.tsx:110-153` (`HeroCard`).
 - **Category**: Anti-pattern (layout).
 - **Description**: Centered card · gradient overlay · 42 px gold number · spring counter · small italic delta below. Reproduces verbatim the "hero metric" tell.
@@ -91,6 +96,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/bolder` or `/simplify` (intentional choice required).
 
 #### C5. AI 2×2 KPI card grid duplicated on Home and Analytics
+
 - **Location**: `routes/index.tsx:157-244` `KPIGrid`, `analytics.tsx:455-509` `PerformanceGrid`.
 - **Category**: Anti-pattern (layout).
 - **Description**: Identical structure: `grid-cols-2 gap-3` of cards each with `<Icon size=20 className=text-X />` + uppercase 10 px label + heading-font value.
@@ -101,6 +107,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 ### High-Severity Issues
 
 #### H1. Touch targets below 44 × 44 px
+
 - **Locations**:
   - Year-selector pills `routes/index.tsx:78-89` — `px-3 py-1` ≈ 24 px tall.
   - Year-toggle pills `analytics.tsx:268-282` — `px-2.5 py-1` ≈ 22 px.
@@ -115,6 +122,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden`.
 
 #### H2. Inter + Space Grotesk type pair
+
 - **Location**: `app.css:34-35`.
 - **Category**: Anti-pattern (typography).
 - **Description**: Inter is the most over-used UI font of 2024–25; Space Grotesk has become the templated "display" pick alongside it.
@@ -123,6 +131,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: design pass; out of scope of `/normalize`.
 
 #### H3. Bundle: 532 KB main + 432 KB charts not split
+
 - **Location**: `vite.config.ts`, all routes importing `recharts`.
 - **Category**: Performance.
 - **Description**: Vite warns "Some chunks are larger than 500 kB after minification." Recharts loads on Home, Analytics, History eagerly; admin.tsx (1207 LOC) ships in main chunk.
@@ -134,6 +143,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/optimize`.
 
 #### H4. Hard-coded hex literals throughout charts
+
 - **Location**: `analytics.tsx:35-47`, `routes/index.tsx:264,271,302,310`, `AnalyticsPage` `pieData` fallback `CHART_COLORS[i]`, `AccountFilterBar.tsx` accent fallback `'#00d4a0'`.
 - **Category**: Theming.
 - **Impact**: Light-mode users see palette mismatch; cannot rebrand without code search-replace; Recharts cannot adopt theme tokens at runtime.
@@ -141,6 +151,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/normalize`.
 
 #### H5. `text-gold` headline metric (`#ffd166`)
+
 - **Location**: `routes/index.tsx:134`.
 - **Category**: Anti-pattern + theming.
 - **Description**: Gold on dark for the primary number is exactly the AI "hero metric" colour cue. In light mode `--color-gold` is unchanged → fails contrast (AA: gold on white ≈ 1.7 : 1).
@@ -149,6 +160,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden` + `/normalize`.
 
 #### H6. Decorative gradient overlay on hero card
+
 - **Location**: `routes/index.tsx:126`.
 - **Description**: `<div className="absolute inset-0 bg-gradient-to-b from-brand/5 to-transparent" />`.
 - **Impact**: Adds DOM weight + paint cost for a barely-visible 5 % opacity wash; classic decorative gradient anti-pattern.
@@ -156,6 +168,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/simplify`.
 
 #### H7. `glow-brand` decoratively used on FAB and primary buttons
+
 - **Location**: `app.css:56-60`, applied at `BottomNav.tsx:44`, `Button.tsx:18`.
 - **Description**: `box-shadow: 0 0 20px var(--color-brand-glow), 0 0 40px rgba(0, 212, 160, 0.1)`.
 - **Impact**: Visual noise on every primary CTA; overlapping shadows when buttons sit near the FAB.
@@ -163,6 +176,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/quieter`.
 
 #### H8. `radius-[var(--radius-md)]` syntax in JSX
+
 - **Location**: `Button.tsx:26-28`, `Input.tsx:29`, `login.tsx:58`.
 - **Description**: Using arbitrary-value `rounded-[var(--radius-md)]` instead of Tailwind v4 `rounded-md` mapped to the token via `@theme`.
 - **Impact**: Brittle, bypasses Tailwind's caching; if the token name changes (e.g., to `--radius-button`) the components break silently.
@@ -170,6 +184,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/normalize`.
 
 #### H9. Year selector duplicated in three places
+
 - **Location**: `routes/index.tsx:76-90`, `analytics.tsx:264-283`, `history.tsx`.
 - **Description**: Same horizontal scrolling year-pill pattern, copy-pasted thrice with subtle styling drift (different opacity, padding, animation).
 - **Impact**: UX inconsistency + maintenance burden + duplicated component.
@@ -177,6 +192,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/extract`.
 
 #### H10. Centered everything (anti-pattern)
+
 - **Location**: every auth page (`login.tsx`, `register.tsx`, `forgot-password.tsx`, `reset-password.tsx`, `verify-email.tsx`), dashboard hero, all empty states.
 - **Description**: `text-center` + `mx-auto` everywhere; no asymmetric layouts.
 - **Impact**: "Centered template" look; no design point of view.
@@ -184,6 +200,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: design pass / `/bolder`.
 
 #### H11. Locale hard-coded in date formatting
+
 - **Location**: `analytics.tsx:53,58`, `routes/index.tsx:47`, multiple `formatMonth` helpers.
 - **Description**: `new Date(...).toLocaleDateString('it-IT', ...)` even though `i18next` is configured for IT/EN.
 - **Impact**: English users see Italian month names ("gen 24", "feb 24") — i18n bug.
@@ -191,6 +208,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden` (i18n).
 
 #### H12. Status colors only encoded by hue
+
 - **Location**: `routes/index.tsx:143-148,346-355`, `analytics.tsx:474-484`.
 - **Description**: Positive/negative deltas distinguished only by `text-positive` (green) / `text-negative` (red); no icon, no sign repetition for screen readers, and the colours are problematic for deuteranopia.
 - **Standard**: WCAG 1.4.1 (Use of Color).
@@ -199,6 +217,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden`.
 
 #### H13. Backdrop blur on multiple stacked elements (sticky)
+
 - **Location**: `Header.tsx:20` (sticky `glass-card`), `AccountFilterBar.tsx` (sticky `backdrop-blur-md`), `Card.tsx` `glass-card`.
 - **Description**: Header, filter bar, and chart cards all use backdrop-filter. When the user scrolls Analytics, three blur layers composite per frame.
 - **Category**: Performance.
@@ -207,6 +226,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/optimize` + `/simplify`.
 
 #### H14. Single primary-button style; no hierarchy
+
 - **Location**: every CTA across the app uses `<Button>` default `primary` (cyan + glow). Secondary/ghost variants exist but are rarely used (login uses primary; new-entry uses primary; settings uses primary).
 - **Description**: "Make every button primary" anti-pattern.
 - **Impact**: No visual call-to-action hierarchy on screens with multiple actions (e.g., Settings has Save / Cancel / Delete chained — all read equally important).
@@ -216,6 +236,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 ### Medium-Severity Issues
 
 #### M1. `space-y-*` and `p-4` everywhere — no spacing rhythm
+
 - **Location**: every route component.
 - **Description**: Default `p-4` page padding + `space-y-4` between sections. No clamp(), no fluid spacing.
 - **Impact**: Layouts feel monotonous; on tablet+ the content hugs `max-w-lg` (32 rem) without breathing.
@@ -223,30 +244,35 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/normalize`.
 
 #### M2. `max-w-lg mx-auto` pinned across all pages
+
 - **Location**: Home, Accounts, History, Analytics, Settings, NewEntry.
 - **Description**: 512 px content column on every breakpoint. On a desktop browser the app looks like a phone frame in the middle of a dark void.
 - **Recommendation**: Container queries for the pages that contain charts (Analytics, Admin) — let them widen to `min(96vw, 1100px)` past 768 px and adopt a side-by-side chart layout.
 - **Fix command**: `/adapt`.
 
 #### M3. Pure `#ffffff` text on dark
+
 - **Location**: `app.css:25` `--color-text-primary: #ffffff`.
 - **Impact**: Eye fatigue at night; flat against the cyan accent. Doesn't match the brand-tinted neutrals advice.
 - **Recommendation**: Tint toward brand: e.g., `oklch(98% 0.005 165)` or `#f5fdfa`.
 - **Fix command**: `/normalize`.
 
 #### M4. Pure `#0a0a0f` background
+
 - **Location**: `app.css:6`.
 - **Impact**: Near-black with a slight cool tint that reads as "default ChatGPT dark mode."
 - **Recommendation**: Pick a meaningful tint — warmer (`oklch(15% 0.02 60)` for editorial) or deeper plum / forest. Whatever the aesthetic direction is.
 - **Fix command**: `/normalize`.
 
 #### M5. Modals used for routine flows
+
 - **Location**: `AccountFormModal.tsx`, `WhatsNewModal.tsx`, `NotificationCenter` (sheet).
 - **Description**: Edit/Create account is a modal with form fields. Editing 4 fields in a modal on mobile fights the keyboard.
 - **Recommendation**: Use full-screen routes for create/edit on mobile (the existing `/new-entry` pattern is already correct — reuse it for accounts).
 - **Fix command**: `/adapt`.
 
 #### M6. Spring counter animation on every dashboard load
+
 - **Location**: `routes/index.tsx:20-41`.
 - **Description**: `useSpring(0, { stiffness: 60, damping: 20 })` animates from 0 to total on every route entry.
 - **Impact**: Feels like a casino slot-machine on a personal-finance app; ignores `prefers-reduced-motion`.
@@ -254,12 +280,14 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/quieter` + `/harden`.
 
 #### M7. Form errors not associated to inputs
+
 - **Location**: `Input.tsx:42` — `<p className="text-xs text-negative">{error}</p>` not linked to input via `aria-describedby` or `aria-errormessage`.
 - **Standard**: WCAG 3.3.1 (Error Identification), 3.3.3 (Error Suggestion).
 - **Recommendation**: Generate `inputId-error` id, set `aria-describedby={error ? id-error : undefined}`, `aria-invalid={!!error}`.
 - **Fix command**: `/harden`.
 
 #### M8. No skip-to-content link
+
 - **Location**: `routes/__root.tsx`.
 - **Standard**: WCAG 2.4.1 Bypass Blocks.
 - **Impact**: Keyboard users tab through Header (logo, version badge, bell, admin) on every page before reaching `<main>`.
@@ -267,18 +295,21 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden`.
 
 #### M9. Heading hierarchy skips levels
+
 - **Location**: `Header.tsx` uses `<h1>` for the brand on every page; pages use `<h1>` for their own title (`routes/accounts.tsx`, `analytics.tsx:118`). Two `<h1>` per page.
 - **Standard**: WCAG 1.3.1.
 - **Recommendation**: Brand stays a `<span>` (visually styled as heading); each page owns the single `<h1>`.
 - **Fix command**: `/harden`.
 
 #### M10. Decorative icons not hidden from AT
+
 - **Location**: most `<*Icon size=… />` lucide instances inside cards/pills.
 - **Description**: lucide-react icons render as SVG with no `aria-hidden`. They are read by screen readers as "image".
 - **Recommendation**: When the icon is decorative (paired with text), wrap with `<span aria-hidden="true">` or pass `aria-hidden` directly. Lucide forwards SVG attrs.
 - **Fix command**: `/harden`.
 
 #### M11. `Card` with `onClick` uses `role="button"` but no focus ring
+
 - **Location**: `Card.tsx:18-30`.
 - **Description**: Sets `tabIndex={0}` and `role="button"` but no `:focus-visible` outline (default browser outline is suppressed via Tailwind preflight).
 - **Standard**: WCAG 2.4.7 Focus Visible.
@@ -286,6 +317,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden`.
 
 #### M12. `motion.button` Buttons + framer-motion `whileTap` for every click
+
 - **Location**: `Button.tsx:46-48`, `AccountFormModal.tsx`, others.
 - **Description**: Every button instantiates a framer-motion node just for `whileTap: scale 0.97`.
 - **Impact**: ~20–30 KB of framer-motion runtime on critical path; testing pain (we hit this earlier — vitest hangs); the same effect can be done with `active:scale-95` Tailwind class.
@@ -293,6 +325,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/optimize`.
 
 #### M13. `text-text-muted` used for visible body content (not just labels)
+
 - **Location**: `routes/index.tsx:139,313,344`, `analytics.tsx:110`.
 - **Description**: Muted gray (`#64748b` dark / `#94a3b8` light) used for delta percent, breakdown caption, "no data" text. These are content, not adornment.
 - **Impact**: Borderline AA in dark mode (≈ 4.6 : 1), fail in light mode.
@@ -300,6 +333,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden`.
 
 #### M14. Year-toggle keeps "at least 1" rule with no feedback
+
 - **Location**: `analytics.tsx:236-244`.
 - **Description**: `if (next.size > 1) next.delete(year)` silently ignores the click when only one year remains active.
 - **Impact**: User clicks → nothing happens → confusion.
@@ -307,18 +341,21 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden`.
 
 #### M15. `<input type="date">` styling not normalised
+
 - **Location**: `new-entry.tsx`, settings.
 - **Impact**: native iOS date picker looks completely different from the rest of the app, and the date input on dark mode shows a white background on Chrome desktop.
 - **Recommendation**: Either embrace native (drop the surrounding glass-card styling for that input) or use a portable component.
 - **Fix command**: `/normalize`.
 
 #### M16. Body uses `bg-surface-base text-text-primary antialiased` from index.html
+
 - **Location**: `index.html:39`.
 - **Description**: Setting Tailwind classes on `<body>` works but the colour is rendered before the React tree mounts. On first paint the user sees `bg-surface-base` solid (not blurred), then the glass cards overlay — small flash.
 - **Recommendation**: Set `background-color` on `:root` via the `@theme` token to avoid FOUC.
 - **Fix command**: `/optimize`.
 
 #### M17. New `AccountFilterBar` is sticky inside a sticky-Header context
+
 - **Location**: `AccountFilterBar.tsx:30`.
 - **Description**: Header is `sticky top-0`, filter bar is `sticky top-0`. The filter bar sticks to viewport top, overlapping the header.
 - **Impact**: Header gets visually covered when scrolling Analytics.
@@ -326,6 +363,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 - **Fix command**: `/harden`.
 
 #### M18. Material Symbols loaded from CDN as part of critical CSS
+
 - **Location**: `index.html:42-44`.
 - **Description**: Two Google Fonts requests blocking, including the Material Symbols variable file. Material Symbols are used **only** for the user-customised account icons (12 options) → ship 12 SVGs instead.
 - **Impact**: ~150 KB blocking font on cold start.
@@ -335,33 +373,43 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 ### Low-Severity Issues
 
 #### L1. `text-[10px]` UPPERCASE labels
+
 - Repeated as "uppercase tracking-wider" 10 px label — SaaS-template fingerprint. Demote to `text-xs` regular weight for less templated feel.
 
 #### L2. `font-mono` used for delta numbers
+
 - `routes/index.tsx:348`. The skill flags monospace-as-technical-vibes. Use tabular-nums of the body font instead: `font-variant-numeric: tabular-nums;`.
 
 #### L3. `divide-border-default` between recent-entries rows
+
 - Common shadcn-template detail; consider grid/asymmetric instead of horizontal rules.
 
 #### L4. `font-heading` and `font-body` used inconsistently
+
 - e.g., chart labels and KPI values both use heading font; nav labels use body. Inconsistent rules.
 
 #### L5. CSS variables alphabetised but not grouped semantically
+
 - `app.css` has tokens loosely grouped; missing `--color-chart-*`, `--shadow-*`, `--easing-*`.
 
 #### L6. Bell badge contrast
+
 - `Header.tsx:37` `bg-brand text-surface-0` — `surface-0` is not defined. Probably renders as transparent/inherit. Visual bug.
 
 #### L7. Hard-coded `'#666'` and `'#888'` in `AccountFilterBar.tsx`
+
 - Just introduced. Replace with `var(--color-text-muted)` / `var(--color-text-secondary)`.
 
 #### L8. PWA precache 1408 KB
+
 - Generated SW precaches everything; many splash images are device-specific and could be excluded for desktop installs.
 
 #### L9. No reduced-motion guard around framer-motion
+
 - The whole app ignores `prefers-reduced-motion`. WCAG 2.3.3 (Animation from Interactions, AAA).
 
 #### L10. `pb-24` / `pb-20` magic numbers for bottom-nav clearance
+
 - Several routes hard-code `pb-20` to compensate for the BottomNav. Convert to `--nav-height` token + `pb-[calc(var(--nav-height)+env(safe-area-inset-bottom))]`.
 
 ---
@@ -395,6 +443,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 ## Recommendations by Priority
 
 ### Immediate (this week)
+
 1. **Fix light-theme contrast** — replace `--color-text-muted` for `html.light`, audit `text-gold` and KPI labels.
 2. **Touch targets** — add `min-h-11 min-w-11` to chip/icon-button surfaces.
 3. **Hard-coded hex** — sweep `analytics.tsx`, `routes/index.tsx`, `AccountFilterBar.tsx`.
@@ -402,6 +451,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 5. **Sticky stack** — fix `AccountFilterBar` `top` offset to sit below the header.
 
 ### Short-term (this sprint)
+
 6. **Bundle split** — lazy-load admin / analytics / history routes.
 7. **Replace dashboard sparkline with hand-rolled SVG** — drop recharts from home critical path.
 8. **Drop framer-motion from `Button.tsx`** — switch to `active:scale-[0.97]`.
@@ -411,6 +461,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 12. **Color-blind hardening** — add ↑/↓ glyphs to delta amounts.
 
 ### Medium-term (next sprint)
+
 13. **Visual identity overhaul** — pick a real aesthetic direction (editorial / brutalist / luxury etc.) and rebuild palette + type pair + hero layout. Without this, "polish" still leaves it AI-shaped.
 14. **Container queries** for analytics charts at desktop breakpoints.
 15. **Replace AccountFormModal with full-screen route** on mobile (consistent with `/new-entry`).
@@ -418,6 +469,7 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 17. **Spacing tokens via `clamp()`** for fluid rhythm.
 
 ### Long-term
+
 18. Code-split queries.ts into per-domain hook files.
 19. Progressive disclosure on Settings (currently 929-line monolith).
 20. PWA precache trim (per-device manifest).
@@ -426,15 +478,15 @@ If shown to a designer with the caption "AI made this," they would not pause. Ev
 
 ## Suggested Commands for Fixes
 
-| Issue cluster | Count | Command | Notes |
-|---|---:|---|---|
-| Light-mode contrast, touch targets, ARIA, focus rings, status colours, locale leak, error-id linking, year-toggle no-feedback, `prefers-reduced-motion` | 12 | `/harden` | i18n + a11y sweep |
-| Hard-coded hex → tokens, `radius-[var(...)]` → Tailwind classes, hue-tinted neutrals, button hierarchy audit | 9 | `/normalize` | design-system alignment |
-| Bundle split / lazy routes / drop framer-motion from Button / inline SVG icons / drop Material Symbols / FOUC fix | 6 | `/optimize` | performance pass |
-| Glassmorphism reduction, glow trim, gradient overlay drop, decorative-motion trim | 5 | `/quieter` + `/simplify` | calm down the visual language |
-| Hero rebuild, KPI grid duplication, type pair, centered template, palette identity | 5 | `/bolder` | requires aesthetic decision before fixing |
-| Container queries, AccountFormModal → full-screen route on mobile | 2 | `/adapt` | responsive pass |
-| Year-pill extraction, queries.ts split | 2 | `/extract` (or manual) | refactor |
+| Issue cluster                                                                                                                                           | Count | Command                  | Notes                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ----: | ------------------------ | ----------------------------------------- |
+| Light-mode contrast, touch targets, ARIA, focus rings, status colours, locale leak, error-id linking, year-toggle no-feedback, `prefers-reduced-motion` |    12 | `/harden`                | i18n + a11y sweep                         |
+| Hard-coded hex → tokens, `radius-[var(...)]` → Tailwind classes, hue-tinted neutrals, button hierarchy audit                                            |     9 | `/normalize`             | design-system alignment                   |
+| Bundle split / lazy routes / drop framer-motion from Button / inline SVG icons / drop Material Symbols / FOUC fix                                       |     6 | `/optimize`              | performance pass                          |
+| Glassmorphism reduction, glow trim, gradient overlay drop, decorative-motion trim                                                                       |     5 | `/quieter` + `/simplify` | calm down the visual language             |
+| Hero rebuild, KPI grid duplication, type pair, centered template, palette identity                                                                      |     5 | `/bolder`                | requires aesthetic decision before fixing |
+| Container queries, AccountFormModal → full-screen route on mobile                                                                                       |     2 | `/adapt`                 | responsive pass                           |
+| Year-pill extraction, queries.ts split                                                                                                                  |     2 | `/extract` (or manual)   | refactor                                  |
 
 ---
 

@@ -6,13 +6,7 @@ interface Props {
   ariaLabel?: string;
 }
 
-export function MiniSparkline({
-  values,
-  width = 320,
-  height = 64,
-  className,
-  ariaLabel,
-}: Props) {
+export function MiniSparkline({ values, width = 320, height = 64, className, ariaLabel }: Props) {
   if (values.length < 2) return null;
   const min = Math.min(...values);
   const max = Math.max(...values);

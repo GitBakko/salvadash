@@ -276,10 +276,7 @@ function UsersSection({
       {/* Search + Filter */}
       <div className="flex gap-2">
         <div className="flex-1 relative">
-          <Search
-            size={20}
-            className="text-text-muted absolute left-3 top-1/2 -translate-y-1/2"
-          />
+          <Search size={20} className="text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
@@ -357,9 +354,7 @@ function UsersSection({
                   </div>
 
                   <div className="text-right shrink-0 ml-2">
-                    <p className="text-sm font-bold">
-                      {formatCurrency(u.totalSavings)}
-                    </p>
+                    <p className="text-sm font-bold">{formatCurrency(u.totalSavings)}</p>
                     <p className="text-[10px] text-text-muted">
                       {u.entriesCount} {t('admin.entries')}
                     </p>

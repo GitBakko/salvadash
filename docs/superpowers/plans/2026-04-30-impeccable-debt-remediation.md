@@ -14,15 +14,15 @@
 
 47 → wave assignment:
 
-| Wave | Theme | Issues addressed | Cmd cluster |
-|---|---|---|---|
-| 1 | A11y + theme contrast (ship-blockers) | C1, H1, H11, H12, M7, M8, M9, M10, M11, M13, M14, M17, L9 | `/harden` |
-| 2 | Design-token consolidation | C3, H4, H5, H8, H14, M3, M4, L5, L6, L7 | `/normalize` |
-| 3 | Performance + bundle | H3, H13, M12, M16, M18, L8, L10 | `/optimize` |
-| 4 | Visual calm | C2, H6, H7, M6, L1, L2, L3 | `/quieter` + `/simplify` |
-| 5 | Visual identity overhaul | C4, C5, H2, H10, M2, L4 | `/bolder` (requires design brief) |
-| 6 | Responsive adaptation | M2, M5, M15 | `/adapt` |
-| 7 | Refactor / extraction | H9, plus extraction follow-ups | `/extract` |
+| Wave | Theme                                 | Issues addressed                                          | Cmd cluster                       |
+| ---- | ------------------------------------- | --------------------------------------------------------- | --------------------------------- |
+| 1    | A11y + theme contrast (ship-blockers) | C1, H1, H11, H12, M7, M8, M9, M10, M11, M13, M14, M17, L9 | `/harden`                         |
+| 2    | Design-token consolidation            | C3, H4, H5, H8, H14, M3, M4, L5, L6, L7                   | `/normalize`                      |
+| 3    | Performance + bundle                  | H3, H13, M12, M16, M18, L8, L10                           | `/optimize`                       |
+| 4    | Visual calm                           | C2, H6, H7, M6, L1, L2, L3                                | `/quieter` + `/simplify`          |
+| 5    | Visual identity overhaul              | C4, C5, H2, H10, M2, L4                                   | `/bolder` (requires design brief) |
+| 6    | Responsive adaptation                 | M2, M5, M15                                               | `/adapt`                          |
+| 7    | Refactor / extraction                 | H9, plus extraction follow-ups                            | `/extract`                        |
 
 ---
 
@@ -31,6 +31,7 @@
 ### Task 0: Worktree + branch baseline
 
 **Files:**
+
 - Modify: working tree.
 
 - [ ] **Step 1: Verify clean tree (or stash)**
@@ -78,6 +79,7 @@ Goal: ship-block issues. Light-mode contrast, touch targets, ARIA hygiene, color
 ### Task 1.1 — Light-mode muted contrast (C1)
 
 **Files:**
+
 - Modify: `frontend/src/app.css:103`.
 
 - [ ] **Step 1: Open file, locate light theme block**
@@ -87,14 +89,17 @@ Lines 85-112.
 - [ ] **Step 2: Replace muted token + audit secondary**
 
 Replace:
+
 ```css
-  --color-text-secondary: #475569;
-  --color-text-muted: #94a3b8;
+--color-text-secondary: #475569;
+--color-text-muted: #94a3b8;
 ```
+
 With:
+
 ```css
-  --color-text-secondary: #334155; /* contrast 9.5:1 on #f5f5f7 */
-  --color-text-muted: #475569; /* contrast 7.2:1 on #f5f5f7 — AAA */
+--color-text-secondary: #334155; /* contrast 9.5:1 on #f5f5f7 */
+--color-text-muted: #475569; /* contrast 7.2:1 on #f5f5f7 — AAA */
 ```
 
 - [ ] **Step 3: Verify with contrast checker**
@@ -119,6 +124,7 @@ git commit -m "fix(a11y): light-mode text-muted contrast 7.2:1 (was 2.4:1)"
 ### Task 1.2 — Touch-target floor 44px (H1)
 
 **Files:**
+
 - Modify: `frontend/src/components/AccountFilterBar.tsx`, `frontend/src/routes/index.tsx:78-89`, `frontend/src/routes/analytics.tsx:268-282`, `frontend/src/components/Header.tsx:30-50`.
 
 - [ ] **Step 1: Add tailwind base utility**
@@ -136,6 +142,7 @@ In `frontend/src/app.css` after `@utility no-scrollbar` add:
 - [ ] **Step 2: Apply to AccountFilterBar chips**
 
 `frontend/src/components/AccountFilterBar.tsx`:
+
 - Find `className="shrink-0 snap-start inline-flex items-center gap-1.5 h-9 px-3 ...`
 - Replace `h-9` with `min-h-11 h-11`.
 - Replace `text-xs` with `text-sm` (chip label readable on phones).
@@ -143,16 +150,19 @@ In `frontend/src/app.css` after `@utility no-scrollbar` add:
 - [ ] **Step 3: Apply to home year-pills**
 
 `frontend/src/routes/index.tsx:78-89`:
+
 - Replace `className={...px-3 py-1...}` with `className={...px-4 min-h-11 inline-flex items-center...}`.
 
 - [ ] **Step 4: Apply to analytics year-toggle**
 
 `frontend/src/routes/analytics.tsx:269-279`:
+
 - Replace `className="px-2.5 py-1 ..."` with `className="px-3 min-h-11 inline-flex items-center ..."`.
 
 - [ ] **Step 5: Apply to header icons**
 
 `frontend/src/components/Header.tsx`:
+
 - Bell button + admin link: replace `p-2 -m-2` with `p-3 -m-3 min-h-11 min-w-11 inline-flex items-center justify-center`.
 
 - [ ] **Step 6: Manual mobile audit**
@@ -169,6 +179,7 @@ git commit -m "fix(a11y): enforce 44px touch target floor (WCAG 2.5.5)"
 ### Task 1.3 — Locale-aware date helpers (H11)
 
 **Files:**
+
 - Create: `frontend/src/lib/intl.ts`.
 - Modify: `frontend/src/routes/index.tsx:45-48`, `frontend/src/routes/analytics.tsx:51-59`, `frontend/src/lib/format.ts` (re-export).
 
@@ -206,6 +217,7 @@ describe('formatMonthLong', () => {
 ```bash
 pnpm --filter frontend exec vitest run src/__tests__/intl.test.ts
 ```
+
 Expected: cannot resolve `../lib/intl`.
 
 - [ ] **Step 3: Implement helper**
@@ -221,7 +233,7 @@ const localeMap: Record<Locale, string> = {
 };
 
 function resolve(lang: string): string {
-  return localeMap[(lang as Locale)] ?? 'en-GB';
+  return localeMap[lang as Locale] ?? 'en-GB';
 }
 
 export function formatMonthShort(dateStr: string, lang: string): string {
@@ -245,11 +257,13 @@ export function formatDateLong(dateStr: string, lang: string): string {
 ```bash
 pnpm --filter frontend exec vitest run src/__tests__/intl.test.ts
 ```
+
 Expected: 4 pass.
 
 - [ ] **Step 5: Replace local helpers in routes**
 
 `frontend/src/routes/index.tsx`:
+
 ```diff
 - function formatMonth(dateStr: string): string {
 -   const d = new Date(dateStr);
@@ -262,6 +276,7 @@ Expected: 4 pass.
 Inside `DashboardPage` add `const { i18n } = useTranslation();` (already have `t`). Use `formatMonthShort(date, i18n.language)`.
 
 `frontend/src/routes/analytics.tsx:51-59`:
+
 ```diff
 - function formatMonth(dateStr: string): string { ... }
 - function formatMonthLong(dateStr: string): string { ... }
@@ -275,6 +290,7 @@ Pass `i18n.language` from `useTranslation()` at component level. Threading: Anal
 ```bash
 pnpm --filter frontend run build
 ```
+
 Expected: green.
 
 - [ ] **Step 7: Commit**
@@ -287,6 +303,7 @@ git commit -m "fix(i18n): locale-aware date formatting (was hard-coded it-IT)"
 ### Task 1.4 — Color-blind redundancy on deltas (H12)
 
 **Files:**
+
 - Create: `frontend/src/components/ui/Delta.tsx`.
 - Modify: `frontend/src/routes/index.tsx:138-148,346-355`, `frontend/src/routes/analytics.tsx:474-484`.
 
@@ -311,7 +328,9 @@ export function Delta({ value, variant = 'currency', className = '', ariaPrefix 
   const tone =
     dir === 'up' ? 'text-positive' : dir === 'down' ? 'text-negative' : 'text-text-muted';
   const formatted = variant === 'percent' ? fmtPercent(value) : fmtCurrencyCompact(value);
-  const ariaLabel = ariaPrefix ? `${ariaPrefix} ${dir === 'down' ? '' : '+'}${formatted}` : undefined;
+  const ariaLabel = ariaPrefix
+    ? `${ariaPrefix} ${dir === 'down' ? '' : '+'}${formatted}`
+    : undefined;
   return (
     <span className={`inline-flex items-center gap-1 ${tone} ${className}`} aria-label={ariaLabel}>
       <Icon size={12} strokeWidth={2.5} aria-hidden="true" />
@@ -324,6 +343,7 @@ export function Delta({ value, variant = 'currency', className = '', ariaPrefix 
 - [ ] **Step 2: Replace at three sites**
 
 `frontend/src/routes/index.tsx:142-148` (HeroCard delta):
+
 ```diff
 - {data.currentEntry.delta != null && (
 -   <span className={`ml-2 ${data.currentEntry.delta >= 0 ? 'text-positive' : 'text-negative'}`}>
@@ -339,6 +359,7 @@ export function Delta({ value, variant = 'currency', className = '', ariaPrefix 
 Add import at top: `import { Delta } from '../components/ui/Delta';`
 
 `frontend/src/routes/index.tsx:346-355` (RecentEntries delta):
+
 ```diff
 - {entry.delta != null && (
 -   <div className={`text-right ${entry.delta >= 0 ? 'text-positive' : 'text-negative'}`}>
@@ -362,6 +383,7 @@ Add import at top: `import { Delta } from '../components/ui/Delta';`
 ```
 
 `frontend/src/routes/analytics.tsx:474-484`:
+
 ```diff
 - value: data.bestMonth.delta ? `+${fmtCurrency(data.bestMonth.delta)}` : '',
 + // sub now rendered as Delta component instead of pre-signed string
@@ -390,6 +412,7 @@ git commit -m "fix(a11y): redundant delta encoding (icon + sign + tone) for colo
 ### Task 1.5 — Form input error linkage (M7)
 
 **Files:**
+
 - Modify: `frontend/src/components/ui/Input.tsx`.
 
 - [ ] **Step 1: Patch Input**
@@ -444,11 +467,13 @@ git commit -m "fix(a11y): aria-invalid/describedby on Input errors + required in
 ### Task 1.6 — Skip-to-content link (M8)
 
 **Files:**
+
 - Modify: `frontend/src/routes/__root.tsx`.
 
 - [ ] **Step 1: Add skip link + main id**
 
 In `RootLayout`, just inside the outermost div for non-auth shell:
+
 ```diff
    return (
      <div className="min-h-dvh bg-surface-base text-text-primary flex flex-col" style={...}>
@@ -502,6 +527,7 @@ git commit -m "feat(a11y): skip-to-content link (WCAG 2.4.1)"
 ### Task 1.7 — Heading hierarchy: brand stays a span (M9)
 
 **Files:**
+
 - Modify: `frontend/src/components/Header.tsx`.
 
 - [ ] **Step 1: Demote brand h1**
@@ -525,6 +551,7 @@ git commit -m "fix(a11y): single h1 per page; brand becomes span"
 ### Task 1.8 — Decorative icons aria-hidden (M10)
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx`, `analytics.tsx`, `accounts.tsx`, etc.
 
 - [ ] **Step 1: Sweep for decorative icons**
@@ -536,6 +563,7 @@ grep -rn "Icon size=" frontend/src --include="*.tsx" | head -50
 For every `<X size={...} className="text-..." />` paired with adjacent text content, append `aria-hidden="true"`. Skip icons that are the only content of a button (those need an `aria-label` on the button instead, which the codebase already does).
 
 Example diff in `routes/index.tsx:204`:
+
 ```diff
 - <kpi.Icon size={20} className={kpi.color} />
 + <kpi.Icon size={20} className={kpi.color} aria-hidden="true" />
@@ -557,6 +585,7 @@ git commit -m "fix(a11y): mark decorative lucide icons aria-hidden"
 ### Task 1.9 — Focus-visible rings on interactive Card (M11)
 
 **Files:**
+
 - Modify: `frontend/src/components/ui/Card.tsx`, `frontend/src/components/ui/Button.tsx` (consistency).
 
 - [ ] **Step 1: Patch Card**
@@ -588,6 +617,7 @@ git commit -m "fix(a11y): focus-visible rings on Card + Button (WCAG 2.4.7)"
 ### Task 1.10 — Demote text-text-muted for content (M13)
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx:139,313,344`, `frontend/src/routes/analytics.tsx:110`.
 
 - [ ] **Step 1: Sweep + replace**
@@ -599,6 +629,7 @@ grep -rn "text-text-muted" frontend/src --include="*.tsx" | wc -l
 For each line where the muted class wraps non-tertiary content (delta caption, percentage, "no data" message), demote to `text-text-secondary`. Tertiary captions (e.g., "Rilevazioni totali" tag, version badge) stay muted.
 
 Example:
+
 - `routes/index.tsx:139` (current entry month label) → keep muted (tertiary).
 - `routes/index.tsx:313` (`{acc.percent.toFixed(1)}%`) → `text-text-secondary`.
 - `routes/index.tsx:344` (`fmtCurrency(entry.total)`) → `text-text-secondary`.
@@ -614,6 +645,7 @@ git commit -m "fix(a11y): promote content from text-muted to text-secondary for 
 ### Task 1.11 — Year-toggle disabled feedback (M14)
 
 **Files:**
+
 - Modify: `frontend/src/routes/analytics.tsx:235-282`.
 
 - [ ] **Step 1: Track last-active state, disable button**
@@ -659,6 +691,7 @@ git commit -m "fix(ux): visible disabled state on last-active year toggle"
 ### Task 1.12 — Sticky stack: filter bar below header (M17)
 
 **Files:**
+
 - Modify: `frontend/src/components/Header.tsx`, `frontend/src/components/AccountFilterBar.tsx`, `frontend/src/app.css`.
 
 - [ ] **Step 1: Expose header height as token**
@@ -666,12 +699,13 @@ git commit -m "fix(ux): visible disabled state on last-active year toggle"
 `app.css` add to `@theme`:
 
 ```css
-  --header-height: 3.5rem; /* matches Header py-3 + content */
+--header-height: 3.5rem; /* matches Header py-3 + content */
 ```
 
 - [ ] **Step 2: Use in Header**
 
 `Header.tsx`:
+
 ```diff
 -      <header className="sticky top-0 z-40 glass-card border-b border-border-default px-4 py-3">
 +      <header className="sticky top-0 z-40 glass-card border-b border-border-default px-4 py-3" style={{ minHeight: 'var(--header-height)' }}>
@@ -680,6 +714,7 @@ git commit -m "fix(ux): visible disabled state on last-active year toggle"
 - [ ] **Step 3: Offset filter bar**
 
 `AccountFilterBar.tsx`:
+
 ```diff
 -      className="sticky top-0 z-20 -mx-4 px-4 pt-3 pb-2 ..."
 +      className="sticky z-20 -mx-4 px-4 pt-3 pb-2 ..."
@@ -700,6 +735,7 @@ git commit -m "fix(layout): filter bar sticks below header (was overlapping)"
 ### Task 1.13 — prefers-reduced-motion guard (L9)
 
 **Files:**
+
 - Create: `frontend/src/hooks/use-prefers-reduced-motion.ts`.
 - Modify: components using `motion.*` and `useSpring`.
 
@@ -727,6 +763,7 @@ export function usePrefersReducedMotion(): boolean {
 - [ ] **Step 2: Apply to AnimatedNumber**
 
 `routes/index.tsx`:
+
 ```diff
  function AnimatedNumber({ value, className }: { value: number; className?: string }) {
 +  const reduced = usePrefersReducedMotion();
@@ -741,6 +778,7 @@ export function usePrefersReducedMotion(): boolean {
 For each `<motion.div initial={{ ... }} animate={{ ... }}>` in HeroCard / KPIGrid / SparklineCard / AccountBreakdown / RecentEntries: wrap with `usePrefersReducedMotion()` and pass `initial={false}` when reduced.
 
 Pattern:
+
 ```tsx
 const reduced = usePrefersReducedMotion();
 return (
@@ -795,6 +833,7 @@ Goal: every color used in JSX flows through `@theme` tokens. Prepare for Wave 5 
 ### Task 2.1 — Chart palette tokens (H4)
 
 **Files:**
+
 - Modify: `frontend/src/app.css`.
 - Create: `frontend/src/lib/theme-vars.ts`.
 - Modify: `frontend/src/routes/analytics.tsx:35-47`, `frontend/src/routes/index.tsx:264,271`.
@@ -804,21 +843,21 @@ Goal: every color used in JSX flows through `@theme` tokens. Prepare for Wave 5 
 Append to `@theme`:
 
 ```css
-  /* ── Chart Palette ─────────────────────────────────────── */
-  --color-chart-1: #00d4a0;
-  --color-chart-2: #ffd166;
-  --color-chart-3: #6c63ff;
-  --color-chart-4: #ff6b6b;
-  --color-chart-5: #4ecdc4;
-  --color-chart-6: #45b7d1;
-  --color-chart-7: #f093fb;
-  --color-chart-8: #feca57;
-  --color-year-1: #00d4a0;
-  --color-year-2: #ffd166;
-  --color-year-3: #6c63ff;
-  --color-year-4: #ff6b6b;
-  --color-year-5: #4ecdc4;
-  --color-year-6: #45b7d1;
+/* ── Chart Palette ─────────────────────────────────────── */
+--color-chart-1: #00d4a0;
+--color-chart-2: #ffd166;
+--color-chart-3: #6c63ff;
+--color-chart-4: #ff6b6b;
+--color-chart-5: #4ecdc4;
+--color-chart-6: #45b7d1;
+--color-chart-7: #f093fb;
+--color-chart-8: #feca57;
+--color-year-1: #00d4a0;
+--color-year-2: #ffd166;
+--color-year-3: #6c63ff;
+--color-year-4: #ff6b6b;
+--color-year-5: #4ecdc4;
+--color-year-6: #45b7d1;
 ```
 
 Light-mode override block: same values OR adjusted for AA on light surface.
@@ -862,6 +901,7 @@ In each chart component, call the helper at render time and use the result.
 - [ ] **Step 4: Replace gradient stops on dashboard sparkline**
 
 `routes/index.tsx`:
+
 ```diff
 -              <stop offset="0%" stopColor="#00d4a0" stopOpacity={0.3} />
 -              <stop offset="100%" stopColor="#00d4a0" stopOpacity={0} />
@@ -885,6 +925,7 @@ git commit -m "refactor(theme): chart palette via CSS tokens (no JSX literals)"
 ### Task 2.2 — Hue-tinted neutrals (M3, M4)
 
 **Files:**
+
 - Modify: `frontend/src/app.css`.
 
 - [ ] **Step 1: Replace pure white/black**
@@ -900,6 +941,7 @@ git commit -m "refactor(theme): chart palette via CSS tokens (no JSX literals)"
 ```
 
 Light mode:
+
 ```diff
 -  --color-surface-base: #f5f5f7;
 +  --color-surface-base: oklch(98% 0.005 165);
@@ -919,6 +961,7 @@ git commit -m "refactor(theme): tint surface and text neutrals toward brand hue"
 ### Task 2.3 — Glow utility uses tokens (C3 part)
 
 **Files:**
+
 - Modify: `frontend/src/app.css:56-60`.
 
 - [ ] **Step 1: Replace glow-brand**
@@ -944,6 +987,7 @@ git commit -m "refactor(theme): glow uses color-mix on brand token (was hardcode
 ### Task 2.4 — Hero gold metric → text-primary (H5)
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx:134`.
 
 - [ ] **Step 1: Patch**
@@ -967,6 +1011,7 @@ git commit -m "fix(theme): hero metric uses text-primary (was gold; failed AA in
 ### Task 2.5 — Tailwind radius classes (H8)
 
 **Files:**
+
 - Modify: `frontend/src/app.css`, `frontend/src/components/ui/Button.tsx`, `Input.tsx`, `routes/login.tsx`.
 
 - [ ] **Step 1: Map radius to Tailwind in @theme**
@@ -999,6 +1044,7 @@ git commit -m "refactor(theme): use Tailwind radius classes (was arbitrary CSS-v
 ### Task 2.6 — Button hierarchy audit (H14)
 
 **Files:**
+
 - Audit only; modify call-sites where actions are misclassified.
 
 - [ ] **Step 1: List all `<Button>` callsites**
@@ -1023,6 +1069,7 @@ git commit -m "refactor(ui): button variant hierarchy (one primary per view)"
 ### Task 2.7 — Bell badge token fix (L6)
 
 **Files:**
+
 - Modify: `frontend/src/components/Header.tsx:37`.
 
 - [ ] **Step 1: Replace surface-0 (undefined) with surface-base**
@@ -1042,6 +1089,7 @@ git commit -m "fix(ui): bell badge text token (surface-0 → surface-base)"
 ### Task 2.8 — AccountFilterBar literals → tokens (L7)
 
 **Files:**
+
 - Modify: `frontend/src/components/AccountFilterBar.tsx`.
 
 - [ ] **Step 1: Replace `'#666'` and `'#888'` literals**
@@ -1071,6 +1119,7 @@ git commit -m "refactor(theme): AccountFilterBar uses CSS tokens"
 ### Task 2.9 — App.css token grouping (L5)
 
 **Files:**
+
 - Modify: `frontend/src/app.css`.
 
 - [ ] **Step 1: Re-organize into semantic blocks**
@@ -1113,11 +1162,13 @@ Toggle theme — every chart, badge, gradient updates accordingly.
 ### Task 3.1 — Lazy route loading (H3)
 
 **Files:**
+
 - Modify: `frontend/src/main.tsx`, `frontend/src/routes/admin.tsx`, `analytics.tsx`, `history.tsx`, `settings.tsx`.
 
 - [ ] **Step 1: Convert to `lazyRouteComponent`**
 
 For each heavy route, replace:
+
 ```diff
 - export const Route = createFileRoute('/admin')({
 -   component: AdminPage,
@@ -1149,6 +1200,7 @@ git commit -m "perf(bundle): lazy-load admin/analytics/history/settings routes"
 ### Task 3.2 — Hand-rolled dashboard sparkline (H3 cont.)
 
 **Files:**
+
 - Create: `frontend/src/components/MiniSparkline.tsx`.
 - Modify: `frontend/src/routes/index.tsx:248-282`.
 
@@ -1217,6 +1269,7 @@ git commit -m "perf: hand-rolled SVG sparkline on dashboard (drops recharts from
 ### Task 3.3 — Drop framer-motion from Button (M12)
 
 **Files:**
+
 - Modify: `frontend/src/components/ui/Button.tsx`.
 
 - [ ] **Step 1: Replace motion.button with plain button**
@@ -1256,6 +1309,7 @@ git commit -m "perf: drop framer-motion from Button (active:scale via Tailwind)"
 ### Task 3.4 — Backdrop-blur stack reduction (H13)
 
 **Files:**
+
 - Modify: `frontend/src/components/Header.tsx`, `frontend/src/components/ui/Card.tsx`, `frontend/src/app.css`.
 
 - [ ] **Step 1: Add a non-blurred surface variant**
@@ -1271,13 +1325,15 @@ git commit -m "perf: drop framer-motion from Button (active:scale via Tailwind)"
 ```
 
 Add tokens:
+
 ```css
-  --color-surface-card-solid: oklch(20% 0.01 175);
+--color-surface-card-solid: oklch(20% 0.01 175);
 ```
 
 Light:
+
 ```css
-  --color-surface-card-solid: oklch(96% 0.005 165);
+--color-surface-card-solid: oklch(96% 0.005 165);
 ```
 
 - [ ] **Step 2: Replace `glass-card` on Header + Card**
@@ -1301,6 +1357,7 @@ git commit -m "perf(ui): replace stacked backdrop-blur with solid surfaces (keep
 ### Task 3.5 — Drop Material Symbols, inline SVG icons (M18)
 
 **Files:**
+
 - Create: `frontend/src/components/AccountIcon.tsx`.
 - Modify: `frontend/index.html`, `AccountFormModal.tsx`, `AccountFilterBar.tsx`.
 
@@ -1310,8 +1367,18 @@ Create `frontend/src/components/AccountIcon.tsx` that maps each Material Symbols
 
 ```tsx
 import {
-  Landmark, PiggyBank, CreditCard, Wallet, Bitcoin,
-  TrendingUp, Banknote, WalletCards, CircleDollarSign, DollarSign, LineChart, PieChart,
+  Landmark,
+  PiggyBank,
+  CreditCard,
+  Wallet,
+  Bitcoin,
+  TrendingUp,
+  Banknote,
+  WalletCards,
+  CircleDollarSign,
+  DollarSign,
+  LineChart,
+  PieChart,
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -1331,7 +1398,12 @@ const ICON_MAP = {
 
 export type AccountIconName = keyof typeof ICON_MAP;
 
-export function AccountIcon({ name, size = 16, className, color }: {
+export function AccountIcon({
+  name,
+  size = 16,
+  className,
+  color,
+}: {
   name: string | null;
   size?: number;
   className?: string;
@@ -1340,7 +1412,14 @@ export function AccountIcon({ name, size = 16, className, color }: {
   if (!name) return null;
   const Icon = ICON_MAP[name as AccountIconName];
   if (!Icon) return null;
-  return <Icon size={size} className={className} style={color ? { color } : undefined} aria-hidden="true" />;
+  return (
+    <Icon
+      size={size}
+      className={className}
+      style={color ? { color } : undefined}
+      aria-hidden="true"
+    />
+  );
 }
 ```
 
@@ -1382,13 +1461,15 @@ Already addressed in Task 1.13 — verify.
 ### Task 3.7 — Bottom-nav clearance via token (L10)
 
 **Files:**
+
 - Modify: `frontend/src/app.css`, `frontend/src/routes/__root.tsx`, all routes using `pb-20` / `pb-24`.
 
 - [ ] **Step 1: Add token**
 
 `@theme`:
+
 ```css
-  --nav-height: 4rem;
+--nav-height: 4rem;
 ```
 
 - [ ] **Step 2: Apply on `<main>`**
@@ -1415,6 +1496,7 @@ git commit -m "refactor(layout): nav-height token replaces magic pb-20/24"
 ### Task 3.8 — FOUC fix (M16)
 
 **Files:**
+
 - Modify: `frontend/src/app.css`, `frontend/index.html`.
 
 - [ ] **Step 1: Set base color on `:root`**
@@ -1442,6 +1524,7 @@ git commit -m "fix(perf): set surface base on :root to prevent flash"
 ### Task 3.9 — PWA precache trim (L8)
 
 **Files:**
+
 - Modify: `frontend/vite.config.ts`.
 
 - [ ] **Step 1: Configure VitePWA `workbox.globIgnores`**
@@ -1503,6 +1586,7 @@ pnpm -r run test
 ### Task 4.1 — Drop hero gradient overlay (H6)
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx:124-127`.
 
 - [ ] **Step 1: Remove**
@@ -1522,6 +1606,7 @@ git commit -m "style: drop decorative hero gradient overlay"
 ### Task 4.2 — Trim glow-brand to FAB only (H7)
 
 **Files:**
+
 - Modify: `frontend/src/components/ui/Button.tsx`, `frontend/src/components/BottomNav.tsx`.
 
 - [ ] **Step 1: Remove glow from Button.primary**
@@ -1538,6 +1623,7 @@ git commit -m "style: drop decorative hero gradient overlay"
 - [ ] **Step 3: Tone down glow second shadow**
 
 `app.css`:
+
 ```diff
  @utility glow-brand {
    box-shadow:
@@ -1559,6 +1645,7 @@ git commit -m "style: glow reserved for FAB only; tone down halo"
 Already handled in Task 1.13 via reduced-motion guard. Decision: keep counter behind motion-OK + first-load-only:
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx`.
 
 - [ ] **Step 1: First-load-only flag**
@@ -1588,6 +1675,7 @@ git commit -m "style: hero counter animates only on first session entry"
 Already partially done in Task 3.4. Now finalize: `glass-card` only on `BottomNav` and the notification sheet.
 
 **Files:**
+
 - Modify: any remaining `glass-card` occurrences.
 
 - [ ] **Step 1: Sweep**
@@ -1608,6 +1696,7 @@ git commit -m "style: glass effect reserved for bottom-nav (was every container)
 ### Task 4.5 — Demote uppercase 10px labels (L1)
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx`, `analytics.tsx`, `accounts.tsx`.
 
 - [ ] **Step 1: Replace pattern**
@@ -1628,6 +1717,7 @@ git commit -m "style: drop uppercase 10px label pattern (was SaaS-template)"
 ### Task 4.6 — Tabular-nums instead of mono for deltas (L2)
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx:348` and any other `font-mono` on numbers.
 
 - [ ] **Step 1: Replace**
@@ -1638,8 +1728,11 @@ git commit -m "style: drop uppercase 10px label pattern (was SaaS-template)"
 ```
 
 If `tabular-nums` utility absent, add to `app.css`:
+
 ```css
-@utility tabular-nums { font-variant-numeric: tabular-nums; }
+@utility tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
 ```
 
 - [ ] **Step 2: Commit**
@@ -1652,6 +1745,7 @@ git commit -m "style: tabular-nums for deltas (was font-mono)"
 ### Task 4.7 — Drop divide-border-default in lists (L3)
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx:339-359` (RecentEntries).
 
 - [ ] **Step 1: Replace divide pattern with subtle row gap**
@@ -1690,7 +1784,7 @@ The audit calls out that the design lacks identity. Pick **one** direction. Exam
 
 - **Editorial / Magazine**: serif display (Fraunces / Tobias / Migra) + neutral body (Söhne, Geist), big asymmetric layouts, restrained palette (one accent), generous margins, mixed-size cards.
 - **Brutalist / Raw**: monospace headlines, hard borders, no shadows, single accent on white, intentional grid breaks, oversized labels.
-- **Luxury / Refined**: low-saturation deep-tinted dark, tasteful gold *only* on the trophy/badges, fine letter-spacing on display, ample negative space.
+- **Luxury / Refined**: low-saturation deep-tinted dark, tasteful gold _only_ on the trophy/badges, fine letter-spacing on display, ample negative space.
 - **Toy / Playful**: rounded everything, bright multi-color palette, micro-illustrations, bouncier (allowed because intentional) motion.
 - **Italian-Editorial**: nod to local design tradition (newsstand magazine: condensed display + body in serif, narrow accents).
 
@@ -1699,6 +1793,7 @@ User picks, then continue.
 ### Task 5.1 — Implement chosen palette + type (C4 part, H2)
 
 **Files:**
+
 - Modify: `frontend/src/app.css` `@theme`, `frontend/index.html` font preconnect/import.
 
 - [ ] **Step 1: Replace fonts**
@@ -1706,6 +1801,7 @@ User picks, then continue.
 Drop Inter + Space Grotesk from `index.html`. Import the chosen pair (e.g., Fraunces 400/600 + Söhne 400/500/600). If not freely licensed, use Bunny Fonts or self-hosted.
 
 `app.css`:
+
 ```diff
 -  --font-heading: 'Space Grotesk', system-ui, sans-serif;
 -  --font-body: 'Inter', system-ui, sans-serif;
@@ -1727,6 +1823,7 @@ git commit -m "feat(design): identity overhaul — [chosen-direction] palette + 
 ### Task 5.2 — Hero rebuild (C4)
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx` HeroCard.
 
 - [ ] **Step 1: Replace centered hero with editorial figure block**
@@ -1766,6 +1863,7 @@ git commit -m "feat(design): editorial hero (left-aligned, fluid type, no glass)
 ### Task 5.3 — KPI grid redesign (C5)
 
 **Files:**
+
 - Modify: `frontend/src/routes/index.tsx` KPIGrid + `analytics.tsx` PerformanceGrid (differentiate the two).
 
 - [ ] **Step 1: Home KPIs — staggered layout**
@@ -1798,6 +1896,7 @@ git commit -m "feat(design): differentiated KPI compositions home vs analytics"
 ### Task 5.4 — Auth pages: structural sidebar on tablet+ (H10)
 
 **Files:**
+
 - Modify: `routes/login.tsx`, `register.tsx`, `forgot-password.tsx`, `reset-password.tsx`, `verify-email.tsx`.
 
 - [ ] **Step 1: Two-column layout at md+**
@@ -1827,6 +1926,7 @@ git commit -m "feat(design): two-column auth layout on tablet+ (centered on mobi
 ### Task 5.5 — Font-heading vs font-body consistency (L4)
 
 **Files:**
+
 - Sweep across components.
 
 - [ ] **Step 1: Define rules**
@@ -1861,6 +1961,7 @@ git commit -m "style(typography): consistent heading/body usage"
 ### Task 6.1 — Container queries on Analytics + Admin (M2)
 
 **Files:**
+
 - Modify: `frontend/src/routes/analytics.tsx`, `admin.tsx`.
 
 - [ ] **Step 1: Switch container at md+**
@@ -1893,6 +1994,7 @@ git commit -m "feat(responsive): container queries on analytics + admin (desktop
 ### Task 6.2 — Account modal → full-screen route on mobile (M5)
 
 **Files:**
+
 - Create: `frontend/src/routes/accounts/new.tsx` and `accounts/$id/edit.tsx` (TanStack file-based).
 - Modify: `accounts.tsx` to navigate instead of opening modal on mobile.
 
@@ -1927,6 +2029,7 @@ git commit -m "feat(responsive): account create/edit is a full-screen route on m
 ### Task 6.3 — Native date input theming (M15)
 
 **Files:**
+
 - Modify: `frontend/src/app.css`, components using `<input type="date">`.
 
 - [ ] **Step 1: Style native picker**
@@ -1963,6 +2066,7 @@ git commit -m "fix(ui): native date picker honors theme"
 ### Task 7.1 — Year-pills extraction (H9)
 
 **Files:**
+
 - Create: `frontend/src/components/YearPills.tsx`.
 - Modify: `routes/index.tsx`, `analytics.tsx` (and history.tsx where applicable).
 
@@ -1990,7 +2094,10 @@ export function YearPills({ years, active, onChange, multi = false }: Props) {
     }
   };
   return (
-    <div role={multi ? 'group' : 'tablist'} className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+    <div
+      role={multi ? 'group' : 'tablist'}
+      className="flex gap-2 overflow-x-auto pb-1 no-scrollbar"
+    >
       {years.map((y) => {
         const isActive = set.has(y);
         const isLast = multi && set.size === 1 && set.has(y);
@@ -2004,7 +2111,9 @@ export function YearPills({ years, active, onChange, multi = false }: Props) {
             aria-disabled={isLast || undefined}
             onClick={() => !isLast && toggle(y)}
             className={`shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-sm font-medium transition-all ${
-              isActive ? 'bg-brand text-surface-base' : 'bg-surface-elevated text-text-secondary hover:text-text-primary'
+              isActive
+                ? 'bg-brand text-surface-base'
+                : 'bg-surface-elevated text-text-secondary hover:text-text-primary'
             } ${isLast ? 'cursor-not-allowed opacity-60' : ''}`}
           >
             {y}
@@ -2035,6 +2144,7 @@ git commit -m "refactor: extract YearPills component (single + multi mode)"
 ### Task 7.2 — Split queries.ts by domain (follow-up)
 
 **Files:**
+
 - Create: `frontend/src/hooks/queries/{accounts,entries,dashboard,analytics,admin,backup,notifications,profile,version}.ts`.
 - Modify: `frontend/src/hooks/queries.ts` (becomes barrel re-export to keep call-sites stable).
 
@@ -2045,6 +2155,7 @@ Each new file owns its hooks + its query-key fragment. Top-level `queryKeys` obj
 - [ ] **Step 2: Re-export**
 
 `frontend/src/hooks/queries.ts`:
+
 ```ts
 export * from './queries/accounts';
 export * from './queries/entries';
@@ -2112,14 +2223,14 @@ git tag v1.1.0
 
 ## Risks + Mitigations
 
-| Risk | Mitigation |
-|---|---|
-| Wave 5 redesign drift; user disagrees mid-flight | Stop at Task 5.0 for sign-off before any visual code lands. |
-| Lazy-route splitting breaks SSR-style scenarios (none for this PWA) | n/a — pure SPA. Smoke-test cold reload + back-button nav. |
-| Glass-card removal affects perceived hierarchy | Step 3.4 introduces `solid-card` — visually equivalent to glass-card without the blur cost. |
-| `prefers-reduced-motion` ramping disables all animations for some users | Acceptable per WCAG; the static fallback is fully usable. |
-| Material Symbols → lucide swap drops icons that don't have a 1:1 lucide equivalent | Mapping table covers the 12 in `AccountFormModal.tsx ICON_OPTIONS` — verified before swap. |
-| Vitest hangs again on render-level component tests (Wave 7 YearPills) | Use logic-only test pattern (extract `toggleYearSelection` helper) — proven to work in Wave 1 AccountFilterBar test. |
+| Risk                                                                               | Mitigation                                                                                                           |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Wave 5 redesign drift; user disagrees mid-flight                                   | Stop at Task 5.0 for sign-off before any visual code lands.                                                          |
+| Lazy-route splitting breaks SSR-style scenarios (none for this PWA)                | n/a — pure SPA. Smoke-test cold reload + back-button nav.                                                            |
+| Glass-card removal affects perceived hierarchy                                     | Step 3.4 introduces `solid-card` — visually equivalent to glass-card without the blur cost.                          |
+| `prefers-reduced-motion` ramping disables all animations for some users            | Acceptable per WCAG; the static fallback is fully usable.                                                            |
+| Material Symbols → lucide swap drops icons that don't have a 1:1 lucide equivalent | Mapping table covers the 12 in `AccountFormModal.tsx ICON_OPTIONS` — verified before swap.                           |
+| Vitest hangs again on render-level component tests (Wave 7 YearPills)              | Use logic-only test pattern (extract `toggleYearSelection` helper) — proven to work in Wave 1 AccountFilterBar test. |
 
 ---
 

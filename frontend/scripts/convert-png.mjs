@@ -18,10 +18,20 @@ const maskableSizes = [192, 512];
 const conversions = [];
 
 for (const size of pwaSizes) {
-  conversions.push({ input: `pwa-${size}x${size}.svg`, output: `pwa-${size}x${size}.png`, w: size, h: size });
+  conversions.push({
+    input: `pwa-${size}x${size}.svg`,
+    output: `pwa-${size}x${size}.png`,
+    w: size,
+    h: size,
+  });
 }
 for (const size of maskableSizes) {
-  conversions.push({ input: `pwa-maskable-${size}x${size}.svg`, output: `pwa-maskable-${size}x${size}.png`, w: size, h: size });
+  conversions.push({
+    input: `pwa-maskable-${size}x${size}.svg`,
+    output: `pwa-maskable-${size}x${size}.png`,
+    w: size,
+    h: size,
+  });
 }
 conversions.push({ input: 'apple-touch-icon.svg', output: 'apple-touch-icon.png', w: 180, h: 180 });
 
@@ -30,7 +40,9 @@ conversions.push({ input: 'favicon.svg', output: 'favicon-32x32.png', w: 32, h: 
 conversions.push({ input: 'favicon.svg', output: 'favicon-16x16.png', w: 16, h: 16 });
 
 // ── Apple splash screens ───────────────────────────────────
-const splashFiles = readdirSync(PUBLIC).filter((f) => f.startsWith('apple-splash-') && f.endsWith('.svg'));
+const splashFiles = readdirSync(PUBLIC).filter(
+  (f) => f.startsWith('apple-splash-') && f.endsWith('.svg'),
+);
 for (const f of splashFiles) {
   const match = f.match(/apple-splash-(\d+)x(\d+)\.svg/);
   if (match) {
@@ -40,7 +52,10 @@ for (const f of splashFiles) {
 
 // ── Convert all ────────────────────────────────────────────
 for (const { input, output, w, h } of conversions) {
-  await sharp(resolve(PUBLIC, input)).resize(w, h).png({ quality: 90, compressionLevel: 9 }).toFile(resolve(PUBLIC, output));
+  await sharp(resolve(PUBLIC, input))
+    .resize(w, h)
+    .png({ quality: 90, compressionLevel: 9 })
+    .toFile(resolve(PUBLIC, output));
   console.log(`✓ ${output}`);
 }
 

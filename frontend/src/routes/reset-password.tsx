@@ -107,10 +107,7 @@ function ResetPasswordPage() {
         </Button>
 
         <div className="text-center">
-          <Link
-            to="/login"
-            className="text-sm text-brand hover:text-brand-hover transition-colors"
-          >
+          <Link to="/login" className="text-sm text-brand hover:text-brand-hover transition-colors">
             {t('auth.backToLogin')}
           </Link>
         </div>
