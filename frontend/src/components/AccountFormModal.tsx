@@ -10,7 +10,7 @@ import { Input } from './ui/Input';
 import { AccountIcon } from './AccountIcon';
 
 const COLOR_OPTIONS = [
-  '#00d4a0',
+  '#3DDC97',
   '#4d9fff',
   '#ffd166',
   '#a78bfa',

@@ -5,13 +5,13 @@ export function readVar(name: string, fallback: string): string {
 }
 
 export function chartPalette(): string[] {
-  return Array.from({ length: 8 }, (_, i) => readVar(`--color-chart-${i + 1}`, '#5b3df6'));
+  return Array.from({ length: 8 }, (_, i) => readVar(`--color-chart-${i + 1}`, '#8E78FF'));
 }
 
 export function yearPalette(): string[] {
-  return Array.from({ length: 6 }, (_, i) => readVar(`--color-year-${i + 1}`, '#5b3df6'));
+  return Array.from({ length: 6 }, (_, i) => readVar(`--color-year-${i + 1}`, '#8E78FF'));
 }
 
 export function brandColor(): string {
-  return readVar('--color-brand', '#5b3df6');
+  return readVar('--color-brand', '#8E78FF');
 }

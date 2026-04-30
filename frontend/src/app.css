@@ -12,10 +12,10 @@
   --color-surface-overlay: rgba(0, 0, 0, 0.6);
 
   /* ── Brand ────────────────────────────────────────────── */
-  --color-brand: #5b3df6; /* aurora violet */
-  --color-brand-hover: #7c63fa;
-  --color-brand-muted: rgba(91, 61, 246, 0.15);
-  --color-brand-glow: rgba(91, 61, 246, 0.3);
+  --color-brand: #8e78ff; /* aurora violet — variant B, 5.85:1 AA on #0A0A0F */
+  --color-brand-hover: #a595ff;
+  --color-brand-muted: rgba(142, 120, 255, 0.15);
+  --color-brand-glow: rgba(142, 120, 255, 0.3);
 
   /* ── Semantic ─────────────────────────────────────────── */
   --color-positive: #3ddc97; /* aurora mint */
@@ -31,7 +31,7 @@
 
   /* ── Border ────────────────────────────────────────────── */
   --color-border-default: rgba(255, 255, 255, 0.08);
-  --color-border-active: rgba(91, 61, 246, 0.4);
+  --color-border-active: rgba(142, 120, 255, 0.4);
 
   /* ── Fonts ─────────────────────────────────────────────── */
   --font-heading: 'Inter Tight', system-ui, sans-serif;
@@ -73,17 +73,17 @@
   color: var(--color-text-primary);
 
   /* Chart palette (Aurora harmonized) */
-  --color-chart-1: #5b3df6; /* brand violet */
+  --color-chart-1: #8e78ff; /* brand violet */
   --color-chart-2: #3ddc97; /* aurora mint */
   --color-chart-3: #ffb347; /* warm amber */
   --color-chart-4: #f26d9a; /* rose */
   --color-chart-5: #4d9fff; /* sky */
   --color-chart-6: #a78bfa; /* lavender */
   --color-chart-7: #ffd166; /* gold */
-  --color-chart-8: #7c63fa; /* lighter violet */
+  --color-chart-8: #a595ff; /* lighter violet companion */
 
   /* Year palette */
-  --color-year-1: #5b3df6;
+  --color-year-1: #8e78ff;
   --color-year-2: #3ddc97;
   --color-year-3: #ffb347;
   --color-year-4: #f26d9a;
@@ -240,7 +240,7 @@ pre,
 /* ─── Aurora hero amount ────────────────────────────────── */
 .hero-amount {
   /* dark-mode glow */
-  text-shadow: 0 0 60px rgba(91, 61, 246, 0.35);
+  text-shadow: 0 0 60px rgba(142, 120, 255, 0.35);
 }
 html.light .hero-amount {
   color: var(--color-brand);

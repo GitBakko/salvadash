@@ -17,6 +17,7 @@ import {
   Languages,
   Lock,
   Mail,
+  Monitor,
   Moon,
   Palette,
   Pencil,
@@ -725,21 +726,27 @@ function ThemeSection() {
   const { t } = useTranslation();
   const { theme, setTheme } = useThemeStore();
 
+  const modes = [
+    { value: 'dark', Icon: Moon },
+    { value: 'light', Icon: Sun },
+    { value: 'system', Icon: Monitor },
+  ] as const;
+
   return (
     <Section title={t('settings.theme')} icon={<Palette size={20} className="text-brand" />} delay={0.22}>
       <div className="flex gap-2">
-        {(['dark', 'light'] as const).map((mode) => (
+        {modes.map(({ value, Icon }) => (
           <button
-            key={mode}
-            onClick={() => setTheme(mode)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-              theme === mode
+            key={value}
+            onClick={() => setTheme(value)}
+            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+              theme === value
                 ? 'bg-brand text-surface-base'
                 : 'bg-surface-elevated text-text-secondary hover:text-text-primary'
             }`}
           >
-            {mode === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
-            {t(`settings.${mode}`)}
+            <Icon size={16} />
+            {t(`settings.${value}`)}
           </button>
         ))}
       </div>

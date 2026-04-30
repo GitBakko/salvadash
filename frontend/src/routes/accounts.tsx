@@ -21,7 +21,7 @@ export const Route = createFileRoute('/accounts')({
 // ─── Color palette for accounts ────────────────────────────
 
 const ACCOUNT_COLORS = [
-  '#00d4a0',
+  '#3DDC97',
   '#4d9fff',
   '#ffd166',
   '#a78bfa',
