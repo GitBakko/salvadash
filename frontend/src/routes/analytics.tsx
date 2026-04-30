@@ -21,6 +21,7 @@ import {
 } from 'recharts';
 import type { AnalyticsData } from '@salvadash/shared';
 import { useAnalytics, useAccounts } from '../hooks/queries';
+import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
 import { Card, Skeleton } from '../components/ui';
 import { Delta } from '../components/ui/Delta';
 import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
@@ -69,6 +70,7 @@ function ChartTooltip({ active, payload, label }: any) {
 
 function AnalyticsPage() {
   const { t, i18n } = useTranslation();
+  const reducedMotion = usePrefersReducedMotion();
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const { data: accounts } = useAccounts();
   const { data, isLoading } = useAnalytics(selectedAccountIds);
@@ -84,7 +86,7 @@ function AnalyticsPage() {
       <div className="p-4 max-w-lg mx-auto">
         <h1 className="font-heading text-2xl font-bold mb-4">{t('analytics.title')}</h1>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-16 text-center"
         >
@@ -109,7 +111,7 @@ function AnalyticsPage() {
       {isFilterActive && !hasFilteredData ? (
         <motion.div
           key="filter-empty"
-          initial={{ opacity: 0, y: 12 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-16 text-center mt-5"
         >
@@ -175,9 +177,10 @@ function ChartSection({
   delay: number;
   children: React.ReactNode;
 }) {
+  const reducedMotion = usePrefersReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
     >
@@ -510,6 +513,7 @@ function PerformanceGrid({
   t: (k: string) => string;
   lang: string;
 }) {
+  const reducedMotion = usePrefersReducedMotion();
   type PerfItem =
     | {
         label: string;
@@ -564,7 +568,7 @@ function PerformanceGrid({
       {items.map((item, i) => (
         <motion.div
           key={item.label}
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={reducedMotion ? false : { opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.25 + i * 0.05 }}
           className="bg-surface-elevated/30 rounded-xl p-3"

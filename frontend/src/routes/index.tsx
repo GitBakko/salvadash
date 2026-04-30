@@ -6,6 +6,7 @@ import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import type { DashboardData } from '@salvadash/shared';
 import { useDashboard } from '../hooks/queries';
 import { useCacheDashboard } from '../hooks/use-offline-sync';
+import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
 import { Card, Skeleton } from '../components/ui';
 import { Delta } from '../components/ui/Delta';
 import { fmtCurrency, fmtCurrencyCompact, fmtPercent } from '../lib/format';
@@ -20,20 +21,27 @@ export const Route = createFileRoute('/')({
 // ─── Animated counter ──────────────────────────────────────
 
 function AnimatedNumber({ value, className }: { value: number; className?: string }) {
+  const reduced = usePrefersReducedMotion();
   const spring = useSpring(0, { stiffness: 60, damping: 20 });
   const display = useTransform(spring, (v) => fmtCurrency(v));
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
+    if (reduced) return;
     spring.set(value);
-  }, [spring, value]);
+  }, [spring, value, reduced]);
 
   useEffect(() => {
+    if (reduced) return;
     const unsubscribe = display.on('change', (v) => {
       if (ref.current) ref.current.textContent = v;
     });
     return unsubscribe;
-  }, [display]);
+  }, [display, reduced]);
+
+  if (reduced) {
+    return <span className={className}>{fmtCurrency(value)}</span>;
+  }
 
   return (
     <span ref={ref} className={className}>
@@ -115,9 +123,10 @@ function HeroCard({
   t: (k: string, o?: Record<string, string>) => string;
   lang: string;
 }) {
+  const reducedMotion = usePrefersReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       className="glass-card p-6 text-center relative overflow-hidden"
     >
@@ -161,6 +170,7 @@ function KPIGrid({
   t: (k: string, o?: Record<string, string>) => string;
   year: string;
 }) {
+  const reducedMotion = usePrefersReducedMotion();
   const kpis: { label: string; value: string; Icon: LucideIcon; color: string }[] = [
     {
       label: t('dashboard.yearTotal', { year }),
@@ -193,7 +203,7 @@ function KPIGrid({
       {kpis.map((kpi, i) => (
         <motion.div
           key={kpi.label}
-          initial={{ opacity: 0, y: 12 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 * (i + 1) }}
         >
@@ -214,7 +224,7 @@ function KPIGrid({
       {/* Best month — full width */}
       {data.bestMonth && (
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           className="col-span-2"
@@ -244,11 +254,12 @@ function KPIGrid({
 // ─── Sparkline Card ────────────────────────────────────────
 
 function SparklineCard({ data }: { data: number[] }) {
+  const reducedMotion = usePrefersReducedMotion();
   const chartData = data.map((v, i) => ({ i, v }));
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
       className="glass-card p-4 overflow-hidden"
@@ -282,9 +293,10 @@ function SparklineCard({ data }: { data: number[] }) {
 // ─── Account Breakdown ─────────────────────────────────────
 
 function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => string }) {
+  const reducedMotion = usePrefersReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
     >
@@ -327,9 +339,10 @@ function RecentEntries({
   t: (k: string) => string;
   lang: string;
 }) {
+  const reducedMotion = usePrefersReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
