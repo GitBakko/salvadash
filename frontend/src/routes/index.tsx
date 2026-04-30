@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { DashboardData } from '@salvadash/shared';
 import { useDashboard } from '../hooks/queries';
@@ -9,6 +9,12 @@ import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
 import { Card, Skeleton } from '../components/ui';
 import { Delta } from '../components/ui/Delta';
 import { MiniSparkline } from '../components/MiniSparkline';
+import {
+  AccountSortControl,
+  sortAccounts,
+  type SortMode,
+  type SortDir,
+} from '../components/AccountSortControl';
 import { fmtCurrency, fmtCurrencyCompact, fmtCurrencyParts, fmtPercent } from '../lib/format';
 import { formatMonthShort, formatMonthLong } from '../lib/intl';
 import { Lightbulb, TrendingUp, TrendingDown } from 'lucide-react';
@@ -243,17 +249,31 @@ function SparklineCard({ data, t }: { data: number[]; t: (k: string) => string }
 
 function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => string }) {
   const reducedMotion = usePrefersReducedMotion();
+  // Default: backend order (custom). Client-side view-only sort.
+  const [sortMode, setSortMode] = useState<SortMode>('custom');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const sortedAccounts = useMemo(
+    () => sortAccounts(data.accountBreakdown, sortMode, sortDir),
+    [data.accountBreakdown, sortMode, sortDir],
+  );
+
   return (
     <motion.div
       initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
     >
-      <p className="text-text-muted text-xs font-medium mb-2">
-        {t('accounts.title')}
-      </p>
+      <div className="flex items-center justify-between mb-2 gap-2">
+        <p className="text-text-muted text-xs font-medium">{t('accounts.title')}</p>
+        <AccountSortControl
+          mode={sortMode}
+          dir={sortDir}
+          onModeChange={setSortMode}
+          onDirChange={setSortDir}
+        />
+      </div>
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-        {data.accountBreakdown.map((acc) => (
+        {sortedAccounts.map((acc) => (
           <Card key={acc.accountId} className="shrink-0 w-36 p-3">
             <div className="flex items-center gap-2 mb-2">
               <div

@@ -336,5 +336,13 @@
     "improvements": "Miglioramenti",
     "searchPlaceholder": "Cerca per versione, data o contenuto...",
     "noResults": "Nessun risultato trovato"
+  },
+  "sort": {
+    "label": "Ordina",
+    "name": "Nome",
+    "amount": "Valore",
+    "custom": "Personalizzato",
+    "asc": "Crescente",
+    "desc": "Decrescente"
   }
 }

@@ -12,6 +12,12 @@ import {
 import { useUIStore } from '../stores/ui-store';
 import { Button, Card, Skeleton, Toggle } from '../components/ui';
 import { AccountFormModal } from '../components/AccountFormModal';
+import {
+  AccountSortControl,
+  sortAccounts,
+  type SortMode,
+  type SortDir,
+} from '../components/AccountSortControl';
 import { Wallet, Plus, GripVertical, Pencil, Trash2 } from 'lucide-react';
 
 export const Route = createFileRoute('/accounts')({
@@ -51,6 +57,10 @@ function AccountsPage() {
   const [showForm, setShowForm] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [orderedActive, setOrderedActive] = useState<AccountPublic[] | null>(null);
+  // Default: custom (drag-drop order). When mode !== 'custom' the list is
+  // rendered as a plain non-draggable list — drag handles disappear.
+  const [sortMode, setSortMode] = useState<SortMode>('custom');
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
 
   // Split accounts into active (draggable) and inactive (locked at bottom)
   const { activeAccounts, inactiveAccounts } = useMemo(() => {
@@ -62,6 +72,25 @@ function AccountsPage() {
   }, [accounts]);
 
   const displayActive = orderedActive ?? activeAccounts;
+
+  // For non-custom modes we render a flat sorted list. Map `sortOrder` →
+  // `orderIndex` so the shared helper can short-circuit the custom branch.
+  const sortedActive = useMemo(() => {
+    if (sortMode === 'custom') return displayActive;
+    return sortAccounts(
+      displayActive.map((a) => ({ ...a, orderIndex: a.sortOrder })),
+      sortMode,
+      sortDir,
+    );
+  }, [displayActive, sortMode, sortDir]);
+  const sortedInactive = useMemo(() => {
+    if (sortMode === 'custom') return inactiveAccounts;
+    return sortAccounts(
+      inactiveAccounts.map((a) => ({ ...a, orderIndex: a.sortOrder })),
+      sortMode,
+      sortDir,
+    );
+  }, [inactiveAccounts, sortMode, sortDir]);
 
   // Sync key for resetting Reorder.Group when server data changes
   const serverActiveKey = activeAccounts.map((a) => a.id).join(',');
@@ -169,7 +198,7 @@ function AccountsPage() {
   return (
     <div className="p-4 max-w-lg mx-auto space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="font-heading text-xl font-semibold">{t('accounts.title')}</h1>
         <Button size="sm" onClick={openCreate}>
           <Plus size={20} />
@@ -177,32 +206,58 @@ function AccountsPage() {
         </Button>
       </div>
 
-      {/* Active accounts — draggable */}
-      <Reorder.Group
-        axis="y"
-        values={displayActive}
-        onReorder={handleReorder}
-        className="space-y-3"
-        key={serverActiveKey}
-      >
-        {displayActive.map((account, idx) => (
-          <DraggableAccountCard
-            key={account.id}
-            account={account}
-            color={getAccountColor(account, idx)}
-            onEdit={() => openEdit(account)}
-            onDelete={() => handleDelete(account)}
-            onToggleActive={() => handleToggleActive(account)}
-            isDeleting={deletingId === account.id}
-            onDragEnd={commitReorder}
-          />
-        ))}
-      </Reorder.Group>
+      {/* Sort control row */}
+      <div className="flex justify-end">
+        <AccountSortControl
+          mode={sortMode}
+          dir={sortDir}
+          onModeChange={setSortMode}
+          onDirChange={setSortDir}
+        />
+      </div>
+
+      {/* Active accounts — draggable in custom mode, plain list otherwise */}
+      {sortMode === 'custom' ? (
+        <Reorder.Group
+          axis="y"
+          values={displayActive}
+          onReorder={handleReorder}
+          className="space-y-3"
+          key={serverActiveKey}
+        >
+          {displayActive.map((account, idx) => (
+            <DraggableAccountCard
+              key={account.id}
+              account={account}
+              color={getAccountColor(account, idx)}
+              onEdit={() => openEdit(account)}
+              onDelete={() => handleDelete(account)}
+              onToggleActive={() => handleToggleActive(account)}
+              isDeleting={deletingId === account.id}
+              onDragEnd={commitReorder}
+            />
+          ))}
+        </Reorder.Group>
+      ) : (
+        <div className="space-y-3">
+          {sortedActive.map((account, idx) => (
+            <AccountCard
+              key={account.id}
+              account={account}
+              color={getAccountColor(account, idx)}
+              onEdit={() => openEdit(account)}
+              onDelete={() => handleDelete(account)}
+              onToggleActive={() => handleToggleActive(account)}
+              isDeleting={deletingId === account.id}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Inactive accounts — locked at bottom, not draggable */}
-      {inactiveAccounts.length > 0 && (
+      {sortedInactive.length > 0 && (
         <div className="space-y-3">
-          {inactiveAccounts.map((account, idx) => (
+          {sortedInactive.map((account, idx) => (
             <AccountCard
               key={account.id}
               account={account}

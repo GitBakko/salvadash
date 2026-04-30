@@ -27,6 +27,12 @@ import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
 import { formatMonthShort, formatMonthLong } from '../lib/intl';
 import { BarChart3, Filter } from 'lucide-react';
 import { AccountFilterBar } from '../components/AccountFilterBar';
+import {
+  AccountSortControl,
+  sortAccounts,
+  type SortMode,
+  type SortDir,
+} from '../components/AccountSortControl';
 import { chartPalette, yearPalette, brandColor, readVar } from '../lib/theme-vars';
 
 export const Route = createLazyFileRoute('/analytics')({
@@ -458,17 +464,37 @@ function YearComparisonChart({
 function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const chartColors = chartPalette();
+  // Default: largest slice first (most useful for a pie). 'custom' is hidden
+  // here — analytics is aggregated, there's no meaningful drag-drop baseline.
+  const [sortMode, setSortMode] = useState<SortMode>('amount');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
 
-  const pieData = data.map((d, i) => ({
+  // Stable colors: bind color to the original index BEFORE sorting so a slice
+  // keeps its hue even when the user toggles direction or mode.
+  const coloredData = data.map((d, i) => ({
     ...d,
     fill: d.color ?? chartColors[i % chartColors.length],
   }));
+  const pieData = useMemo(
+    () => sortAccounts(coloredData, sortMode, sortDir),
+    [coloredData, sortMode, sortDir],
+  );
 
   const total = useMemo(() => pieData.reduce((s, d) => s + d.amount, 0), [pieData]);
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="relative w-36 h-36 shrink-0">
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <AccountSortControl
+          mode={sortMode}
+          dir={sortDir}
+          onModeChange={setSortMode}
+          onDirChange={setSortDir}
+          showCustom={false}
+        />
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="relative w-36 h-36 shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -531,6 +557,7 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
             </span>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );
