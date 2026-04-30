@@ -10,16 +10,8 @@ import { Card, Skeleton } from '../components/ui';
 import { Delta } from '../components/ui/Delta';
 import { MiniSparkline } from '../components/MiniSparkline';
 import { fmtCurrency, fmtCurrencyCompact, fmtCurrencyParts, fmtPercent } from '../lib/format';
-import { formatMonthShort } from '../lib/intl';
-import {
-  Lightbulb,
-  CalendarDays,
-  ArrowDown,
-  TrendingUp,
-  TrendingDown,
-  ArrowUp,
-  Trophy,
-} from 'lucide-react';
+import { formatMonthShort, formatMonthLong } from '../lib/intl';
+import { Lightbulb, TrendingUp, TrendingDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { brandColor } from '../lib/theme-vars';
 
@@ -74,7 +66,7 @@ function DashboardPage() {
       <HeroCard data={data} t={t} />
 
       {/* Secondary KPIs */}
-      <KPIGrid data={data} t={t} year={year} />
+      <KPIGrid data={data} t={t} year={year} lang={i18n.language} />
 
       {/* Sparkline */}
       {data.sparklineData.length > 1 && <SparklineCard data={data.sparklineData} t={t} />}
@@ -154,93 +146,75 @@ function HeroCard({
   );
 }
 
-// ─── KPI Grid ──────────────────────────────────────────────
+// ─── KPI Grid (Aurora tiles) ───────────────────────────────
 
 function KPIGrid({
   data,
   t,
   year,
+  lang,
 }: {
   data: DashboardData;
   t: (k: string, o?: Record<string, string>) => string;
   year: string;
+  lang: string;
 }) {
-  const reducedMotion = usePrefersReducedMotion();
-  const kpis: { label: string; value: string; Icon: LucideIcon; color: string }[] = [
-    {
-      label: t('dashboard.yearTotal', { year }),
-      value: data.yearTotal != null ? fmtCurrency(data.yearTotal) : '—',
-      Icon: CalendarDays,
-      color: 'text-info',
-    },
-    {
-      label: t('dashboard.monthlyIncome'),
-      value: fmtCurrency(data.monthlyIncome),
-      Icon: ArrowDown,
-      color: 'text-positive',
-    },
-    {
-      label: t('dashboard.avgMonthly'),
-      value: fmtCurrency(data.avgMonthlyYTD),
-      Icon: TrendingUp,
-      color: 'text-purple',
-    },
-    {
-      label: t('dashboard.growthYTD'),
-      value: fmtPercent(data.growthYTD),
-      Icon: data.growthYTD >= 0 ? ArrowUp : ArrowDown,
-      color: data.growthYTD >= 0 ? 'text-positive' : 'text-negative',
-    },
-  ];
+  // Aurora tile language: plain surface-card-solid divs, no border, no icons,
+  // tight text hierarchy. Mint variant tints the value in `text-positive`.
+  const tileBase = 'bg-surface-card-solid rounded-[18px] p-4';
+  const labelCls = 'text-text-muted text-[11px] font-semibold leading-tight mb-2.5';
+  const valueBase =
+    'font-heading text-[1.45rem] font-bold tracking-[-0.02em] leading-none mb-1.5 tabular-nums';
+  const ctxCls = 'text-text-muted text-[11px] font-medium leading-tight';
+
+  const monthName = data.currentEntry
+    ? formatMonthLong(data.currentEntry.date, lang)
+    : '';
+
+  const growthPositive = data.growthYTD >= 0;
+  const growthValueCls = growthPositive ? 'text-positive' : 'text-negative';
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {kpis.map((kpi, i) => (
-        <motion.div
-          key={kpi.label}
-          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 * (i + 1) }}
-        >
-          <Card className="p-3">
-            <div className="flex items-start gap-2">
-              <kpi.Icon size={20} className={kpi.color} aria-hidden="true" />
-              <div className="min-w-0">
-                <p className="text-text-muted text-xs font-medium leading-tight">
-                  {kpi.label}
-                </p>
-                <p className="font-heading text-lg font-bold mt-0.5">{kpi.value}</p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-      ))}
+    <div className="grid grid-cols-2 gap-2.5">
+      {/* Tile 1 — yearTotal */}
+      <div className={tileBase}>
+        <p className={labelCls}>{t('dashboard.yearTotal', { year })}</p>
+        <p className={`${valueBase} text-text-primary`}>
+          {data.yearTotal != null ? fmtCurrency(data.yearTotal) : '—'}
+        </p>
+        <p className={ctxCls}>{year}</p>
+      </div>
 
-      {/* Best month — full width */}
+      {/* Tile 2 — monthlyIncome */}
+      <div className={tileBase}>
+        <p className={labelCls}>{t('dashboard.monthlyIncome')}</p>
+        <p className={`${valueBase} text-text-primary`}>{fmtCurrency(data.monthlyIncome)}</p>
+        <p className={`${ctxCls} capitalize`}>{monthName}</p>
+      </div>
+
+      {/* Tile 3 — growthYTD (mint when positive) */}
+      <div className={tileBase}>
+        <p className={labelCls}>{t('dashboard.growthYTD')}</p>
+        <p className={`${valueBase} ${growthValueCls}`}>{fmtPercent(data.growthYTD)}</p>
+        <p className={ctxCls}>{t('dashboard.vsJanuary')}</p>
+      </div>
+
+      {/* Tile 4 — avgMonthly */}
+      <div className={tileBase}>
+        <p className={labelCls}>{t('dashboard.avgMonthly')}</p>
+        <p className={`${valueBase} text-text-primary`}>{fmtCurrency(data.avgMonthlyYTD)}</p>
+        <p className={ctxCls}>{t('analytics.perMonth')}</p>
+      </div>
+
+      {/* Wide row — bestMonth (mint) */}
       {data.bestMonth && (
-        <motion.div
-          initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="col-span-2"
-        >
-          <Card className="p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Trophy size={20} className="text-gold" aria-hidden="true" />
-                <div>
-                  <p className="text-text-muted text-xs font-medium">
-                    {t('dashboard.bestMonth')}
-                  </p>
-                  <p className="text-sm font-semibold capitalize">{data.bestMonth.month}</p>
-                </div>
-              </div>
-              <p className="font-heading text-lg font-bold text-positive">
-                +{fmtCurrencyCompact(data.bestMonth.delta)}
-              </p>
-            </div>
-          </Card>
-        </motion.div>
+        <div className={`${tileBase} col-span-2`}>
+          <p className={labelCls}>{t('dashboard.bestMonth')}</p>
+          <p className={`${valueBase} text-positive`}>
+            +{fmtCurrencyCompact(data.bestMonth.delta)}
+          </p>
+          <p className={`${ctxCls} capitalize`}>{data.bestMonth.month}</p>
+        </div>
       )}
     </div>
   );

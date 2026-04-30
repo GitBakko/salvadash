@@ -25,8 +25,7 @@ import { Card, Skeleton } from '../components/ui';
 import { Delta } from '../components/ui/Delta';
 import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
 import { formatMonthShort, formatMonthLong } from '../lib/intl';
-import { BarChart3, TrendingUp, TrendingDown, Gauge, Trophy } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { AccountFilterBar } from '../components/AccountFilterBar';
 import { chartPalette, yearPalette, brandColor } from '../lib/theme-vars';
 
@@ -490,7 +489,11 @@ function IncomeBarChart({
   );
 }
 
-// ─── Performance Grid ──────────────────────────────────────
+// ─── Performance Grid (hairline columns) ───────────────────
+//
+// Visual differentiation from Home KPIGrid (Aurora tiles): no per-cell card,
+// hairline dividers between columns, value dominant. The wrapping ChartSection
+// already provides the surrounding card and the section title.
 
 function PerformanceGrid({
   data,
@@ -501,83 +504,60 @@ function PerformanceGrid({
   t: (k: string) => string;
   lang: string;
 }) {
-  const reducedMotion = usePrefersReducedMotion();
   type PerfItem =
-    | {
-        label: string;
-        value: string;
-        sub: string;
-        Icon: LucideIcon;
-        color: string;
-        subDelta?: undefined;
-      }
-    | {
-        label: string;
-        value: string;
-        subDelta: number;
-        Icon: LucideIcon;
-        color: string;
-        sub?: undefined;
-      };
+    | { label: string; value: string; valueColor: string; sub: string; subColor?: string; subDelta?: undefined }
+    | { label: string; value: string; valueColor: string; subDelta: number; sub?: undefined; subColor?: undefined };
 
   const items: PerfItem[] = [
     {
       label: t('analytics.bestMonth'),
       value: data.bestMonth.date ? formatMonthLong(data.bestMonth.date, lang) : '—',
+      valueColor: 'text-positive',
       subDelta: data.bestMonth.delta,
-      Icon: TrendingUp,
-      color: 'text-positive',
     },
     {
       label: t('analytics.worstMonth'),
       value: data.worstMonth.date ? formatMonthLong(data.worstMonth.date, lang) : '—',
+      valueColor: 'text-negative',
       subDelta: data.worstMonth.delta,
-      Icon: TrendingDown,
-      color: 'text-negative',
     },
     {
       label: t('analytics.avgGrowth'),
       value: fmtCurrency(data.avgGrowth),
+      valueColor: data.avgGrowth >= 0 ? 'text-brand' : 'text-negative',
       sub: t('analytics.perMonth'),
-      Icon: Gauge,
-      color: data.avgGrowth >= 0 ? 'text-brand' : 'text-negative',
     },
     {
       label: t('analytics.bestYear'),
       value: data.bestYear.year ? String(data.bestYear.year) : '—',
+      valueColor: 'text-gold',
       subDelta: data.bestYear.growth,
-      Icon: Trophy,
-      color: 'text-gold',
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {items.map((item, i) => (
-        <motion.div
-          key={item.label}
-          initial={reducedMotion ? false : { opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.25 + i * 0.05 }}
-          className="bg-surface-elevated/30 rounded-xl p-3"
-        >
-          <div className="flex items-center gap-1.5 mb-1">
-            <item.Icon size={16} className={item.color} aria-hidden="true" />
-            <span className="text-text-muted text-xs font-medium">
-              {item.label}
-            </span>
-          </div>
-          <p className="font-heading text-sm font-bold capitalize">{item.value}</p>
+    <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border-default">
+      {items.map((item) => (
+        <div key={item.label} className="px-4 py-3 first:pl-0 last:pr-0">
+          {/* Mixed-case label — uppercase is reserved for the hero per Wave 4 audit. */}
+          <p className="text-text-muted text-[11px] font-semibold leading-tight">
+            {item.label}
+          </p>
+          <p
+            className={`font-heading text-xl font-bold tracking-tight tabular-nums leading-none mt-1.5 capitalize ${item.valueColor}`}
+          >
+            {item.value}
+          </p>
           {item.subDelta !== undefined ? (
             <Delta
               value={item.subDelta}
-              className="mt-0.5 text-xs"
+              className="mt-1 text-[11px]"
               ariaPrefix={t('dashboard.deltaAria')}
             />
           ) : item.sub ? (
-            <p className={`text-xs ${item.color} font-semibold mt-0.5`}>{item.sub}</p>
+            <p className="text-[11px] text-text-muted font-medium mt-1">{item.sub}</p>
           ) : null}
-        </motion.div>
+        </div>
       ))}
     </div>
   );
