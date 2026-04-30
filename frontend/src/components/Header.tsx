@@ -21,7 +21,7 @@ export function Header() {
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Link to="/" className="flex items-center gap-2">
             <CircleDollarSign size={28} className="text-brand" />
-            <h1 className="font-heading text-xl font-bold text-brand">{t('common.appName')}</h1>
+            <span className="font-heading text-xl font-bold text-brand">{t('common.appName')}</span>
           </Link>
           <VersionBadge className="ml-1 self-end mb-0.5" />
 
