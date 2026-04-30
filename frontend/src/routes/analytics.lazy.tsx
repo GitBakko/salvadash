@@ -544,7 +544,7 @@ function PerformanceGrid({
             {item.label}
           </p>
           <p
-            className={`font-heading text-xl font-bold tracking-tight tabular-nums leading-none mt-1.5 capitalize ${item.valueColor}`}
+            className={`text-xl font-bold tracking-tight tabular-nums leading-none mt-1.5 capitalize ${item.valueColor}`}
           >
             {item.value}
           </p>

@@ -164,7 +164,7 @@ function KPIGrid({
   const tileBase = 'bg-surface-card-solid rounded-[18px] p-4';
   const labelCls = 'text-text-muted text-[11px] font-semibold leading-tight mb-2.5';
   const valueBase =
-    'font-heading text-[1.45rem] font-bold tracking-[-0.02em] leading-none mb-1.5 tabular-nums';
+    'text-[1.45rem] font-bold tracking-[-0.02em] leading-none mb-1.5 tabular-nums';
   const ctxCls = 'text-text-muted text-[11px] font-medium leading-tight';
 
   const monthName = data.currentEntry
@@ -262,7 +262,7 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
               />
               <span className="text-xs text-text-secondary truncate">{acc.name}</span>
             </div>
-            <p className="font-heading text-base font-bold">{fmtCurrency(acc.amount)}</p>
+            <p className="text-base font-bold">{fmtCurrency(acc.amount)}</p>
             <div className="mt-2 h-1 bg-surface-elevated rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"

@@ -248,7 +248,7 @@ function OverviewCards() {
               <kpi.Icon size={20} className={kpi.color} />
               <span className="text-xs text-text-muted">{kpi.label}</span>
             </div>
-            <p className="text-xl font-bold font-heading">{kpi.value}</p>
+            <p className="text-xl font-bold">{kpi.value}</p>
           </Card>
         </motion.div>
       ))}
@@ -357,7 +357,7 @@ function UsersSection({
                   </div>
 
                   <div className="text-right shrink-0 ml-2">
-                    <p className="text-sm font-bold font-heading">
+                    <p className="text-sm font-bold">
                       {formatCurrency(u.totalSavings)}
                     </p>
                     <p className="text-[10px] text-text-muted">
@@ -611,7 +611,7 @@ function StatItem({
         <Icon size={14} className="text-text-muted" />
         <span className="text-[10px] text-text-muted uppercase tracking-wide">{label}</span>
       </div>
-      <p className={`font-bold font-heading ${small ? 'text-xs' : 'text-sm'}`}>{value}</p>
+      <p className={`font-bold ${small ? 'text-xs' : 'text-sm'}`}>{value}</p>
     </div>
   );
 }

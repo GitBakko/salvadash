@@ -120,7 +120,7 @@ function EntryCard({
           <span className="text-[10px] font-semibold text-brand uppercase tracking-wider">
             {formatMonthShort(entry.date, lang)}
           </span>
-          <span className="font-heading text-xl font-bold text-text-primary leading-tight">
+          <span className="text-xl font-bold text-text-primary leading-tight">
             {formatDay(entry.date)}
           </span>
         </div>
@@ -128,7 +128,7 @@ function EntryCard({
         {/* Main content */}
         <div className="flex-1 px-3 py-3 flex items-center justify-between min-w-0">
           <div className="min-w-0">
-            <p className="font-heading text-base font-bold text-text-primary">
+            <p className="text-base font-bold text-text-primary">
               {fmtCurrency(entry.total)}
             </p>
             {entry.totalIncome > 0 && (
@@ -200,7 +200,7 @@ function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () =
             </div>
             <div className="text-right">
               <p className="text-text-muted text-xs">{t('entries.total')}</p>
-              <p className="font-heading text-xl font-bold text-gold">{fmtCurrency(entry.total)}</p>
+              <p className="text-xl font-bold text-gold">{fmtCurrency(entry.total)}</p>
             </div>
           </div>
 

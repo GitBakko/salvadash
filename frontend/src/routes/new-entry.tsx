@@ -394,7 +394,7 @@ function NewEntryPage() {
                 <p className="text-text-muted text-xs uppercase tracking-wider">
                   {t('entries.liveTotal')}
                 </p>
-                <p className="font-heading text-2xl font-bold text-gold">
+                <p className="text-2xl font-bold text-gold">
                   {fmtCurrency(liveTotal)}
                 </p>
               </div>
