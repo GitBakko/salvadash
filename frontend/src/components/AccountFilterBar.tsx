@@ -26,7 +26,8 @@ export function AccountFilterBar({ accounts, selected, onChange }: AccountFilter
 
   return (
     <div
-      className="sticky top-0 z-20 -mx-4 px-4 pt-3 pb-2 bg-surface-base/85 backdrop-blur-md border-b border-border-default/40"
+      className="sticky z-20 -mx-4 px-4 pt-3 pb-2 bg-surface-base/85 backdrop-blur-md border-b border-border-default/40"
+      style={{ top: 'var(--header-height)' }}
       role="region"
       aria-label={t('analytics.filter.label')}
     >

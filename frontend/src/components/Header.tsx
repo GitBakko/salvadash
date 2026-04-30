@@ -17,7 +17,10 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 glass-card border-b border-border-default px-4 py-3">
+      <header
+        className="sticky top-0 z-40 glass-card border-b border-border-default px-4 py-3"
+        style={{ minHeight: 'var(--header-height)' }}
+      >
         <div className="flex items-center justify-between max-w-lg mx-auto">
           <Link to="/" className="flex items-center gap-2">
             <CircleDollarSign size={28} className="text-brand" aria-hidden="true" />
