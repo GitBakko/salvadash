@@ -1,14 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef } from 'react';
-import { motion, useSpring, useTransform, type MotionValue } from 'framer-motion';
-import { AreaChart, Area, ResponsiveContainer } from 'recharts';
+import { motion, useSpring, useTransform } from 'framer-motion';
 import type { DashboardData } from '@salvadash/shared';
 import { useDashboard } from '../hooks/queries';
 import { useCacheDashboard } from '../hooks/use-offline-sync';
 import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
 import { Card, Skeleton } from '../components/ui';
 import { Delta } from '../components/ui/Delta';
+import { MiniSparkline } from '../components/MiniSparkline';
 import { fmtCurrency, fmtCurrencyCompact, fmtPercent } from '../lib/format';
 import { formatMonthShort } from '../lib/intl';
 import { Lightbulb, CalendarDays, ArrowDown, TrendingUp, ArrowUp, Trophy } from 'lucide-react';
@@ -257,8 +257,6 @@ function KPIGrid({
 
 function SparklineCard({ data }: { data: number[] }) {
   const reducedMotion = usePrefersReducedMotion();
-  const brand = brandColor();
-  const chartData = data.map((v, i) => ({ i, v }));
 
   return (
     <motion.div
@@ -268,27 +266,7 @@ function SparklineCard({ data }: { data: number[] }) {
       className="glass-card p-4 overflow-hidden"
     >
       <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">Trend 12 mesi</p>
-      <div className="h-20 -mx-4 -mb-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={brand} stopOpacity={0.3} />
-                <stop offset="100%" stopColor={brand} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <Area
-              type="monotone"
-              dataKey="v"
-              stroke={brand}
-              strokeWidth={2}
-              fill="url(#sparkGrad)"
-              dot={false}
-              isAnimationActive
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+      <MiniSparkline values={data} className="w-full h-20" ariaLabel="Trend 12 mesi" />
     </motion.div>
   );
 }
