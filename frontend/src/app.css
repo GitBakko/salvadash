@@ -227,3 +227,13 @@ pre,
   white-space: nowrap;
   border-width: 0;
 }
+
+/* ─── Aurora hero amount ────────────────────────────────── */
+.hero-amount {
+  /* dark-mode glow */
+  text-shadow: 0 0 60px rgba(91, 61, 246, 0.35);
+}
+html.light .hero-amount {
+  color: var(--color-brand);
+  text-shadow: none;
+}

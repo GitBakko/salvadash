@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useRef } from 'react';
-import { motion, useSpring, useTransform } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import type { DashboardData } from '@salvadash/shared';
 import { useDashboard } from '../hooks/queries';
 import { useCacheDashboard } from '../hooks/use-offline-sync';
@@ -11,52 +11,21 @@ import { Delta } from '../components/ui/Delta';
 import { MiniSparkline } from '../components/MiniSparkline';
 import { fmtCurrency, fmtCurrencyCompact, fmtPercent } from '../lib/format';
 import { formatMonthShort } from '../lib/intl';
-import { Lightbulb, CalendarDays, ArrowDown, TrendingUp, ArrowUp, Trophy } from 'lucide-react';
+import {
+  Lightbulb,
+  CalendarDays,
+  ArrowDown,
+  TrendingUp,
+  TrendingDown,
+  ArrowUp,
+  Trophy,
+} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { brandColor } from '../lib/theme-vars';
 
 export const Route = createFileRoute('/')({
   component: DashboardPage,
 });
-
-// ─── Animated counter ──────────────────────────────────────
-
-function AnimatedNumber({ value, className }: { value: number; className?: string }) {
-  const reduced = usePrefersReducedMotion();
-  const firstRender = useRef(true);
-  const animate = !reduced && firstRender.current;
-
-  const spring = useSpring(0, { stiffness: 60, damping: 20 });
-  const display = useTransform(spring, (v) => fmtCurrency(v));
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    firstRender.current = false;
-  }, []);
-
-  useEffect(() => {
-    if (!animate) return;
-    spring.set(value);
-  }, [animate, spring, value]);
-
-  useEffect(() => {
-    if (!animate) return;
-    const unsubscribe = display.on('change', (v) => {
-      if (ref.current) ref.current.textContent = v;
-    });
-    return unsubscribe;
-  }, [animate, display]);
-
-  if (!animate) {
-    return <span className={className}>{fmtCurrency(value)}</span>;
-  }
-
-  return (
-    <span ref={ref} className={className}>
-      {fmtCurrency(value)}
-    </span>
-  );
-}
 
 // ─── Dashboard Page ────────────────────────────────────────
 
@@ -102,7 +71,7 @@ function DashboardPage() {
       </div>
 
       {/* Hero KPI */}
-      <HeroCard data={data} t={t} lang={i18n.language} />
+      <HeroCard data={data} t={t} />
 
       {/* Secondary KPIs */}
       <KPIGrid data={data} t={t} year={year} />
@@ -121,47 +90,70 @@ function DashboardPage() {
   );
 }
 
-// ─── Hero Card ─────────────────────────────────────────────
+// ─── Hero (Aurora) ─────────────────────────────────────────
 
 function HeroCard({
   data,
   t,
-  lang,
 }: {
   data: DashboardData;
   t: (k: string, o?: Record<string, string>) => string;
-  lang: string;
 }) {
-  const reducedMotion = usePrefersReducedMotion();
+  const formatted = fmtCurrency(data.currentTotal);
+  const lastComma = formatted.lastIndexOf(',');
+  const integerPart = lastComma >= 0 ? formatted.slice(0, lastComma) : formatted;
+  const centsPart = lastComma >= 0 ? formatted.slice(lastComma) : '';
+
+  const delta = data.currentEntry?.delta ?? null;
+  const deltaPercent = data.currentEntry?.deltaPercent ?? null;
+
+  let chipTone = 'bg-surface-elevated text-text-muted';
+  let ChipIcon: LucideIcon | null = null;
+  if (delta != null) {
+    if (delta > 0) {
+      chipTone = 'bg-positive/12 text-positive';
+      ChipIcon = TrendingUp;
+    } else if (delta < 0) {
+      chipTone = 'bg-negative/12 text-negative';
+      ChipIcon = TrendingDown;
+    }
+  }
+
+  let chipText = '';
+  let ariaText = '';
+  if (delta != null) {
+    const currencyStr = fmtCurrencyCompact(delta);
+    const signedCurrency = delta > 0 && !currencyStr.startsWith('+') ? `+${currencyStr}` : currencyStr;
+    chipText = signedCurrency;
+    if (deltaPercent != null) {
+      chipText += ` · ${fmtPercent(deltaPercent)}`;
+    }
+    ariaText = `${t('dashboard.deltaAria')} ${chipText}`;
+  }
+
   return (
-    <motion.div
-      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="solid-card p-6 text-center relative overflow-hidden"
-    >
-      <p className="text-text-secondary text-sm font-medium relative">
+    <section className="py-2 px-1">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted mb-3.5">
         {t('dashboard.currentTotal')}
       </p>
-      <div className="relative">
-        <AnimatedNumber
-          value={data.currentTotal}
-          className="font-heading text-[42px] font-bold text-text-primary leading-tight"
-        />
+      <div className="hero-amount font-heading text-[clamp(3.5rem,11vw,5.5rem)] font-extrabold tracking-[-0.045em] leading-[0.95] text-text-primary tabular-nums">
+        <span>{integerPart}</span>
+        {centsPart && (
+          <span className="text-[2.6rem] font-bold text-text-muted tracking-[-0.03em] ml-1">
+            {centsPart}
+          </span>
+        )}
       </div>
-
-      {data.currentEntry && (
-        <p className="text-text-muted text-xs mt-1 relative">
-          {formatMonthShort(data.currentEntry.date, lang)}
-          {data.currentEntry.delta != null && (
-            <Delta
-              value={data.currentEntry.delta}
-              className="ml-2"
-              ariaPrefix={t('dashboard.deltaAria')}
-            />
-          )}
-        </p>
+      {delta != null && (
+        <div
+          className={`inline-flex items-center gap-2 mt-4 px-3.5 py-1.5 rounded-full text-sm font-semibold ${chipTone}`}
+          aria-label={ariaText}
+        >
+          {ChipIcon && <ChipIcon size={14} strokeWidth={2.5} aria-hidden="true" />}
+          <span>{chipText}</span>
+        </div>
       )}
-    </motion.div>
+    </section>
   );
 }
 
