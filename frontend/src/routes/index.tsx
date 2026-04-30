@@ -196,7 +196,7 @@ function KPIGrid({
       <div className={tileBase}>
         <p className={labelCls}>{t('dashboard.growthYTD')}</p>
         <p className={`${valueBase} ${growthValueCls}`}>{fmtPercent(data.growthYTD)}</p>
-        <p className={ctxCls}>{t('dashboard.vsJanuary')}</p>
+        <p className={ctxCls}>{t('dashboard.vsYearStart')}</p>
       </div>
 
       {/* Tile 4 — avgMonthly */}

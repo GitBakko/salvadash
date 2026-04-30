@@ -505,8 +505,8 @@ function PerformanceGrid({
   lang: string;
 }) {
   type PerfItem =
-    | { label: string; value: string; valueColor: string; sub: string; subColor?: string; subDelta?: undefined }
-    | { label: string; value: string; valueColor: string; subDelta: number; sub?: undefined; subColor?: undefined };
+    | { label: string; value: string; valueColor: string; sub: string; subDelta?: undefined }
+    | { label: string; value: string; valueColor: string; subDelta: number; sub?: undefined };
 
   const items: PerfItem[] = [
     {

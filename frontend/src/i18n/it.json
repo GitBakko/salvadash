@@ -75,11 +75,11 @@
   "dashboard": {
     "currentTotal": "Totale Attuale",
     "yearTotal": "Totale {{year}}",
-    "monthlyIncome": "Income Mensile",
+    "monthlyIncome": "Entrata Mensile",
     "avgMonthly": "Media Mensile YTD",
     "bestMonth": "Mese Migliore",
     "growthYTD": "Crescita YTD",
-    "vsJanuary": "vs gennaio",
+    "vsYearStart": "vs inizio anno",
     "recentEntries": "Ultime Rilevazioni",
     "noEntries": "Nessuna rilevazione ancora",
     "deltaAria": "variazione di",
