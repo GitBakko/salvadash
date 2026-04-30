@@ -9,12 +9,14 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, icon, className = '', id, ...props }, ref) => {
     const inputId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
+    const errorId = error && inputId ? `${inputId}-error` : undefined;
 
     return (
       <div className="space-y-1.5">
         {label && (
           <label htmlFor={inputId} className="block text-sm font-medium text-text-secondary">
             {label}
+            {props.required && <span aria-hidden="true" className="text-negative ml-0.5">*</span>}
           </label>
         )}
         <div className="relative">
@@ -24,6 +26,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             id={inputId}
+            aria-invalid={!!error || undefined}
+            aria-describedby={errorId}
             className={`
               w-full bg-surface-elevated/50 text-text-primary
               border border-border-default rounded-[var(--radius-md)]
@@ -39,7 +43,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
         </div>
-        {error && <p className="text-xs text-negative">{error}</p>}
+        {error && (
+          <p id={errorId} className="text-xs text-negative" role="alert">
+            {error}
+          </p>
+        )}
       </div>
     );
   },
