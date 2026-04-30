@@ -27,7 +27,7 @@ import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
 import { formatMonthShort, formatMonthLong } from '../lib/intl';
 import { BarChart3 } from 'lucide-react';
 import { AccountFilterBar } from '../components/AccountFilterBar';
-import { chartPalette, yearPalette, brandColor } from '../lib/theme-vars';
+import { chartPalette, yearPalette, brandColor, readVar } from '../lib/theme-vars';
 
 export const Route = createLazyFileRoute('/analytics')({
   component: AnalyticsPage,
@@ -38,13 +38,22 @@ export const Route = createLazyFileRoute('/analytics')({
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="solid-card p-2 text-xs border border-border-default shadow-lg">
-      <p className="text-text-muted mb-1">{label}</p>
-      {payload.map((p: any, i: number) => (
-        <p key={i} style={{ color: p.color }} className="font-semibold">
-          {p.name}: {fmtCurrency(p.value)}
-        </p>
-      ))}
+    <div className="rounded-xl border border-border-default bg-surface-card-solid/95 backdrop-blur-md p-3 shadow-lg min-w-[140px]">
+      <p className="text-text-muted text-[11px] font-medium mb-1.5">{label}</p>
+      <div className="space-y-1">
+        {payload.map((p: any, i: number) => (
+          <div key={i} className="flex items-center gap-2">
+            <span
+              className="w-2 h-2 rounded-full shrink-0"
+              style={{ backgroundColor: p.color ?? p.payload?.fill }}
+            />
+            <span className="text-text-secondary text-xs flex-1 truncate">{p.name}</span>
+            <span className="font-semibold tabular-nums text-text-primary text-xs">
+              {fmtCurrency(p.value)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -168,9 +177,12 @@ function ChartSection({
       transition={{ delay }}
     >
       <Card className="p-4 overflow-hidden">
-        <p className="text-text-muted text-xs font-medium mb-3">
-          {title}
-        </p>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-brand" />
+          <p className="text-text-secondary text-xs font-semibold uppercase tracking-wider">
+            {title}
+          </p>
+        </div>
         {children}
       </Card>
     </motion.div>
@@ -187,27 +199,53 @@ function PatrimonyChart({
   lang: string;
 }) {
   const brand = brandColor();
+  const positive = useMemo(() => readVar('--color-positive', '#5dd6b8'), []);
+  const tickFill = useMemo(() => readVar('--color-text-muted', '#7a7a8a'), []);
+  const gridStroke = useMemo(
+    () => readVar('--color-border-default', 'rgba(255,255,255,0.08)'),
+    [],
+  );
+  const surfaceBase = useMemo(() => readVar('--color-surface-base', '#0d0b1a'), []);
   const chartData = data.map((d) => ({ ...d, label: formatMonthShort(d.date, lang) }));
+  const lastIndex = chartData.length - 1;
+
+  // Custom dot: only render at the last data point (Aurora endpoint).
+  // Recharts passes { cx, cy, index, ... }. We guard for missing values.
+  const EndpointDot = (props: any) => {
+    const { cx, cy, index } = props;
+    if (typeof cx !== 'number' || typeof cy !== 'number') return <g />;
+    if (index !== lastIndex) return <g />;
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={7} fill={positive} opacity={0.18} />
+        <circle cx={cx} cy={cy} r={3.5} fill={positive} stroke={surfaceBase} strokeWidth={1.5} />
+      </g>
+    );
+  };
 
   return (
     <div className="h-52 -mx-2">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
           <defs>
-            <linearGradient id="patrimGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={brand} stopOpacity={0.35} />
+            <linearGradient id="patrimStroke" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor={brand} />
+              <stop offset="100%" stopColor={positive} />
+            </linearGradient>
+            <linearGradient id="patrimFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={brand} stopOpacity={0.4} />
               <stop offset="100%" stopColor={brand} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+          <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 10, fill: '#666' }}
+            tick={{ fontSize: 10, fill: tickFill }}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            tick={{ fontSize: 10, fill: '#666' }}
+            tick={{ fontSize: 10, fill: tickFill }}
             tickLine={false}
             axisLine={false}
             tickFormatter={(v) => fmtCurrencyCompact(v)}
@@ -218,12 +256,12 @@ function PatrimonyChart({
             type="monotone"
             dataKey="total"
             name="Patrimonio"
-            stroke={brand}
-            strokeWidth={2}
-            fill="url(#patrimGrad)"
+            stroke="url(#patrimStroke)"
+            strokeWidth={2.5}
+            fill="url(#patrimFill)"
             animationDuration={1200}
-            dot={false}
-            activeDot={{ r: 4, fill: brand, stroke: 'var(--color-surface-base)', strokeWidth: 2 }}
+            dot={EndpointDot}
+            activeDot={{ r: 5, fill: brand, stroke: surfaceBase, strokeWidth: 2 }}
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -242,6 +280,11 @@ function YearComparisonChart({
 }) {
   const { t } = useTranslation();
   const yearColors = yearPalette();
+  const tickFill = useMemo(() => readVar('--color-text-muted', '#7a7a8a'), []);
+  const gridStroke = useMemo(
+    () => readVar('--color-border-default', 'rgba(255,255,255,0.08)'),
+    [],
+  );
   const years = Object.keys(data).sort();
   const [activeYears, setActiveYears] = useState<Set<string>>(() => {
     // Show last 3 years by default
@@ -305,6 +348,7 @@ function YearComparisonChart({
                 backgroundColor: active ? color + '20' : 'transparent',
                 borderColor: active ? color : 'rgba(255,255,255,0.1)',
                 color: active ? color : '#666',
+                boxShadow: active ? `0 4px 12px ${color}33` : undefined,
               }}
             >
               {year}
@@ -316,15 +360,15 @@ function YearComparisonChart({
       <div className="h-52 -mx-2">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+            <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
             <XAxis
               dataKey="month"
-              tick={{ fontSize: 10, fill: '#666' }}
+              tick={{ fontSize: 10, fill: tickFill }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              tick={{ fontSize: 10, fill: '#666' }}
+              tick={{ fontSize: 10, fill: tickFill }}
               tickLine={false}
               axisLine={false}
               tickFormatter={(v) => fmtCurrencyCompact(v)}
@@ -333,20 +377,29 @@ function YearComparisonChart({
             <Tooltip content={<ChartTooltip />} />
             {years
               .filter((y) => activeYears.has(y))
-              .map((year) => (
-                <Line
-                  key={year}
-                  type="monotone"
-                  dataKey={year}
-                  name={year}
-                  stroke={yearColors[years.indexOf(year) % yearColors.length]}
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, strokeWidth: 2 }}
-                  connectNulls
-                  animationDuration={800}
-                />
-              ))}
+              .map((year) => {
+                const lineColor = yearColors[years.indexOf(year) % yearColors.length];
+                return (
+                  <Line
+                    key={year}
+                    type="monotone"
+                    dataKey={year}
+                    name={year}
+                    stroke={lineColor}
+                    strokeWidth={2.5}
+                    dot={{ r: 2.5, fill: lineColor, strokeWidth: 0 }}
+                    activeDot={{
+                      r: 5,
+                      fill: lineColor,
+                      stroke: lineColor,
+                      strokeWidth: 2,
+                      strokeOpacity: 0.3,
+                    }}
+                    connectNulls
+                    animationDuration={800}
+                  />
+                );
+              })}
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -365,9 +418,11 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
     fill: d.color ?? chartColors[i % chartColors.length],
   }));
 
+  const total = useMemo(() => pieData.reduce((s, d) => s + d.amount, 0), [pieData]);
+
   return (
     <div className="flex items-center gap-4">
-      <div className="w-36 h-36 shrink-0">
+      <div className="relative w-36 h-36 shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -376,9 +431,9 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
               nameKey="name"
               cx="50%"
               cy="50%"
-              innerRadius={35}
-              outerRadius={60}
-              paddingAngle={2}
+              innerRadius={42}
+              outerRadius={66}
+              paddingAngle={4}
               animationDuration={800}
               onMouseEnter={(_, i) => setActiveIndex(i)}
               onMouseLeave={() => setActiveIndex(null)}
@@ -389,12 +444,26 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
                   fill={d.fill}
                   stroke="transparent"
                   opacity={activeIndex === null || activeIndex === i ? 1 : 0.4}
-                  style={{ transition: 'opacity 0.2s' }}
+                  style={{
+                    transition: 'opacity 0.2s, filter 0.2s',
+                    filter:
+                      activeIndex === i
+                        ? `drop-shadow(0 4px 12px ${d.fill}59)`
+                        : undefined,
+                  }}
                 />
               ))}
             </Pie>
           </PieChart>
         </ResponsiveContainer>
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span className="text-text-muted text-[9px] font-semibold uppercase tracking-wider">
+            Totale
+          </span>
+          <span className="text-sm font-bold tabular-nums text-text-primary leading-none mt-0.5">
+            {fmtCurrencyCompact(total)}
+          </span>
+        </div>
       </div>
 
       {/* Legend */}
@@ -431,6 +500,11 @@ function IncomeBarChart({
   lang: string;
 }) {
   const chartColors = chartPalette();
+  const tickFill = useMemo(() => readVar('--color-text-muted', '#7a7a8a'), []);
+  const gridStroke = useMemo(
+    () => readVar('--color-border-default', 'rgba(255,255,255,0.08)'),
+    [],
+  );
   // Collect all source names
   const allSources = useMemo(() => {
     const set = new Set<string>();
@@ -454,35 +528,51 @@ function IncomeBarChart({
 
   if (allSources.length === 0) return null;
 
+  const onlyOne = allSources.length === 1;
+
   return (
     <div className="h-52 -mx-2">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+        <BarChart
+          data={chartData}
+          margin={{ top: 4, right: 4, left: 0, bottom: 0 }}
+          barCategoryGap="22%"
+          barGap={0}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 10, fill: '#666' }}
+            tick={{ fontSize: 10, fill: tickFill }}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            tick={{ fontSize: 10, fill: '#666' }}
+            tick={{ fontSize: 10, fill: tickFill }}
             tickLine={false}
             axisLine={false}
             tickFormatter={(v) => fmtCurrencyCompact(v)}
             width={55}
           />
-          <Tooltip content={<ChartTooltip />} />
-          {allSources.map((name, i) => (
-            <Bar
-              key={name}
-              dataKey={name}
-              stackId="income"
-              fill={chartColors[i % chartColors.length]}
-              radius={i === allSources.length - 1 ? [3, 3, 0, 0] : [0, 0, 0, 0]}
-              animationDuration={800}
-            />
-          ))}
+          <Tooltip content={<ChartTooltip />} cursor={{ fill: gridStroke, opacity: 0.4 }} />
+          {allSources.map((name, i) => {
+            // Round both top and bottom when there is a single segment;
+            // otherwise round only the top of the last (top-most) stack.
+            const radius: [number, number, number, number] = onlyOne
+              ? [6, 6, 6, 6]
+              : i === allSources.length - 1
+                ? [6, 6, 0, 0]
+                : [0, 0, 0, 0];
+            return (
+              <Bar
+                key={name}
+                dataKey={name}
+                stackId="income"
+                fill={chartColors[i % chartColors.length]}
+                radius={radius}
+                animationDuration={800}
+              />
+            );
+          })}
         </BarChart>
       </ResponsiveContainer>
     </div>
