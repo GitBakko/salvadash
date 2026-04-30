@@ -83,6 +83,7 @@ export function useUpdateAccount() {
       name?: string;
       type?: 'MAIN' | 'SUB';
       icon?: string;
+      iconUrl?: string | null;
       color?: string;
       isActive?: boolean;
     }) => {
@@ -111,6 +112,52 @@ export function useReorderAccounts() {
     mutationFn: async (accounts: { id: string; sortOrder: number }[]) => {
       const res = await api.put('/accounts/reorder', { accounts });
       if (!res.success) throw new Error(res.error ?? 'Failed to reorder');
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.accounts }),
+  });
+}
+
+// ─── Account logo (Brandfetch) ─────────────────────────────
+
+import type { SearchResult } from '../components/AccountLogoPicker';
+
+export function useSearchLogo(query: string) {
+  return useQuery({
+    queryKey: ['logo-search', query] as const,
+    queryFn: async () => {
+      const res = await api.get<SearchResult[]>(
+        `/accounts/search-logo?q=${encodeURIComponent(query)}`,
+      );
+      if (!res.success) throw new Error(res.error ?? 'Search failed');
+      return res.data ?? [];
+    },
+    enabled: query.trim().length >= 2,
+    staleTime: 60_000,
+    retry: false,
+  });
+}
+
+export function useImportLogo() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { accountId: string; iconUrl: string }) => {
+      const res = await api.post<{ iconUrl: string; color: string }>(
+        '/accounts/import-logo',
+        input,
+      );
+      if (!res.success) throw new Error(res.error ?? 'Import failed');
+      return res.data!;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.accounts }),
+  });
+}
+
+export function useDeleteAccountIcon() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (accountId: string) => {
+      const res = await api.delete(`/accounts/${accountId}/icon`);
+      if (!res.success) throw new Error(res.error ?? 'Failed to clear icon');
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.accounts }),
   });

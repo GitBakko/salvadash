@@ -100,7 +100,19 @@
     "active": "Active",
     "inactive": "Inactive",
     "deleteConfirm": "Are you sure you want to delete this account?",
-    "hasEntries": "This account has entries: it will be deactivated."
+    "hasEntries": "This account has entries: it will be deactivated.",
+    "logo": "Logo",
+    "logoSearch": "Search logo",
+    "logoChange": "Change logo",
+    "logoClear": "Remove logo",
+    "logoSearchPlaceholder": "Search by name...",
+    "logoNoResults": "No results. Try another name.",
+    "logoSearchError": "Search error",
+    "logoImportError": "Import failed",
+    "logoNoteImage": "Image replaces the icon",
+    "logoAfterSave": "Save the account, then come back to choose a logo.",
+    "logoAutoColor": "Color auto-set from logo",
+    "logoMatchScore": "{{score}}% match"
   },
   "entries": {
     "title": "Entry History",

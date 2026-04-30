@@ -8,6 +8,7 @@ import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { AccountIcon } from './AccountIcon';
+import { AccountLogoPicker } from './AccountLogoPicker';
 
 const COLOR_OPTIONS = [
   '#3DDC97',
@@ -56,8 +57,11 @@ export function AccountFormModal({ account, onClose }: Props) {
   const [name, setName] = useState(account?.name ?? '');
   const [type, setType] = useState<'MAIN' | 'SUB'>(account?.type ?? 'MAIN');
   const [icon, setIcon] = useState(account?.icon ?? 'account_balance');
+  const [iconUrl, setIconUrl] = useState<string | null>(account?.iconUrl ?? null);
   const [color, setColor] = useState(account?.color ?? COLOR_OPTIONS[0]);
   const [error, setError] = useState('');
+
+  const hasLogo = !!iconUrl;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -70,8 +74,16 @@ export function AccountFormModal({ account, onClose }: Props) {
 
     try {
       if (isEditing) {
-        await updateAccount.mutateAsync({ id: account.id, name: name.trim(), type, icon, color });
+        await updateAccount.mutateAsync({
+          id: account.id,
+          name: name.trim(),
+          type,
+          icon,
+          iconUrl,
+          color,
+        });
       } else {
+        // Create flow: no logo yet — picker is disabled until first save.
         await createAccount.mutateAsync({ name: name.trim(), type, icon, color });
       }
       addToast({ type: 'success', message: t('common.success') });
@@ -128,8 +140,19 @@ export function AccountFormModal({ account, onClose }: Props) {
           </div>
         </div>
 
-        {/* Icon selector — Material Symbols (stored in DB) */}
-        <div className="space-y-2">
+        {/* Logo picker — Brandfetch search (editing only) */}
+        <AccountLogoPicker
+          accountId={account?.id ?? null}
+          initialName={name || account?.name || ''}
+          iconUrl={iconUrl}
+          onIconChange={(url, c) => {
+            setIconUrl(url);
+            if (c) setColor(c);
+          }}
+        />
+
+        {/* Icon selector — Material Symbols (manual fallback). De-emphasized when logo is set. */}
+        <div className={`space-y-2 ${hasLogo ? 'opacity-60' : ''}`}>
           <label className="text-sm font-medium text-text-secondary">Icona</label>
           <div className="grid grid-cols-6 gap-2">
             {ICON_OPTIONS.map((ic) => (
@@ -143,12 +166,7 @@ export function AccountFormModal({ account, onClose }: Props) {
                     : 'bg-surface-elevated text-text-secondary border border-transparent hover:border-border-default'
                 }`}
               >
-                <AccountIcon
-                  icon={ic}
-                  name={ic}
-                  size={28}
-                  color={icon === ic ? color : null}
-                />
+                <AccountIcon icon={ic} name={ic} size={28} color={icon === ic ? color : null} />
               </button>
             ))}
           </div>

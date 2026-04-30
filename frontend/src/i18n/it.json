@@ -100,7 +100,19 @@
     "active": "Attivo",
     "inactive": "Inattivo",
     "deleteConfirm": "Sei sicuro di voler eliminare questo conto?",
-    "hasEntries": "Questo conto ha rilevazioni: verrà disattivato."
+    "hasEntries": "Questo conto ha rilevazioni: verrà disattivato.",
+    "logo": "Logo",
+    "logoSearch": "Cerca logo",
+    "logoChange": "Cambia logo",
+    "logoClear": "Rimuovi logo",
+    "logoSearchPlaceholder": "Cerca per nome...",
+    "logoNoResults": "Nessun risultato. Prova un altro nome.",
+    "logoSearchError": "Errore di ricerca",
+    "logoImportError": "Errore durante l'importazione",
+    "logoNoteImage": "L'immagine sostituisce l'icona",
+    "logoAfterSave": "Salva il conto, poi torna qui per scegliere un logo.",
+    "logoAutoColor": "Colore aggiornato dal logo",
+    "logoMatchScore": "{{score}}% match"
   },
   "entries": {
     "title": "Storico Rilevazioni",
