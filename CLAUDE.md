@@ -86,6 +86,14 @@ Prod: `pm2 start backend/ecosystem.config.json`; IIS reverse-proxy `/api`,`/uplo
 
 **Currently running in prod:** check `/api/health` or footer version badge. Upgrade procedure per release in `dist-release/<version>/UPGRADE-<version>.md`.
 
+### Prod deploy gotchas (CRITICAL — read before packaging a release)
+
+1. **Frontend goes to `frontend\`, NOT `frontend\dist\`.** In prod, IIS site root is `E:\www\salvadash\frontend\` directly — `index.html`, `assets/`, `sw.js` sit there. The dev `frontend/dist/` content must be **flattened** into the release `frontend/` folder. Shipping `frontend/dist/index.html` instead of `frontend/index.html` causes 404/500 because IIS can't find the entry point.
+
+2. **NEVER ship `frontend/web.config` in the release package.** Prod has its own minimal working config (3 rewrite rules: API proxy, uploads proxy, SPA fallback). The dev template `web.config` adds `<outboundRules>` referencing `RESPONSE_Cache-Control` which is NOT registered in IIS `allowedServerVariables` → every request returns 500. Compression / custom headers / static MIME blocks also reference modules that may not be installed. Override them only when an upgrade explicitly requires a config change, and document that as a separate manual step.
+
+3. The dev `dist-release/` packaging script needs to be aware of #1 and #2. Re-validate any time the release flow is touched.
+
 ## Conventions / gotchas
 
 - Routes import Prisma client from `../generated/prisma/client.js` (Prisma 7 ESM output, post-build script `fix-prisma-esm.mjs`). Adapter `PrismaPg` strips `?schema=` before passing URL to `pg`.

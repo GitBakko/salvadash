@@ -53,27 +53,35 @@ L'ambiente prod attivo è così configurato:
 
 ### File di build necessari
 
-Dalla macchina di sviluppo servono:
+Dalla macchina di sviluppo servono (layout del pacchetto release, NON quello di sviluppo):
 
-```
+```text
 salvadash/
 ├── package.json                    ← Root workspace (per pnpm)
 ├── pnpm-workspace.yaml             ← Configurazione workspace
 ├── pnpm-lock.yaml                  ← Lock file dipendenze
-├── frontend/dist/                  ← Build frontend (file statici)
-├── frontend/web.config             ← Configurazione IIS per SPA + proxy
-├── backend/dist/                   ← Build backend (JS compilato)
+├── frontend/                       ← FLATTENED: index.html, assets/, sw.js direttamente qui
+│   ├── index.html
+│   ├── assets/
+│   ├── sw.js
+│   ├── workbox-*.js
+│   └── manifest.webmanifest
+├── backend/dist/                   ← Build backend (JS compilato — sì, in dist/)
 ├── backend/package.json            ← Per pnpm install sul server
 ├── backend/prisma/                 ← Schema e migrazioni Prisma
 ├── backend/prisma.config.ts        ← Configurazione Prisma 7
-├── backend/.env                    ← Configurazione ambiente (DA CREARE SUL SERVER)
 ├── backend/ecosystem.config.json   ← Configurazione PM2
 ├── shared/dist/                    ← Codice condiviso compilato
 └── shared/package.json             ← Package condiviso
 ```
 
-> **IMPORTANTE**: Il pacchetto `shared` ora viene compilato (`shared/dist/`).
-> Non serve più copiare `shared/src/`.
+> **CRITICO #1 — Frontend asimmetrico rispetto a backend.** In prod IIS punta a `E:\www\salvadash\frontend\` come document root. `index.html` deve stare DIRETTAMENTE lì, NON in `frontend/dist/index.html`. Quando crei il pacchetto release, **appiattisci** il contenuto di `frontend/dist/` (build Vite) dentro `frontend/` del pacchetto. Backend invece mantiene `backend/dist/` perché PM2 esegue `dist/index.js`.
+>
+> **CRITICO #2 — NON includere `frontend/web.config` nel pacchetto release.** Prod ha il suo `web.config` minimo funzionante (3 rewrite rules: API proxy, uploads proxy, SPA fallback). Sostituirlo con quello dev causa 500 su tutte le richieste perché `<outboundRules>` referenzia `RESPONSE_Cache-Control` non registrato in IIS `allowedServerVariables`, e `<httpCompression>`/`<httpProtocol>` referenziano moduli che potrebbero non essere installati. Solo se un upgrade richiede esplicitamente una modifica config, documentala come step manuale separato nella guida UPGRADE.
+>
+> **CRITICO #3 — `backend/.env` NON nel pacchetto.** Si crea una sola volta sul server al primo deploy. Eventuali nuove env vars vanno comunicate nella guida UPGRADE come step manuale (es. `BRANDFETCH_API_KEY` aggiunta in 1.2.0).
+>
+> **NOTA**: Il pacchetto `shared` viene compilato (`shared/dist/`). Non serve più copiare `shared/src/`.
 
 ---
 
