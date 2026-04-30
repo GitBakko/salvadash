@@ -78,7 +78,7 @@ function ReleaseHistoryPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + idx * 0.05 }}
-            className="glass-card p-4 space-y-3"
+            className="solid-card p-4 space-y-3"
           >
             <div className="flex items-center justify-between">
               <h2 className="font-heading font-semibold">v{entry.version}</h2>

@@ -55,7 +55,7 @@ function ResetPasswordPage() {
   if (!token) {
     return (
       <div className="min-h-dvh flex items-center justify-center p-4">
-        <div className="w-full max-w-sm glass-card p-6 text-center space-y-4">
+        <div className="w-full max-w-sm solid-card p-6 text-center space-y-4">
           <AlertCircle size={48} strokeWidth={1.5} className="text-negative mx-auto" />
           <p className="text-text-secondary text-sm">{t('auth.invalidResetLink')}</p>
           <Link to="/forgot-password">
@@ -75,7 +75,7 @@ function ResetPasswordPage() {
           <h1 className="font-heading text-2xl font-bold text-brand mt-2">{t('common.appName')}</h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="solid-card p-6 space-y-4">
           <h2 className="font-heading text-lg font-semibold text-center">
             {t('auth.resetPassword')}
           </h2>

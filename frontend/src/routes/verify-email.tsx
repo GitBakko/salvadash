@@ -69,7 +69,7 @@ function VerifyEmailPage() {
           <h1 className="font-heading text-2xl font-bold text-brand mt-2">{t('common.appName')}</h1>
         </div>
 
-        <div className="glass-card p-6 space-y-6 text-center">
+        <div className="solid-card p-6 space-y-6 text-center">
           {/* Verification success */}
           {status === 'success' && (
             <>

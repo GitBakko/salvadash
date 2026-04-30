@@ -42,7 +42,7 @@ function ForgotPasswordPage() {
           <h1 className="font-heading text-2xl font-bold text-brand mt-2">{t('common.appName')}</h1>
         </div>
 
-        <div className="glass-card p-6 space-y-4">
+        <div className="solid-card p-6 space-y-4">
           <h2 className="font-heading text-lg font-semibold text-center">
             {t('auth.forgotPassword')}
           </h2>

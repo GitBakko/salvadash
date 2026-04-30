@@ -137,7 +137,7 @@ function HeroCard({
     <motion.div
       initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-6 text-center relative overflow-hidden"
+      className="solid-card p-6 text-center relative overflow-hidden"
     >
       <p className="text-text-secondary text-sm font-medium relative">
         {t('dashboard.currentTotal')}
@@ -267,7 +267,7 @@ function SparklineCard({ data }: { data: number[] }) {
       initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="glass-card p-4 overflow-hidden"
+      className="solid-card p-4 overflow-hidden"
     >
       <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">Trend 12 mesi</p>
       <MiniSparkline values={data} className="w-full h-20" ariaLabel="Trend 12 mesi" />

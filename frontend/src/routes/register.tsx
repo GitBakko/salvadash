@@ -63,7 +63,7 @@ function RegisterPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="solid-card p-6 space-y-4">
           <h2 className="font-heading text-lg font-semibold text-center">{t('auth.register')}</h2>
 
           {error && (

@@ -39,7 +39,7 @@ export const Route = createLazyFileRoute('/analytics')({
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="glass-card p-2 text-xs border border-border-default shadow-lg">
+    <div className="solid-card p-2 text-xs border border-border-default shadow-lg">
       <p className="text-text-muted mb-1">{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} style={{ color: p.color }} className="font-semibold">

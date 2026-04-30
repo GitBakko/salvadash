@@ -36,7 +36,7 @@ function ToastItem({ toast }: { toast: ToastType }) {
       initial={{ opacity: 0, y: -20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
-      className="glass-card px-4 py-3 flex items-center gap-3 shadow-xl max-w-sm w-full"
+      className="solid-card px-4 py-3 flex items-center gap-3 shadow-xl max-w-sm w-full"
     >
       <Icon size={22} className={colorMap[toast.type]} />
       <p className="text-sm text-text-primary flex-1">{toast.message}</p>

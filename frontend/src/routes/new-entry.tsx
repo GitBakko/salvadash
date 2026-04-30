@@ -384,7 +384,7 @@ function NewEntryPage() {
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="fixed bottom-0 inset-x-0 glass-card border-t border-border-default p-4"
+          className="fixed bottom-0 inset-x-0 solid-card border-t border-border-default p-4"
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
         >
           <div className="max-w-lg mx-auto">

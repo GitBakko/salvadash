@@ -40,7 +40,7 @@ export function PWAUpdatePrompt() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -80, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed top-0 inset-x-0 z-[100] glass-card border-b border-border-default p-4"
+          className="fixed top-0 inset-x-0 z-[100] solid-card border-b border-border-default p-4"
           style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)' }}
         >
           <div className="flex items-center gap-3 max-w-lg mx-auto">
