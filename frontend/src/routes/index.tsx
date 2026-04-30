@@ -20,6 +20,7 @@ import { formatMonthShort, formatMonthLong } from '../lib/intl';
 import { Lightbulb, TrendingUp, TrendingDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AccountIcon } from '../components/AccountIcon';
+import { YearPills } from '../components/YearPills';
 import { brandColor } from '../lib/theme-vars';
 
 export const Route = createFileRoute('/')({
@@ -53,21 +54,7 @@ function DashboardPage() {
     <div className="p-4 max-w-lg mx-auto space-y-4">
       <h1 className="sr-only">{t('nav.home')}</h1>
       {/* Year selector pills */}
-      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-        {years.map((y) => (
-          <button
-            key={y}
-            onClick={() => setYear(y)}
-            className={`shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-sm font-medium transition-all ${
-              year === y
-                ? 'bg-brand text-surface-base'
-                : 'bg-surface-elevated text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            {y}
-          </button>
-        ))}
-      </div>
+      <YearPills years={years} active={year} onChange={(y) => setYear(y as string)} />
 
       {/* Hero KPI */}
       <HeroCard data={data} t={t} />
