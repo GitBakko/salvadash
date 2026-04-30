@@ -143,7 +143,12 @@ export function AccountFormModal({ account, onClose }: Props) {
                     : 'bg-surface-elevated text-text-secondary border border-transparent hover:border-border-default'
                 }`}
               >
-                <AccountIcon name={ic} size={20} />
+                <AccountIcon
+                  icon={ic}
+                  name={ic}
+                  size={28}
+                  color={icon === ic ? color : null}
+                />
               </button>
             ))}
           </div>

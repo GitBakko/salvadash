@@ -251,9 +251,11 @@ function NewEntryPage() {
                     {/* Account indicator — DB-driven icon, mapped to lucide via AccountIcon */}
                     <div className="flex items-center gap-2 min-w-0 w-28 shrink-0">
                       <AccountIcon
-                        name={account.icon}
-                        size={18}
-                        color={account.color ?? 'var(--color-brand)'}
+                        iconUrl={account.iconUrl}
+                        icon={account.icon}
+                        name={account.name}
+                        size={24}
+                        color={account.color}
                       />
                       <span className="text-sm text-text-secondary truncate">{account.name}</span>
                     </div>

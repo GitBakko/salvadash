@@ -76,7 +76,8 @@ export function AccountFilterBar({ accounts, selected, onChange }: AccountFilter
             <FilterChip
               key={account.id}
               label={account.name}
-              materialIcon={account.icon}
+              accountIcon={account.icon}
+              accountIconUrl={account.iconUrl}
               color={account.color}
               active={active}
               onClick={() => toggle(account.id)}
@@ -92,7 +93,8 @@ export function AccountFilterBar({ accounts, selected, onChange }: AccountFilter
 interface FilterChipProps {
   label: string;
   icon?: React.ReactNode;
-  materialIcon?: string | null;
+  accountIcon?: string | null;
+  accountIconUrl?: string | null;
   color: string | null;
   active: boolean;
   onClick: () => void;
@@ -102,7 +104,8 @@ interface FilterChipProps {
 function FilterChip({
   label,
   icon,
-  materialIcon,
+  accountIcon,
+  accountIconUrl,
   color,
   active,
   onClick,
@@ -123,14 +126,16 @@ function FilterChip({
       }}
     >
       {icon}
-      {!icon && materialIcon && (
+      {!icon && (accountIconUrl || accountIcon) && (
         <AccountIcon
-          name={materialIcon}
-          size={16}
-          color={active ? accent : 'var(--color-text-secondary)'}
+          iconUrl={accountIconUrl}
+          icon={accountIcon}
+          name={label}
+          size={20}
+          color={active ? accent : null}
         />
       )}
-      {!icon && !materialIcon && color && (
+      {!icon && !accountIconUrl && !accountIcon && color && (
         <span
           className="w-2 h-2 rounded-full"
           style={{ backgroundColor: accent }}
