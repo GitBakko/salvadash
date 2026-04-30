@@ -82,7 +82,7 @@ function AnalyticsPage() {
   // No data at all (no entries yet) — keep original empty state
   if (!data || data.patrimonyOverTime.length < 2) {
     return (
-      <div className="p-4 max-w-lg mx-auto">
+      <div className="p-4 mx-auto" style={{ maxWidth: 'min(96vw, 1100px)' }}>
         <h1 className="font-heading text-2xl font-bold mb-4">{t('analytics.title')}</h1>
         <motion.div
           initial={reducedMotion ? false : { opacity: 0, y: 20 }}
@@ -97,7 +97,7 @@ function AnalyticsPage() {
   }
 
   return (
-    <div className="p-4 max-w-lg mx-auto">
+    <div className="p-4 mx-auto" style={{ maxWidth: 'min(96vw, 1100px)' }}>
       <h1 className="font-heading text-2xl font-bold mb-3">{t('analytics.title')}</h1>
 
       <AccountFilterBar
@@ -137,35 +137,41 @@ function AnalyticsPage() {
           </button>
         </motion.div>
       ) : (
-        <div className="space-y-5 mt-4">
-          {/* Patrimony over time — AreaChart */}
-          <ChartSection title={t('analytics.patrimony')} delay={0}>
-            <PatrimonyChart data={data.patrimonyOverTime} lang={i18n.language} />
-          </ChartSection>
-
-          {/* Year comparison — LineChart */}
-          <ChartSection title={t('analytics.yearComparison')} delay={0.05}>
-            <YearComparisonChart data={data.yearComparison} lang={i18n.language} />
-          </ChartSection>
-
-          {/* Account breakdown — PieChart. Hidden when exactly 1 account selected (a single 100% slice is not informative). */}
-          {data.accountBreakdown.length > 0 && selectedAccountIds.length !== 1 && (
-            <ChartSection title={t('analytics.accountBreakdown')} delay={0.1}>
-              <AccountPieChart data={data.accountBreakdown} />
+        <div className="@container">
+          <div className="space-y-5 mt-4 @md:space-y-0 @md:grid @md:grid-cols-2 @md:gap-4">
+            {/* Patrimony over time — AreaChart */}
+            <ChartSection title={t('analytics.patrimony')} delay={0}>
+              <PatrimonyChart data={data.patrimonyOverTime} lang={i18n.language} />
             </ChartSection>
-          )}
 
-          {/* Income by source — BarChart (income is not account-bound, shown unfiltered) */}
-          {data.monthlyIncome.length > 0 && (
-            <ChartSection title={t('analytics.incomeBySource')} delay={0.15}>
-              <IncomeBarChart data={data.monthlyIncome} lang={i18n.language} />
+            {/* Year comparison — LineChart */}
+            <ChartSection title={t('analytics.yearComparison')} delay={0.05}>
+              <YearComparisonChart data={data.yearComparison} lang={i18n.language} />
             </ChartSection>
-          )}
 
-          {/* Performance section */}
-          <ChartSection title={t('analytics.performance')} delay={0.2}>
-            <PerformanceGrid data={data} t={t} lang={i18n.language} />
-          </ChartSection>
+            {/* Account breakdown — PieChart. Hidden when exactly 1 account selected (a single 100% slice is not informative). */}
+            {data.accountBreakdown.length > 0 && selectedAccountIds.length !== 1 && (
+              <ChartSection title={t('analytics.accountBreakdown')} delay={0.1}>
+                <AccountPieChart data={data.accountBreakdown} />
+              </ChartSection>
+            )}
+
+            {/* Income by source — BarChart (income is not account-bound, shown unfiltered) */}
+            {data.monthlyIncome.length > 0 && (
+              <ChartSection title={t('analytics.incomeBySource')} delay={0.15}>
+                <IncomeBarChart data={data.monthlyIncome} lang={i18n.language} />
+              </ChartSection>
+            )}
+
+            {/* Performance section — full width at md+ */}
+            <ChartSection
+              title={t('analytics.performance')}
+              delay={0.2}
+              className="@md:col-span-2"
+            >
+              <PerformanceGrid data={data} t={t} lang={i18n.language} />
+            </ChartSection>
+          </div>
         </div>
       )}
     </div>
@@ -217,10 +223,12 @@ function ChartSection({
   title,
   delay,
   children,
+  className,
 }: {
   title: string;
   delay: number;
   children: React.ReactNode;
+  className?: string;
 }) {
   const reducedMotion = usePrefersReducedMotion();
   return (
@@ -228,6 +236,7 @@ function ChartSection({
       initial={reducedMotion ? false : { opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
+      className={className}
     >
       <Card className="p-4 overflow-hidden">
         <div className="flex items-center gap-2 mb-3">
@@ -735,7 +744,7 @@ function PerformanceGrid({
 
 function AnalyticsSkeleton() {
   return (
-    <div className="p-4 max-w-lg mx-auto space-y-5">
+    <div className="p-4 mx-auto space-y-5" style={{ maxWidth: 'min(96vw, 1100px)' }}>
       <Skeleton className="h-8 w-32" />
       {Array.from({ length: 4 }).map((_, i) => (
         <Skeleton key={i} className="h-64 w-full rounded-xl" />

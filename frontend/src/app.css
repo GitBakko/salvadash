@@ -246,3 +246,26 @@ html.light .hero-amount {
   color: var(--color-brand);
   text-shadow: none;
 }
+
+/* ─── Native date picker — honor theme ─────────────────── */
+input[type='date'],
+input[type='datetime-local'],
+input[type='time'] {
+  color-scheme: dark;
+}
+html.light input[type='date'],
+html.light input[type='datetime-local'],
+html.light input[type='time'] {
+  color-scheme: light;
+}
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='datetime-local']::-webkit-calendar-picker-indicator,
+input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(0.65);
+  cursor: pointer;
+}
+html.light input[type='date']::-webkit-calendar-picker-indicator,
+html.light input[type='datetime-local']::-webkit-calendar-picker-indicator,
+html.light input[type='time']::-webkit-calendar-picker-indicator {
+  filter: none;
+}

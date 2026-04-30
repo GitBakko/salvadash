@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
 import { Reorder, AnimatePresence, useDragControls, motion } from 'framer-motion';
@@ -9,6 +9,7 @@ import {
   useUpdateAccount,
   useReorderAccounts,
 } from '../hooks/queries';
+import { useMediaQuery } from '../hooks/use-media-query';
 import { useUIStore } from '../stores/ui-store';
 import { Button, Card, Skeleton, Toggle } from '../components/ui';
 import { AccountFormModal } from '../components/AccountFormModal';
@@ -49,6 +50,8 @@ function getAccountColor(account: AccountPublic, index: number): string {
 
 function AccountsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isDesktop = useMediaQuery('(min-width: 768px)');
   const { data: accounts, isLoading } = useAccounts();
   const deleteAccount = useDeleteAccount();
   const updateAccount = useUpdateAccount();
@@ -142,13 +145,21 @@ function AccountsPage() {
   }
 
   function openEdit(account: AccountPublic) {
-    setEditingAccount(account);
-    setShowForm(true);
+    if (isDesktop) {
+      setEditingAccount(account);
+      setShowForm(true);
+    } else {
+      navigate({ to: '/accounts/$id/edit', params: { id: account.id } });
+    }
   }
 
   function openCreate() {
-    setEditingAccount(null);
-    setShowForm(true);
+    if (isDesktop) {
+      setEditingAccount(null);
+      setShowForm(true);
+    } else {
+      navigate({ to: '/accounts/new' });
+    }
   }
 
   // ─── Loading ───────────────────────────────────────────────

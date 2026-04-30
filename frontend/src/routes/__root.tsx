@@ -23,7 +23,9 @@ export const Route = createRootRoute({
 
 // Auth pages that don't need the shell
 const AUTH_PATHS = ['/login', '/register', '/forgot-password', '/verify-email', '/reset-password'];
-const FULLSCREEN_PATHS = ['/new-entry'];
+const FULLSCREEN_PATHS = ['/new-entry', '/accounts/new'];
+// Matches `/accounts/{id}/edit` for the mobile full-screen edit route.
+const FULLSCREEN_REGEX = /^\/accounts\/[^/]+\/edit$/;
 
 function RootLayout() {
   const { t } = useTranslation();
@@ -31,7 +33,8 @@ function RootLayout() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isAuthPage = AUTH_PATHS.some((p) => pathname.startsWith(p));
-  const isFullscreen = FULLSCREEN_PATHS.some((p) => pathname.startsWith(p));
+  const isFullscreen =
+    FULLSCREEN_PATHS.some((p) => pathname.startsWith(p)) || FULLSCREEN_REGEX.test(pathname);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
 

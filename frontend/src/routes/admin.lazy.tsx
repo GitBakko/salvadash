@@ -102,7 +102,7 @@ function AdminPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
+    <div className="mx-auto px-4 py-6 space-y-6" style={{ maxWidth: 'min(96vw, 1100px)' }}>
       {/* Title */}
       <motion.h1
         initial={{ opacity: 0, y: -10 }}

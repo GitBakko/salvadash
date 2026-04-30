@@ -22,6 +22,8 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AccountsNewRouteImport } from './routes/accounts/new'
+import { Route as AccountsIdEditRouteImport } from './routes/accounts/$id/edit'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -88,10 +90,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountsNewRoute = AccountsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AccountsRoute,
+} as any)
+const AccountsIdEditRoute = AccountsIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AccountsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/accounts': typeof AccountsRoute
+  '/accounts': typeof AccountsRouteWithChildren
   '/admin': typeof AdminRoute
   '/analytics': typeof AnalyticsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -103,10 +115,12 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/accounts/new': typeof AccountsNewRoute
+  '/accounts/$id/edit': typeof AccountsIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/accounts': typeof AccountsRoute
+  '/accounts': typeof AccountsRouteWithChildren
   '/admin': typeof AdminRoute
   '/analytics': typeof AnalyticsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -118,11 +132,13 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/accounts/new': typeof AccountsNewRoute
+  '/accounts/$id/edit': typeof AccountsIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/accounts': typeof AccountsRoute
+  '/accounts': typeof AccountsRouteWithChildren
   '/admin': typeof AdminRoute
   '/analytics': typeof AnalyticsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -134,6 +150,8 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/settings': typeof SettingsRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/accounts/new': typeof AccountsNewRoute
+  '/accounts/$id/edit': typeof AccountsIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +169,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/settings'
     | '/verify-email'
+    | '/accounts/new'
+    | '/accounts/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,6 +186,8 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/settings'
     | '/verify-email'
+    | '/accounts/new'
+    | '/accounts/$id/edit'
   id:
     | '__root__'
     | '/'
@@ -181,11 +203,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/settings'
     | '/verify-email'
+    | '/accounts/new'
+    | '/accounts/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AccountsRoute: typeof AccountsRoute
+  AccountsRoute: typeof AccountsRouteWithChildren
   AdminRoute: typeof AdminRoute
   AnalyticsRoute: typeof AnalyticsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -292,12 +316,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accounts/new': {
+      id: '/accounts/new'
+      path: '/new'
+      fullPath: '/accounts/new'
+      preLoaderRoute: typeof AccountsNewRouteImport
+      parentRoute: typeof AccountsRoute
+    }
+    '/accounts/$id/edit': {
+      id: '/accounts/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/accounts/$id/edit'
+      preLoaderRoute: typeof AccountsIdEditRouteImport
+      parentRoute: typeof AccountsRoute
+    }
   }
 }
 
+interface AccountsRouteChildren {
+  AccountsNewRoute: typeof AccountsNewRoute
+  AccountsIdEditRoute: typeof AccountsIdEditRoute
+}
+
+const AccountsRouteChildren: AccountsRouteChildren = {
+  AccountsNewRoute: AccountsNewRoute,
+  AccountsIdEditRoute: AccountsIdEditRoute,
+}
+
+const AccountsRouteWithChildren = AccountsRoute._addFileChildren(
+  AccountsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AccountsRoute: AccountsRoute,
+  AccountsRoute: AccountsRouteWithChildren,
   AdminRoute: AdminRoute,
   AnalyticsRoute: AnalyticsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
