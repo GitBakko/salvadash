@@ -9,7 +9,13 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    TanStackRouterVite(),
+    TanStackRouterVite({
+      // Ignore compiled .js/.d.ts artifacts that tsc -b emits alongside sources.
+      // Without this, the generator chokes on .d.ts files (which export `Route`
+      // as a type, not a CallExpression) and silently skips routeTree regeneration —
+      // breaking lazy-route discovery.
+      routeFileIgnorePattern: '\\.(js|d\\.ts|js\\.map|d\\.ts\\.map)$',
+    }),
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],

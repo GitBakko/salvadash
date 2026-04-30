@@ -11,8 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ReleaseHistoryRouteImport } from './routes/release-history'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ReleaseHistoryRouteImport } from './routes/release-history'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as NewEntryRouteImport } from './routes/new-entry'
 import { Route as LoginRouteImport } from './routes/login'
@@ -32,15 +32,15 @@ const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/settings.lazy').then((d) => d.Route))
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ReleaseHistoryRoute = ReleaseHistoryRouteImport.update({
   id: '/release-history',
   path: '/release-history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -62,7 +62,7 @@ const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/history.lazy').then((d) => d.Route))
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -72,12 +72,12 @@ const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/analytics.lazy').then((d) => d.Route))
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/admin.lazy').then((d) => d.Route))
 const AccountsRoute = AccountsRouteImport.update({
   id: '/accounts',
   path: '/accounts',
@@ -215,18 +215,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/release-history': {
-      id: '/release-history'
-      path: '/release-history'
-      fullPath: '/release-history'
-      preLoaderRoute: typeof ReleaseHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/release-history': {
+      id: '/release-history'
+      path: '/release-history'
+      fullPath: '/release-history'
+      preLoaderRoute: typeof ReleaseHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
