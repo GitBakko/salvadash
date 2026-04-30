@@ -44,6 +44,22 @@
 
   /* ── Layout ────────────────────────────────────────────── */
   --header-height: 3.5rem; /* matches Header py-3 + content */
+
+  /* ── Chart Palette ─────────────────────────────────────── */
+  --color-chart-1: #00d4a0;
+  --color-chart-2: #ffd166;
+  --color-chart-3: #6c63ff;
+  --color-chart-4: #ff6b6b;
+  --color-chart-5: #4ecdc4;
+  --color-chart-6: #45b7d1;
+  --color-chart-7: #f093fb;
+  --color-chart-8: #feca57;
+  --color-year-1: #00d4a0;
+  --color-year-2: #ffd166;
+  --color-year-3: #6c63ff;
+  --color-year-4: #ff6b6b;
+  --color-year-5: #4ecdc4;
+  --color-year-6: #45b7d1;
 }
 
 /* ─── Glass Card Utility ────────────────────────────────── */

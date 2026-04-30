@@ -29,26 +29,11 @@ import { formatMonthShort, formatMonthLong } from '../lib/intl';
 import { BarChart3, TrendingUp, TrendingDown, Gauge, Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { AccountFilterBar } from '../components/AccountFilterBar';
+import { chartPalette, yearPalette, brandColor } from '../lib/theme-vars';
 
 export const Route = createFileRoute('/analytics')({
   component: AnalyticsPage,
 });
-
-// ─── Colors ────────────────────────────────────────────────
-
-const BRAND = '#00d4a0';
-const GOLD = '#ffd166';
-const CHART_COLORS = [
-  '#00d4a0',
-  '#ffd166',
-  '#6c63ff',
-  '#ff6b6b',
-  '#4ecdc4',
-  '#45b7d1',
-  '#f093fb',
-  '#feca57',
-];
-const YEAR_COLORS = ['#00d4a0', '#ffd166', '#6c63ff', '#ff6b6b', '#4ecdc4', '#45b7d1'];
 
 // ─── Custom Tooltip ────────────────────────────────────────
 
@@ -203,6 +188,7 @@ function PatrimonyChart({
   data: AnalyticsData['patrimonyOverTime'];
   lang: string;
 }) {
+  const brand = brandColor();
   const chartData = data.map((d) => ({ ...d, label: formatMonthShort(d.date, lang) }));
 
   return (
@@ -211,8 +197,8 @@ function PatrimonyChart({
         <AreaChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="patrimGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={BRAND} stopOpacity={0.35} />
-              <stop offset="100%" stopColor={BRAND} stopOpacity={0} />
+              <stop offset="0%" stopColor={brand} stopOpacity={0.35} />
+              <stop offset="100%" stopColor={brand} stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
@@ -234,12 +220,12 @@ function PatrimonyChart({
             type="monotone"
             dataKey="total"
             name="Patrimonio"
-            stroke={BRAND}
+            stroke={brand}
             strokeWidth={2}
             fill="url(#patrimGrad)"
             animationDuration={1200}
             dot={false}
-            activeDot={{ r: 4, fill: BRAND, stroke: '#0a0a0f', strokeWidth: 2 }}
+            activeDot={{ r: 4, fill: brand, stroke: '#0a0a0f', strokeWidth: 2 }}
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -257,6 +243,7 @@ function YearComparisonChart({
   lang: string;
 }) {
   const { t } = useTranslation();
+  const yearColors = yearPalette();
   const years = Object.keys(data).sort();
   const [activeYears, setActiveYears] = useState<Set<string>>(() => {
     // Show last 3 years by default
@@ -306,7 +293,7 @@ function YearComparisonChart({
       <div className="flex gap-1.5 mb-3 flex-wrap">
         {years.map((year, i) => {
           const active = activeYears.has(year);
-          const color = YEAR_COLORS[i % YEAR_COLORS.length];
+          const color = yearColors[i % yearColors.length];
           return (
             <button
               key={year}
@@ -354,7 +341,7 @@ function YearComparisonChart({
                   type="monotone"
                   dataKey={year}
                   name={year}
-                  stroke={YEAR_COLORS[years.indexOf(year) % YEAR_COLORS.length]}
+                  stroke={yearColors[years.indexOf(year) % yearColors.length]}
                   strokeWidth={2}
                   dot={false}
                   activeDot={{ r: 4, strokeWidth: 2 }}
@@ -373,10 +360,11 @@ function YearComparisonChart({
 
 function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const chartColors = chartPalette();
 
   const pieData = data.map((d, i) => ({
     ...d,
-    fill: d.color ?? CHART_COLORS[i % CHART_COLORS.length],
+    fill: d.color ?? chartColors[i % chartColors.length],
   }));
 
   return (
@@ -444,6 +432,7 @@ function IncomeBarChart({
   data: AnalyticsData['monthlyIncome'];
   lang: string;
 }) {
+  const chartColors = chartPalette();
   // Collect all source names
   const allSources = useMemo(() => {
     const set = new Set<string>();
@@ -491,7 +480,7 @@ function IncomeBarChart({
               key={name}
               dataKey={name}
               stackId="income"
-              fill={CHART_COLORS[i % CHART_COLORS.length]}
+              fill={chartColors[i % chartColors.length]}
               radius={i === allSources.length - 1 ? [3, 3, 0, 0] : [0, 0, 0, 0]}
               animationDuration={800}
             />
