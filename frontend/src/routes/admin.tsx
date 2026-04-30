@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
 import { Card, Skeleton, SkeletonCard } from '../components/ui';
+import { formatDateMedium, formatDateTimeMedium } from '../lib/intl';
 import { formatCurrency } from '@salvadash/shared';
 import {
   useAdminOverview,
@@ -382,7 +383,7 @@ function UsersSection({
 // ─── User Detail Sheet ──────────────────────────────────────
 
 function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentUser = useAuthStore((s) => s.user);
   const { data: user, isLoading } = useAdminUser(userId);
   const updateUser = useAdminUpdateUser();
@@ -412,11 +413,7 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
 
   const formatDate = (d: string | null) => {
     if (!d) return t('admin.never');
-    return new Date(d).toLocaleDateString('it-IT', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return formatDateMedium(d, i18n.language);
   };
 
   return (
@@ -622,7 +619,7 @@ function StatItem({
 // ─── Invite Codes Section ───────────────────────────────────
 
 function InviteCodesSection() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data: codes, isLoading } = useInviteCodes();
   const createCode = useCreateInviteCode();
   const deleteCode = useDeleteInviteCode();
@@ -633,11 +630,7 @@ function InviteCodesSection() {
 
   const formatDate = (d: string | null) => {
     if (!d) return '—';
-    return new Date(d).toLocaleDateString('it-IT', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
+    return formatDateMedium(d, i18n.language);
   };
 
   const getStatusBadge = (code: { isActive: boolean; usedAt: string | null }) => {
@@ -868,7 +861,7 @@ function BroadcastSection() {
 // ─── Backup Section ─────────────────────────────────────────
 
 function BackupSection() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentUser = useAuthStore((s) => s.user);
   const { data: backups, isLoading } = useBackups();
   const { data: backupConfig } = useBackupConfig();
@@ -896,13 +889,7 @@ function BackupSection() {
 
   const formatDate = (d: string | null) => {
     if (!d) return '—';
-    return new Date(d).toLocaleDateString('it-IT', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatDateTimeMedium(d, i18n.language);
   };
 
   const handleCreate = () => {

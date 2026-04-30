@@ -7,6 +7,7 @@ import type { EntryListItem } from '@salvadash/shared';
 import { useEntries, useEntry, useDeleteEntry } from '../hooks/queries';
 import { Card, Skeleton, BottomSheet, Button } from '../components/ui';
 import { fmtCurrency } from '../lib/format';
+import { formatDateLongDay, formatDateShort, formatMonthName } from '../lib/intl';
 
 export const Route = createFileRoute('/history')({
   component: HistoryPage,
@@ -14,17 +15,12 @@ export const Route = createFileRoute('/history')({
 
 // ─── Utilities ─────────────────────────────────────────────
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('it-IT', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+function formatDate(dateStr: string, lang: string): string {
+  return formatDateLongDay(dateStr, lang);
 }
 
-function formatMonthShort(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('it-IT', { month: 'short' }).toUpperCase();
+function formatMonthShort(dateStr: string, lang: string): string {
+  return formatMonthName(dateStr, lang).toUpperCase();
 }
 
 function formatDay(dateStr: string): string {
@@ -34,7 +30,7 @@ function formatDay(dateStr: string): string {
 // ─── History Page ──────────────────────────────────────────
 
 function HistoryPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(String(currentYear));
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -82,7 +78,11 @@ function HistoryPage() {
                 transition={{ delay: i * 0.03 }}
                 layout
               >
-                <EntryCard entry={entry} onTap={() => setSelectedId(entry.id)} />
+                <EntryCard
+                  entry={entry}
+                  lang={i18n.language}
+                  onTap={() => setSelectedId(entry.id)}
+                />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -97,7 +97,15 @@ function HistoryPage() {
 
 // ─── Entry Card ────────────────────────────────────────────
 
-function EntryCard({ entry, onTap }: { entry: EntryListItem; onTap: () => void }) {
+function EntryCard({
+  entry,
+  lang,
+  onTap,
+}: {
+  entry: EntryListItem;
+  lang: string;
+  onTap: () => void;
+}) {
   const hasDelta = entry.delta != null;
   const isPositive = (entry.delta ?? 0) >= 0;
 
@@ -110,7 +118,7 @@ function EntryCard({ entry, onTap }: { entry: EntryListItem; onTap: () => void }
         {/* Date column */}
         <div className="w-16 shrink-0 flex flex-col items-center justify-center py-3 bg-surface-elevated/50 border-r border-border-default">
           <span className="text-[10px] font-semibold text-brand uppercase tracking-wider">
-            {formatMonthShort(entry.date)}
+            {formatMonthShort(entry.date, lang)}
           </span>
           <span className="font-heading text-xl font-bold text-text-primary leading-tight">
             {formatDay(entry.date)}
@@ -163,7 +171,7 @@ function EntryCard({ entry, onTap }: { entry: EntryListItem; onTap: () => void }
 // ─── Entry Detail Bottom Sheet ─────────────────────────────
 
 function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data: entry, isLoading } = useEntry(entryId);
   const deleteEntry = useDeleteEntry();
 
@@ -188,7 +196,7 @@ function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () =
           <div className="flex items-center justify-between">
             <div>
               <p className="text-text-muted text-xs">{t('entries.date')}</p>
-              <p className="font-semibold">{formatDate(entry.date)}</p>
+              <p className="font-semibold">{formatDate(entry.date, i18n.language)}</p>
             </div>
             <div className="text-right">
               <p className="text-text-muted text-xs">{t('entries.total')}</p>
@@ -261,7 +269,7 @@ function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () =
 
           {/* Created at */}
           <p className="text-text-muted text-[10px] text-center">
-            {t('entries.createdAt')} {new Date(entry.createdAt).toLocaleDateString('it-IT')}
+            {t('entries.createdAt')} {formatDateShort(entry.createdAt, i18n.language)}
           </p>
 
           {/* Actions */}

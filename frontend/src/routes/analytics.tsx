@@ -48,23 +48,6 @@ const CHART_COLORS = [
 ];
 const YEAR_COLORS = ['#00d4a0', '#ffd166', '#6c63ff', '#ff6b6b', '#4ecdc4', '#45b7d1'];
 
-// ─── Utilities ─────────────────────────────────────────────
-
-const MONTH_LABELS = [
-  'Gen',
-  'Feb',
-  'Mar',
-  'Apr',
-  'Mag',
-  'Giu',
-  'Lug',
-  'Ago',
-  'Set',
-  'Ott',
-  'Nov',
-  'Dic',
-];
-
 // ─── Custom Tooltip ────────────────────────────────────────
 
 function ChartTooltip({ active, payload, label }: any) {
@@ -153,7 +136,7 @@ function AnalyticsPage() {
 
           {/* Year comparison — LineChart */}
           <ChartSection title={t('analytics.yearComparison')} delay={0.05}>
-            <YearComparisonChart data={data.yearComparison} />
+            <YearComparisonChart data={data.yearComparison} lang={i18n.language} />
           </ChartSection>
 
           {/* Account breakdown — PieChart. Hidden when exactly 1 account selected (a single 100% slice is not informative). */}
@@ -262,7 +245,13 @@ function PatrimonyChart({
 
 // ─── Year Comparison LineChart ─────────────────────────────
 
-function YearComparisonChart({ data }: { data: AnalyticsData['yearComparison'] }) {
+function YearComparisonChart({
+  data,
+  lang,
+}: {
+  data: AnalyticsData['yearComparison'];
+  lang: string;
+}) {
   const years = Object.keys(data).sort();
   const [activeYears, setActiveYears] = useState<Set<string>>(() => {
     // Show last 3 years by default
@@ -281,11 +270,21 @@ function YearComparisonChart({ data }: { data: AnalyticsData['yearComparison'] }
     });
   };
 
+  const monthLabels = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) =>
+        new Date(2000, i, 1).toLocaleDateString(lang === 'it' ? 'it-IT' : 'en-GB', {
+          month: 'short',
+        }),
+      ),
+    [lang],
+  );
+
   // Build chart data: 12 months, each year as a key
   const chartData = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => {
       const month = i + 1;
-      const point: Record<string, any> = { month: MONTH_LABELS[i] };
+      const point: Record<string, any> = { month: monthLabels[i] };
       for (const year of years) {
         if (!activeYears.has(year)) continue;
         const entry = data[year]?.find((e) => e.month === month);
@@ -293,7 +292,7 @@ function YearComparisonChart({ data }: { data: AnalyticsData['yearComparison'] }
       }
       return point;
     });
-  }, [data, years, activeYears]);
+  }, [data, years, activeYears, monthLabels]);
 
   return (
     <div>
