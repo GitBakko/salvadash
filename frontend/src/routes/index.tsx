@@ -312,7 +312,7 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
             <div className="flex items-center gap-2 mb-2">
               <div
                 className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: acc.color ?? '#00d4a0' }}
+                style={{ backgroundColor: acc.color ?? brandColor() }}
               />
               <span className="text-xs text-text-secondary truncate">{acc.name}</span>
             </div>
@@ -320,7 +320,7 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
             <div className="mt-2 h-1 bg-surface-elevated rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${acc.percent}%`, backgroundColor: acc.color ?? '#00d4a0' }}
+                style={{ width: `${acc.percent}%`, backgroundColor: acc.color ?? brandColor() }}
               />
             </div>
             <p className="text-[10px] text-text-secondary mt-1">{acc.percent.toFixed(1)}%</p>

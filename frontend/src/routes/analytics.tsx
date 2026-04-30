@@ -225,7 +225,7 @@ function PatrimonyChart({
             fill="url(#patrimGrad)"
             animationDuration={1200}
             dot={false}
-            activeDot={{ r: 4, fill: brand, stroke: '#0a0a0f', strokeWidth: 2 }}
+            activeDot={{ r: 4, fill: brand, stroke: 'var(--color-surface-base)', strokeWidth: 2 }}
           />
         </AreaChart>
       </ResponsiveContainer>
