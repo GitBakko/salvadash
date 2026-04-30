@@ -59,9 +59,7 @@ function ResetPasswordPage() {
           <AlertCircle size={48} strokeWidth={1.5} className="text-negative mx-auto" />
           <p className="text-text-secondary text-sm">{t('auth.invalidResetLink')}</p>
           <Link to="/forgot-password">
-            <Button variant="secondary" fullWidth>
-              {t('auth.requestNewLink')}
-            </Button>
+            <Button fullWidth>{t('auth.requestNewLink')}</Button>
           </Link>
         </div>
       </div>

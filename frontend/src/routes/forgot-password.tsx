@@ -52,9 +52,7 @@ function ForgotPasswordPage() {
               <MailCheck size={48} strokeWidth={1.5} className="text-brand mx-auto" />
               <p className="text-text-secondary text-sm">{t('auth.resetEmailSent')}</p>
               <Link to="/login">
-                <Button variant="secondary" fullWidth>
-                  {t('auth.backToLogin')}
-                </Button>
+                <Button fullWidth>{t('auth.backToLogin')}</Button>
               </Link>
             </div>
           ) : (

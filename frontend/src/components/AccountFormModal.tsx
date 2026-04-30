@@ -170,7 +170,7 @@ export function AccountFormModal({ account, onClose }: Props) {
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">
-          <Button variant="secondary" fullWidth onClick={onClose} type="button">
+          <Button variant="ghost" fullWidth onClick={onClose} type="button">
             {t('common.cancel')}
           </Button>
           <Button fullWidth type="submit" loading={isLoading}>
