@@ -75,6 +75,15 @@
   --shadow-lg: 0 12px 32px -4px rgb(0 0 0 / 0.3);
 }
 
+/* ─── FOUC fix ──────────────────────────────────────────── */
+/* Paint surface + text colors immediately on page load, before */
+/* React hydrates. Without this, the page flashes white briefly */
+/* on cold load (especially noticeable in dark theme). */
+:root {
+  background-color: var(--color-surface-base);
+  color: var(--color-text-primary);
+}
+
 /* ─── Glass Card Utility ────────────────────────────────── */
 @utility glass-card {
   background: var(--color-surface-card);
