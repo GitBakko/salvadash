@@ -342,7 +342,7 @@ function UsersSection({
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-sm truncate">{u.name}</p>
                         <span
-                          className={`text-[10px] tabular-nums px-1.5 py-0.5 rounded ${ROLE_BG[u.role]}`}
+                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${ROLE_BG[u.role]}`}
                         >
                           {u.role}
                         </span>
@@ -459,7 +459,7 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-heading text-lg font-bold">{user.name}</h3>
-                  <span className={`text-xs tabular-nums px-2 py-0.5 rounded ${ROLE_BG[user.role]}`}>
+                  <span className={`text-xs font-mono px-2 py-0.5 rounded ${ROLE_BG[user.role]}`}>
                     {user.role}
                   </span>
                 </div>
@@ -679,7 +679,7 @@ function InviteCodesSection() {
                   <div className="flex items-center justify-between">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <code className="tabular-nums text-sm font-bold text-brand tracking-wider">
+                        <code className="font-mono text-sm font-bold text-brand tracking-wider">
                           {code.code}
                         </code>
                         <span className={`text-[10px] px-1.5 py-0.5 rounded ${status.className}`}>
