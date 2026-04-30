@@ -308,7 +308,7 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
                 style={{ width: `${acc.percent}%`, backgroundColor: acc.color ?? '#00d4a0' }}
               />
             </div>
-            <p className="text-[10px] text-text-muted mt-1">{acc.percent.toFixed(1)}%</p>
+            <p className="text-[10px] text-text-secondary mt-1">{acc.percent.toFixed(1)}%</p>
           </Card>
         ))}
       </div>
@@ -341,7 +341,7 @@ function RecentEntries({
           <div key={entry.id} className="flex items-center justify-between px-4 py-3">
             <div>
               <p className="text-sm font-medium capitalize">{formatMonthShort(entry.date, lang)}</p>
-              <p className="text-xs text-text-muted">{fmtCurrency(entry.total)}</p>
+              <p className="text-xs text-text-secondary">{fmtCurrency(entry.total)}</p>
             </div>
             {entry.delta != null && (
               <div className="text-right flex flex-col items-end gap-0.5">
