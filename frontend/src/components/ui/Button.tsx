@@ -1,13 +1,9 @@
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
-import { motion } from 'framer-motion';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-interface ButtonProps extends Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart'
-> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
@@ -43,13 +39,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     return (
-      <motion.button
+      <button
         ref={ref}
-        whileTap={{ scale: disabled || loading ? 1 : 0.97 }}
         className={`
           inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200
           focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2
+          active:scale-[0.97]
           disabled:opacity-50 disabled:cursor-not-allowed
+          disabled:active:scale-100
           ${variantClasses[variant]}
           ${sizeClasses[size]}
           ${fullWidth ? 'w-full' : ''}
@@ -76,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           </svg>
         )}
         {children}
-      </motion.button>
+      </button>
     );
   },
 );
