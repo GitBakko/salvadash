@@ -82,10 +82,17 @@ Prod: `pm2 start backend/ecosystem.config.json`; IIS reverse-proxy `/api`,`/uplo
 
 ## Known refactor surfaces (active)
 
-- Heavy boilerplate in route handlers (try/catch + 500, Zod parse error response). Use `backend/src/lib/http.ts` (`asyncHandler`, `validationError`) when added.
-- `entryInclude` / `formatEntry` shared via `backend/src/lib/entries-shared.ts`.
-- `validateUserOwnership` helper avoids duplicating accountId/sourceId checks in entries POST/PUT.
-- Big monoliths to split when touched: `frontend/src/routes/admin.tsx` (≈1.2k), `routes/settings.tsx` (≈930), `hooks/queries.ts` (≈670).
+- `frontend/src/routes/admin.lazy.tsx` (~1.2k lines) — multiple sections in one file (overview, users, invite codes, backups, maintenance). Pre-existing `any`/unused warnings. Split when next touched.
+- `frontend/src/routes/settings.lazy.tsx` (~930 lines) — profile, password, currency, language, notifications, push, data export/import, reset. Split by section when next touched.
+
+**Closed in v1.2.0 (impeccable remediation):**
+
+- `frontend/src/hooks/queries.ts` → split per-domain under `hooks/queries/` (barrel re-exports)
+- `frontend/src/components/AccountFilterBar.tsx` → exports pure `toggleAccountId` for testing
+- Dashboard/Analytics/History/Settings routes split into route-config + `.lazy.tsx` for code-splitting
+- YearPills extracted from `routes/index.tsx`
+- AccountForm extracted from `AccountFormModal` for full-screen route reuse
+- Backend boilerplate consolidated via `lib/http.ts` (`asyncHandler`, `respondValidation`) and `lib/entries-shared.ts` (`entryInclude`, `formatEntry`, `validateUserOwnership`)
 
 ## Scripts
 

@@ -22,6 +22,99 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: '1.2.0',
+    date: '2026-04-30',
+    categories: [
+      {
+        type: 'feature',
+        items: [
+          {
+            it: 'Identità visiva Aurora: nuova palette violet+mint, tipografia Inter Tight, hero ridisegnato',
+            en: 'Aurora visual identity: new violet+mint palette, Inter Tight typography, rebuilt hero',
+          },
+          {
+            it: 'Logo conti automatico via Brandfetch: cerca per nome, importa, colore predominante auto-applicato',
+            en: 'Auto account logo via Brandfetch: search by name, import, dominant color auto-applied',
+          },
+          {
+            it: 'Toggle tema in header: dark / light / sistema (segue OS)',
+            en: 'Theme toggle in header: dark / light / system (follows OS)',
+          },
+          {
+            it: 'Modifica rilevazione dal dettaglio storico (riusa il form di nuova rilevazione)',
+            en: 'Edit entry from history detail (reuses the new-entry form)',
+          },
+          {
+            it: 'Account form a tutto schermo su mobile, modale su desktop',
+            en: 'Account form full-screen on mobile, modal on desktop',
+          },
+          {
+            it: 'Filtro Analytics: ordinamento alfabetico + pill riassuntiva del filtro applicato',
+            en: 'Analytics filter: alphabetical sort + applied-filter summary pill',
+          },
+          {
+            it: 'Ordinamento conti per Nome / Valore / Personalizzato (dashboard, analytics, lista conti)',
+            en: 'Account sort by Name / Value / Custom (dashboard, analytics, accounts list)',
+          },
+          {
+            it: 'Importo aggiornato visibile su ogni conto in /conti',
+            en: 'Updated amount visible on each account in /accounts',
+          },
+        ],
+      },
+      {
+        type: 'improvement',
+        items: [
+          {
+            it: 'Layout responsive desktop: Analytics e Admin si allargano fino a 1100px con grafici affiancati',
+            en: 'Responsive desktop layout: Analytics and Admin expand to 1100px with side-by-side charts',
+          },
+          {
+            it: 'Grafici Analytics con personalità: gradient violet→mint, dot endpoint mint, tooltip raffinato',
+            en: 'Analytics charts with personality: violet→mint gradient, mint endpoint dot, polished tooltip',
+          },
+          {
+            it: 'Performance: bundle main 535KB→465KB, charts vendor lazy-loaded solo su /analytics',
+            en: 'Performance: main bundle 535KB→465KB, charts vendor lazy-loaded only on /analytics',
+          },
+          {
+            it: 'Accessibilità: contrasti AA su tutta la palette, touch-target 44px ovunque, focus visibile',
+            en: 'Accessibility: AA contrast across the palette, 44px touch targets everywhere, visible focus',
+          },
+          {
+            it: 'Date picker nativo segue il tema (dark/light)',
+            en: 'Native date picker honors the theme (dark/light)',
+          },
+          {
+            it: 'Icone account visibili in tutte le schermate (dashboard, analytics, storico, conti, nuova rilevazione)',
+            en: 'Account icons visible everywhere (dashboard, analytics, history, accounts, new entry)',
+          },
+        ],
+      },
+      {
+        type: 'fix',
+        items: [
+          {
+            it: 'Cache-bust su import logo: la preview si aggiorna immediatamente',
+            en: 'Cache-bust on logo import: preview updates immediately',
+          },
+          {
+            it: 'Cache invalidation: dopo modifica conto, dashboard/analytics/storico ricaricano automaticamente',
+            en: 'Cache invalidation: after account changes, dashboard/analytics/history refetch automatically',
+          },
+          {
+            it: 'Cents del totale patrimonio gestiti correttamente per locale (EUR/USD/GBP)',
+            en: 'Patrimony cents split correctly per locale (EUR/USD/GBP)',
+          },
+          {
+            it: 'Tema: brand violet più chiaro per leggibilità su sfondo scuro',
+            en: 'Theme: lighter brand violet for readability on dark background',
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '1.1.0',
     date: '2026-04-01',
     categories: [
