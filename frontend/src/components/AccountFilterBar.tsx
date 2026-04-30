@@ -105,7 +105,7 @@ function FilterChip({
       onClick={onClick}
       role="option"
       aria-selected={ariaSelected}
-      className="shrink-0 snap-start inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold border transition-all touch-manipulation active:scale-95"
+      className="shrink-0 snap-start inline-flex items-center gap-1.5 min-h-11 h-11 px-3 rounded-full text-sm font-semibold border transition-all touch-manipulation active:scale-95"
       style={{
         backgroundColor: active ? `${accent}24` : 'transparent',
         borderColor: active ? accent : 'rgba(255,255,255,0.12)',

@@ -29,7 +29,7 @@ export function Header() {
             {/* Notification bell */}
             <button
               onClick={() => setShowNotifications(true)}
-              className="relative p-2 -m-2 text-text-muted hover:text-text-primary transition-colors"
+              className="relative p-3 -m-3 min-h-11 min-w-11 inline-flex items-center justify-center text-text-muted hover:text-text-primary transition-colors"
               aria-label={t('notifications.title')}
             >
               <Bell size={22} />
@@ -43,7 +43,7 @@ export function Header() {
             {isAdmin && (
               <Link
                 to="/admin"
-                className="p-2 -m-2 text-gold hover:text-gold/80 transition-colors"
+                className="p-3 -m-3 min-h-11 min-w-11 inline-flex items-center justify-center text-gold hover:text-gold/80 transition-colors"
                 aria-label="Admin Dashboard"
               >
                 <ShieldCheck size={22} />

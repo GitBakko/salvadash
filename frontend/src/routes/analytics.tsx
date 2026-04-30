@@ -309,7 +309,7 @@ function YearComparisonChart({ data }: { data: AnalyticsData['yearComparison'] }
             <button
               key={year}
               onClick={() => toggleYear(year)}
-              className="px-2.5 py-1 rounded-full text-xs font-semibold transition-all border"
+              className="px-3 min-h-11 inline-flex items-center rounded-full text-xs font-semibold transition-all border"
               style={{
                 backgroundColor: active ? color + '20' : 'transparent',
                 borderColor: active ? color : 'rgba(255,255,255,0.1)',

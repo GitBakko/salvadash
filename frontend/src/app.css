@@ -153,3 +153,9 @@ pre,
     display: none;
   }
 }
+
+/* ─── Touch target floor (WCAG 2.5.5) ──────────────── */
+@utility tap-target {
+  min-height: 2.75rem; /* 44px */
+  min-width: 2.75rem;
+}

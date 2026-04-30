@@ -78,7 +78,7 @@ function DashboardPage() {
           <button
             key={y}
             onClick={() => setYear(y)}
-            className={`shrink-0 px-3 py-1 rounded-full text-sm font-medium transition-all ${
+            className={`shrink-0 px-4 min-h-11 inline-flex items-center rounded-full text-sm font-medium transition-all ${
               year === y
                 ? 'bg-brand text-surface-base'
                 : 'bg-surface-elevated text-text-secondary hover:text-text-primary'
