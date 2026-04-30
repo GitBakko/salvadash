@@ -60,6 +60,11 @@
     "resendError": "Errore nell'invio dell'email di verifica",
     "resendEmail": "Reinvia email di verifica",
     "emailResent": "Email inviata!",
+    "emailVerified": "Email verificata!",
+    "emailVerifiedDesc": "Il tuo account è stato attivato. Ora puoi accedere.",
+    "verifyFailed": "Verifica fallita",
+    "verifyFailedDesc": "Il link di verifica non è valido o è scaduto. Prova a richiedere una nuova email.",
+    "verifying": "Verifica in corso...",
     "newPassword": "Nuova password",
     "passwordResetSuccess": "Password reimpostata con successo!",
     "resetPasswordError": "Errore nel reset della password. Il link potrebbe essere scaduto.",
@@ -133,7 +138,15 @@
     "avgGrowth": "Crescita Media",
     "bestYear": "Anno Migliore",
     "noData": "Aggiungi almeno due rilevazioni per visualizzare le analytics.",
-    "perMonth": "/mese"
+    "perMonth": "/mese",
+    "filter": {
+      "label": "Filtra per conto",
+      "allAccounts": "Tutti i conti",
+      "clear": "Reset",
+      "emptyTitle": "Nessun dato",
+      "emptyBody": "I conti selezionati non hanno rilevazioni con saldo.",
+      "showAll": "Mostra tutti"
+    }
   },
   "admin": {
     "title": "Admin Dashboard",

@@ -60,6 +60,11 @@
     "resendError": "Failed to resend verification email",
     "resendEmail": "Resend verification email",
     "emailResent": "Email sent!",
+    "emailVerified": "Email verified!",
+    "emailVerifiedDesc": "Your account has been activated. You can now log in.",
+    "verifyFailed": "Verification failed",
+    "verifyFailedDesc": "The verification link is invalid or expired. Try requesting a new email.",
+    "verifying": "Verifying...",
     "newPassword": "New password",
     "passwordResetSuccess": "Password reset successful!",
     "resetPasswordError": "Password reset failed. The link may have expired.",
@@ -133,7 +138,15 @@
     "avgGrowth": "Average Growth",
     "bestYear": "Best Year",
     "noData": "Add at least two entries to view analytics.",
-    "perMonth": "/month"
+    "perMonth": "/month",
+    "filter": {
+      "label": "Filter by account",
+      "allAccounts": "All accounts",
+      "clear": "Reset",
+      "emptyTitle": "No data",
+      "emptyBody": "The selected accounts have no recorded balances.",
+      "showAll": "Show all"
+    }
   },
   "admin": {
     "title": "Admin Dashboard",

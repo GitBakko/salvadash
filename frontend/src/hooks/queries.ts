@@ -26,7 +26,10 @@ export const queryKeys = {
   entries: (year?: string) => (year ? (['entries', year] as const) : (['entries'] as const)),
   entry: (id: string) => ['entry', id] as const,
   incomeSources: ['incomeSources'] as const,
-  analytics: ['analytics'] as const,
+  analytics: (accountIds?: string[]) =>
+    accountIds && accountIds.length > 0
+      ? (['analytics', { accountIds: [...accountIds].sort() }] as const)
+      : (['analytics'] as const),
   adminOverview: ['admin', 'overview'] as const,
   adminUsers: (search?: string, role?: string) => ['admin', 'users', { search, role }] as const,
   adminUser: (id: string) => ['admin', 'users', id] as const,
@@ -271,11 +274,15 @@ export function useDeleteIncomeSource() {
 
 // ─── Analytics ─────────────────────────────────────────────
 
-export function useAnalytics() {
+export function useAnalytics(accountIds?: string[]) {
   return useQuery({
-    queryKey: queryKeys.analytics,
+    queryKey: queryKeys.analytics(accountIds),
     queryFn: async () => {
-      const res = await api.get<AnalyticsData>('/data/analytics');
+      const qs =
+        accountIds && accountIds.length > 0
+          ? `?accountIds=${encodeURIComponent(accountIds.join(','))}`
+          : '';
+      const res = await api.get<AnalyticsData>(`/data/analytics${qs}`);
       if (!res.success) throw new Error(res.error ?? 'Failed to fetch analytics');
       return res.data!;
     },

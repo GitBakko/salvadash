@@ -20,11 +20,12 @@ import {
   Legend,
 } from 'recharts';
 import type { AnalyticsData } from '@salvadash/shared';
-import { useAnalytics } from '../hooks/queries';
+import { useAnalytics, useAccounts } from '../hooks/queries';
 import { Card, Skeleton } from '../components/ui';
 import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
 import { BarChart3, TrendingUp, TrendingDown, Gauge, Trophy } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { AccountFilterBar } from '../components/AccountFilterBar';
 
 export const Route = createFileRoute('/analytics')({
   component: AnalyticsPage,
@@ -93,10 +94,16 @@ function ChartTooltip({ active, payload, label }: any) {
 
 function AnalyticsPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = useAnalytics();
+  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
+  const { data: accounts } = useAccounts();
+  const { data, isLoading } = useAnalytics(selectedAccountIds);
 
-  if (isLoading) return <AnalyticsSkeleton />;
+  const isFilterActive = selectedAccountIds.length > 0;
+  const hasFilteredData = !!data && data.patrimonyOverTime.some((p) => p.total !== 0);
 
+  if (isLoading && !data) return <AnalyticsSkeleton />;
+
+  // No data at all (no entries yet) — keep original empty state
   if (!data || data.patrimonyOverTime.length < 2) {
     return (
       <div className="p-4 max-w-lg mx-auto">
@@ -114,37 +121,70 @@ function AnalyticsPage() {
   }
 
   return (
-    <div className="p-4 max-w-lg mx-auto space-y-5 pb-24">
-      <h1 className="font-heading text-2xl font-bold">{t('analytics.title')}</h1>
+    <div className="p-4 max-w-lg mx-auto pb-24">
+      <h1 className="font-heading text-2xl font-bold mb-3">{t('analytics.title')}</h1>
 
-      {/* Patrimony over time — AreaChart */}
-      <ChartSection title={t('analytics.patrimony')} delay={0}>
-        <PatrimonyChart data={data.patrimonyOverTime} />
-      </ChartSection>
+      <AccountFilterBar
+        accounts={accounts ?? []}
+        selected={selectedAccountIds}
+        onChange={setSelectedAccountIds}
+      />
 
-      {/* Year comparison — LineChart */}
-      <ChartSection title={t('analytics.yearComparison')} delay={0.05}>
-        <YearComparisonChart data={data.yearComparison} />
-      </ChartSection>
+      {/* Filter active but produced empty results */}
+      {isFilterActive && !hasFilteredData ? (
+        <motion.div
+          key="filter-empty"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-16 text-center mt-5"
+        >
+          <BarChart3 size={56} className="text-text-muted mb-3" strokeWidth={1.5} />
+          <p className="text-text-primary text-sm font-semibold mb-1">
+            {t('analytics.filter.emptyTitle')}
+          </p>
+          <p className="text-text-secondary text-xs mb-4 max-w-[18rem]">
+            {t('analytics.filter.emptyBody')}
+          </p>
+          <button
+            type="button"
+            onClick={() => setSelectedAccountIds([])}
+            className="px-4 py-2 rounded-full text-xs font-semibold bg-brand/15 text-brand border border-brand/30 hover:bg-brand/25 transition-colors"
+          >
+            {t('analytics.filter.showAll')}
+          </button>
+        </motion.div>
+      ) : (
+        <div className="space-y-5 mt-4">
+          {/* Patrimony over time — AreaChart */}
+          <ChartSection title={t('analytics.patrimony')} delay={0}>
+            <PatrimonyChart data={data.patrimonyOverTime} />
+          </ChartSection>
 
-      {/* Account breakdown — PieChart */}
-      {data.accountBreakdown.length > 0 && (
-        <ChartSection title={t('analytics.accountBreakdown')} delay={0.1}>
-          <AccountPieChart data={data.accountBreakdown} />
-        </ChartSection>
+          {/* Year comparison — LineChart */}
+          <ChartSection title={t('analytics.yearComparison')} delay={0.05}>
+            <YearComparisonChart data={data.yearComparison} />
+          </ChartSection>
+
+          {/* Account breakdown — PieChart. Hidden when exactly 1 account selected (a single 100% slice is not informative). */}
+          {data.accountBreakdown.length > 0 && selectedAccountIds.length !== 1 && (
+            <ChartSection title={t('analytics.accountBreakdown')} delay={0.1}>
+              <AccountPieChart data={data.accountBreakdown} />
+            </ChartSection>
+          )}
+
+          {/* Income by source — BarChart (income is not account-bound, shown unfiltered) */}
+          {data.monthlyIncome.length > 0 && (
+            <ChartSection title={t('analytics.incomeBySource')} delay={0.15}>
+              <IncomeBarChart data={data.monthlyIncome} />
+            </ChartSection>
+          )}
+
+          {/* Performance section */}
+          <ChartSection title={t('analytics.performance')} delay={0.2}>
+            <PerformanceGrid data={data} t={t} />
+          </ChartSection>
+        </div>
       )}
-
-      {/* Income by source — BarChart */}
-      {data.monthlyIncome.length > 0 && (
-        <ChartSection title={t('analytics.incomeBySource')} delay={0.15}>
-          <IncomeBarChart data={data.monthlyIncome} />
-        </ChartSection>
-      )}
-
-      {/* Performance section */}
-      <ChartSection title={t('analytics.performance')} delay={0.2}>
-        <PerformanceGrid data={data} t={t} />
-      </ChartSection>
     </div>
   );
 }
