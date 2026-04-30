@@ -69,6 +69,22 @@ pnpm test                       # vitest both sides
 
 Prod: `pm2 start backend/ecosystem.config.json`; IIS reverse-proxy `/api`,`/uploads` → `:3000`, SPA fallback for `/*`. Full guide in `DEPLOY-GUIDA-IIS.md`.
 
+## Production environment
+
+| Component       | Detail                                                                                          |
+| --------------- | ----------------------------------------------------------------------------------------------- |
+| App server      | Windows Server 2019                                                                             |
+| App path        | `E:\www\salvadash\` (frontend `frontend\dist\`, backend root, `backend\uploads\`)               |
+| App runtime     | Node.js 20 + PM2 (process `salvadash-api` on `:3000`), IIS reverse-proxy on `:80`/`:443`        |
+| DB server       | Windows Server 2019 (separate host)                                                             |
+| DB engine       | PostgreSQL 18                                                                                   |
+| DB endpoint     | `192.168.3.243:5432/salvadash`                                                                  |
+| DB data dir     | `E:\postresql\data` (note: actual folder name lacks the `g`)                                    |
+| DB pg_hba.conf  | App access via `host salvadash salvadash 192.168.3.0/24 md5`; superuser only via `127.0.0.1/32` |
+| DB service name | `postgresql-x64-18`                                                                             |
+
+**Currently running in prod:** check `/api/health` or footer version badge. Upgrade procedure per release in `dist-release/<version>/UPGRADE-<version>.md`.
+
 ## Conventions / gotchas
 
 - Routes import Prisma client from `../generated/prisma/client.js` (Prisma 7 ESM output, post-build script `fix-prisma-esm.mjs`). Adapter `PrismaPg` strips `?schema=` before passing URL to `pg`.

@@ -22,6 +22,29 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: '1.2.1',
+    date: '2026-04-30',
+    categories: [
+      {
+        type: 'improvement',
+        items: [
+          {
+            it: 'Sicurezza: rate limiting su tutte le API (600/15min globale, 60/15min sulle scritture, 30/15min auth)',
+            en: 'Security: rate limiting on all APIs (600/15min global, 60/15min on writes, 30/15min auth)',
+          },
+          {
+            it: 'Sicurezza: validazione CUID + path.basename su ID account prima di operazioni filesystem (path traversal)',
+            en: 'Security: CUID validation + path.basename on account IDs before filesystem ops (path traversal)',
+          },
+          {
+            it: 'CI: tutti i check ora verdi (lint, format, type check, test, build, CodeQL, Dependency Review)',
+            en: 'CI: all checks now green (lint, format, type check, test, build, CodeQL, Dependency Review)',
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '1.2.0',
     date: '2026-04-30',
     categories: [

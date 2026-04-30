@@ -1,5 +1,29 @@
 # SalvaDash — Guida al Deploy su Windows Server 2019 + IIS
 
+## Ambiente di produzione attuale
+
+Questa guida copre due topologie:
+
+- **Greenfield** (server vuoti, primo deploy)
+- **Aggiornamento incrementale** (versione precedente già in produzione)
+
+L'ambiente prod attivo è così configurato:
+
+| Componente         | Dettaglio                                                     |
+| ------------------ | ------------------------------------------------------------- |
+| **Server App**     | Windows Server 2019, IIS 10 + Node 20 + PM2                   |
+| **Path app**       | `E:\www\salvadash\` (root del workspace pnpm in prod)         |
+| **Server DB**      | Windows Server 2019, host separato (`192.168.3.243`)          |
+| **PostgreSQL**     | Versione **18**, service `postgresql-x64-18`                  |
+| **DB endpoint**    | `192.168.3.243:5432/salvadash`                                |
+| **DB data dir**    | `E:\postresql\data` (nome cartella senza la "g": `postresql`) |
+| **DB user app**    | `salvadash` (ruolo applicativo, non `postgres` superuser)     |
+| **DB pg_hba.conf** | `host salvadash salvadash 192.168.3.0/24 md5`                 |
+
+> **Nota Postgres 18.** I path config sono in `E:\postresql\data\postgresql.conf` e `E:\postresql\data\pg_hba.conf`. Gli edit richiedono Notepad/VS Code aperto **as Administrator** (ACL ristrette). Reload soft: `net stop postgresql-x64-18 && net start postgresql-x64-18`.
+>
+> **Recovery password superuser `postgres`.** Se persa, edit temporaneo `pg_hba.conf` con righe `trust` per `127.0.0.1/32` e `::1/128`, restart, `psql -U postgres` e `ALTER USER postgres WITH PASSWORD '...';`, poi ripristina pg_hba.conf e restart.
+
 ## Indice
 
 1. [Prerequisiti](#1-prerequisiti)
@@ -17,15 +41,15 @@
 
 ## 1. Prerequisiti
 
-| Componente                        | Versione minima     | Note                                    |
-| --------------------------------- | ------------------- | --------------------------------------- |
-| Windows Server                    | 2019 (o successivo) | Con accesso Administrator               |
-| Node.js                           | 20.x LTS            | Consigliato 22.x LTS                    |
-| pnpm                              | 9.x+                | Package manager                         |
-| PostgreSQL                        | 15 o 16             | Può essere sullo stesso server o remoto |
-| IIS                               | 10.0                | Incluso in Windows Server               |
-| URL Rewrite Module                | 2.1                 | Modulo IIS per rewrite/proxy            |
-| ARR (Application Request Routing) | 3.0                 | Modulo IIS per reverse proxy            |
+| Componente                        | Versione minima     | Note                                                      |
+| --------------------------------- | ------------------- | --------------------------------------------------------- |
+| Windows Server                    | 2019 (o successivo) | Con accesso Administrator                                 |
+| Node.js                           | 20.x LTS            | Consigliato 22.x LTS                                      |
+| pnpm                              | 9.x+                | Package manager                                           |
+| PostgreSQL                        | 15 / 16 / 17 / 18   | Prod attuale: 18. Può essere sullo stesso server o remoto |
+| IIS                               | 10.0                | Incluso in Windows Server                                 |
+| URL Rewrite Module                | 2.1                 | Modulo IIS per rewrite/proxy                              |
+| ARR (Application Request Routing) | 3.0                 | Modulo IIS per reverse proxy                              |
 
 ### File di build necessari
 
