@@ -334,9 +334,9 @@ function RecentEntries({
       <p className="text-text-muted text-xs font-medium mb-2">
         {t('dashboard.recentEntries')}
       </p>
-      <Card className="divide-y divide-border-default">
+      <Card className="space-y-1">
         {entries.map((entry) => (
-          <div key={entry.id} className="flex items-center justify-between px-4 py-3">
+          <div key={entry.id} className="flex items-center justify-between rounded-md px-3 py-2 odd:bg-surface-elevated/40">
             <div>
               <p className="text-sm font-medium capitalize">{formatMonthShort(entry.date, lang)}</p>
               <p className="text-xs text-text-secondary">{fmtCurrency(entry.total)}</p>
