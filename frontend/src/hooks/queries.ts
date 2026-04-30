@@ -55,6 +55,19 @@ export function useAccounts() {
   });
 }
 
+/**
+ * Invalidates every cache that embeds account fields (icon/iconUrl/color/name/amount).
+ * Backend response shapes for dashboard, analytics, and entry detail include these
+ * fields per-account, so changing an account must refetch those views or stale icons
+ * persist until a hard refresh.
+ */
+function invalidateAccountConsumers(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: queryKeys.accounts });
+  qc.invalidateQueries({ queryKey: ['dashboard'] });
+  qc.invalidateQueries({ queryKey: ['analytics'] });
+  qc.invalidateQueries({ queryKey: ['entries'] });
+}
+
 export function useCreateAccount() {
   const qc = useQueryClient();
   return useMutation({
@@ -68,7 +81,7 @@ export function useCreateAccount() {
       if (!res.success) throw new Error(res.error ?? 'Failed to create account');
       return res.data!;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.accounts }),
+    onSuccess: () => invalidateAccountConsumers(qc),
   });
 }
 
@@ -91,7 +104,7 @@ export function useUpdateAccount() {
       if (!res.success) throw new Error(res.error ?? 'Failed to update account');
       return res.data!;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.accounts }),
+    onSuccess: () => invalidateAccountConsumers(qc),
   });
 }
 
@@ -102,7 +115,7 @@ export function useDeleteAccount() {
       const res = await api.delete(`/accounts/${id}`);
       if (!res.success) throw new Error(res.error ?? 'Failed to delete account');
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.accounts }),
+    onSuccess: () => invalidateAccountConsumers(qc),
   });
 }
 
@@ -113,7 +126,7 @@ export function useReorderAccounts() {
       const res = await api.put('/accounts/reorder', { accounts });
       if (!res.success) throw new Error(res.error ?? 'Failed to reorder');
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.accounts }),
+    onSuccess: () => invalidateAccountConsumers(qc),
   });
 }
 
@@ -148,7 +161,7 @@ export function useImportLogo() {
       if (!res.success) throw new Error(res.error ?? 'Import failed');
       return res.data!;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.accounts }),
+    onSuccess: () => invalidateAccountConsumers(qc),
   });
 }
 
@@ -159,7 +172,7 @@ export function useDeleteAccountIcon() {
       const res = await api.delete(`/accounts/${accountId}/icon`);
       if (!res.success) throw new Error(res.error ?? 'Failed to clear icon');
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.accounts }),
+    onSuccess: () => invalidateAccountConsumers(qc),
   });
 }
 
