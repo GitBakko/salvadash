@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp, ChevronRight, Pencil, Trash2, CalendarDays } from '
 import type { EntryListItem } from '@salvadash/shared';
 import { useEntries, useEntry, useDeleteEntry } from '../hooks/queries';
 import { Card, Skeleton, BottomSheet, Button } from '../components/ui';
+import { AccountIcon } from '../components/AccountIcon';
 import { fmtCurrency } from '../lib/format';
 import { formatDateLongDay, formatDateShort, formatMonthName } from '../lib/intl';
 
@@ -221,9 +222,18 @@ function EntryDetailSheet({ entryId, onClose }: { entryId: string; onClose: () =
                   const pct = entry.total > 0 ? (b.amount / entry.total) * 100 : 0;
                   return (
                     <div key={b.id}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-text-secondary">{b.accountName}</span>
-                        <span className="font-semibold">{fmtCurrency(b.amount)}</span>
+                      <div className="flex items-center justify-between text-sm mb-1 gap-2">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <AccountIcon
+                            iconUrl={b.accountIconUrl}
+                            icon={b.accountIcon}
+                            name={b.accountName}
+                            color={b.accountColor}
+                            size={24}
+                          />
+                          <span className="text-text-secondary truncate">{b.accountName}</span>
+                        </div>
+                        <span className="font-semibold shrink-0">{fmtCurrency(b.amount)}</span>
                       </div>
                       <div className="h-1.5 bg-surface-elevated rounded-full overflow-hidden">
                         <motion.div

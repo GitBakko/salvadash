@@ -8,7 +8,15 @@
 interface EntryRow {
   id: string;
   date: Date;
-  balances: { accountId: string; accountName: string; amount: number; color: string | null }[];
+  balances: {
+    accountId: string;
+    accountName: string;
+    amount: number;
+    color: string | null;
+    icon: string | null;
+    iconUrl: string | null;
+    orderIndex: number;
+  }[];
   incomes: { incomeSourceId: string; incomeSourceName: string; amount: number }[];
 }
 
@@ -26,7 +34,13 @@ export interface RawEntryInput {
   date: Date;
   balances: Array<{
     accountId: string;
-    account?: { name?: string | null; color?: string | null } | null;
+    account?: {
+      name?: string | null;
+      color?: string | null;
+      icon?: string | null;
+      iconUrl?: string | null;
+      sortOrder?: number | null;
+    } | null;
     amount: DecimalLike;
   }>;
   incomes: Array<{
@@ -51,6 +65,9 @@ export function rawEntryToRow(entry: RawEntryInput): EntryRow {
       accountName: b.account?.name ?? '',
       amount: toNumber(b.amount),
       color: b.account?.color ?? null,
+      icon: b.account?.icon ?? null,
+      iconUrl: b.account?.iconUrl ?? null,
+      orderIndex: b.account?.sortOrder ?? 0,
     })),
     incomes: entry.incomes.map((i) => ({
       incomeSourceId: i.incomeSourceId,
@@ -136,6 +153,9 @@ export function computeDashboard(
         amount: b.amount,
         percent: currentTotal !== 0 ? Math.round((b.amount / currentTotal) * 10000) / 100 : 0,
         color: b.color,
+        icon: b.icon,
+        iconUrl: b.iconUrl,
+        orderIndex: b.orderIndex,
       }))
     : [];
 
@@ -217,10 +237,14 @@ export function computeAnalytics(entries: EntryRow[], options: AnalyticsOptions 
   const latestTotal = latest ? entryTotal(latest) : 0;
   const accountBreakdown = latest
     ? latest.balances.map((b) => ({
+        accountId: b.accountId,
         name: b.accountName,
         amount: b.amount,
         percent: latestTotal !== 0 ? Math.round((b.amount / latestTotal) * 10000) / 100 : 0,
         color: b.color,
+        icon: b.icon,
+        iconUrl: b.iconUrl,
+        orderIndex: b.orderIndex,
       }))
     : [];
 

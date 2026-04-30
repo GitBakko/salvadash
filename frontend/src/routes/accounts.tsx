@@ -12,12 +12,14 @@ import {
 import { useUIStore } from '../stores/ui-store';
 import { Button, Card, Skeleton, Toggle } from '../components/ui';
 import { AccountFormModal } from '../components/AccountFormModal';
+import { AccountIcon } from '../components/AccountIcon';
 import {
   AccountSortControl,
   sortAccounts,
   type SortMode,
   type SortDir,
 } from '../components/AccountSortControl';
+import { fmtCurrency } from '../lib/format';
 import { Wallet, Plus, GripVertical, Pencil, Trash2 } from 'lucide-react';
 
 export const Route = createFileRoute('/accounts')({
@@ -376,7 +378,7 @@ function AccountCardContent({
   return (
     <Card className={`p-4 ${!account.isActive ? 'opacity-50' : ''}`}>
       <div className="flex items-center gap-3">
-        {/* Drag handle + color indicator */}
+        {/* Drag handle + account icon */}
         <div className="flex items-center gap-2 shrink-0">
           {onGripPointerDown ? (
             <button
@@ -391,7 +393,13 @@ function AccountCardContent({
               <GripVertical size={20} />
             </div>
           )}
-          <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
+          <AccountIcon
+            iconUrl={account.iconUrl}
+            icon={account.icon}
+            name={account.name}
+            color={color}
+            size={32}
+          />
         </div>
 
         {/* Info */}
@@ -402,9 +410,14 @@ function AccountCardContent({
               {account.type === 'MAIN' ? t('accounts.main') : t('accounts.sub')}
             </span>
           </div>
-          <span className="text-xs text-text-muted">
-            {account.isActive ? t('accounts.active') : t('accounts.inactive')}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-text-muted">
+              {account.isActive ? t('accounts.active') : t('accounts.inactive')}
+            </span>
+            <span className="text-xs font-semibold text-text-secondary tabular-nums">
+              {fmtCurrency(account.amount)}
+            </span>
+          </div>
         </div>
 
         {/* Actions */}

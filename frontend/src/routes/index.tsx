@@ -19,6 +19,7 @@ import { fmtCurrency, fmtCurrencyCompact, fmtCurrencyParts, fmtPercent } from '.
 import { formatMonthShort, formatMonthLong } from '../lib/intl';
 import { Lightbulb, TrendingUp, TrendingDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { AccountIcon } from '../components/AccountIcon';
 import { brandColor } from '../lib/theme-vars';
 
 export const Route = createFileRoute('/')({
@@ -276,9 +277,12 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
         {sortedAccounts.map((acc) => (
           <Card key={acc.accountId} className="shrink-0 w-36 p-3">
             <div className="flex items-center gap-2 mb-2">
-              <div
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: acc.color ?? brandColor() }}
+              <AccountIcon
+                iconUrl={acc.iconUrl}
+                icon={acc.icon}
+                name={acc.name}
+                color={acc.color}
+                size={28}
               />
               <span className="text-xs text-text-secondary truncate">{acc.name}</span>
             </div>

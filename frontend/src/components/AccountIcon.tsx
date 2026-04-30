@@ -46,6 +46,8 @@ interface AccountIconProps {
   className?: string;
   /** Image alt text override; defaults to `name`. */
   alt?: string;
+  /** Optional pass-through attributes (e.g. data-* for tests). */
+  [key: `data-${string}`]: string | undefined;
 }
 
 export function AccountIcon({
@@ -56,13 +58,18 @@ export function AccountIcon({
   size = 32,
   className = '',
   alt,
+  ...rest
 }: AccountIconProps) {
   const [imgFailed, setImgFailed] = useState(false);
+
+  // Always tag rendered output for testability (Playwright queries this attr).
+  const dataAttrs = { 'data-account-icon': 'true', ...rest };
 
   // Level 1: image URL from API (with onError fallback to next level)
   if (iconUrl && !imgFailed) {
     return (
       <img
+        {...dataAttrs}
         src={iconUrl}
         alt={alt ?? name}
         width={size}
@@ -81,6 +88,7 @@ export function AccountIcon({
   if (Icon) {
     return (
       <span
+        {...dataAttrs}
         className={`inline-flex items-center justify-center rounded-md ${className}`}
         style={{
           width: size,
@@ -102,6 +110,7 @@ export function AccountIcon({
   const letter = (name?.trim().charAt(0) || '?').toUpperCase();
   return (
     <span
+      {...dataAttrs}
       className={`inline-flex items-center justify-center rounded-md font-semibold ${className}`}
       style={{
         width: size,

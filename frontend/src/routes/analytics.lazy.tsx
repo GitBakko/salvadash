@@ -27,6 +27,7 @@ import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
 import { formatMonthShort, formatMonthLong } from '../lib/intl';
 import { BarChart3, Filter } from 'lucide-react';
 import { AccountFilterBar } from '../components/AccountFilterBar';
+import { AccountIcon } from '../components/AccountIcon';
 import {
   AccountSortControl,
   sortAccounts,
@@ -464,8 +465,9 @@ function YearComparisonChart({
 function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const chartColors = chartPalette();
-  // Default: largest slice first (most useful for a pie). 'custom' is hidden
-  // here — analytics is aggregated, there's no meaningful drag-drop baseline.
+  // Default: largest slice first (most useful for a pie). 'custom' (the
+  // drag-drop order from /accounts) is also available — backend now exposes
+  // orderIndex on each breakdown item.
   const [sortMode, setSortMode] = useState<SortMode>('amount');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
 
@@ -490,7 +492,7 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
           dir={sortDir}
           onModeChange={setSortMode}
           onDirChange={setSortDir}
-          showCustom={false}
+          showCustom
         />
       </div>
       <div className="flex items-center gap-4">
@@ -542,14 +544,17 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
       <div className="flex-1 space-y-1.5 min-w-0">
         {pieData.map((d, i) => (
           <div
-            key={d.name}
+            key={d.accountId ?? d.name}
             className="flex items-center gap-2 text-sm"
             onMouseEnter={() => setActiveIndex(i)}
             onMouseLeave={() => setActiveIndex(null)}
           >
-            <div
-              className="w-2.5 h-2.5 rounded-full shrink-0"
-              style={{ backgroundColor: d.fill }}
+            <AccountIcon
+              iconUrl={d.iconUrl}
+              icon={d.icon}
+              name={d.name}
+              color={d.color ?? d.fill}
+              size={20}
             />
             <span className="text-text-secondary truncate flex-1">{d.name}</span>
             <span className="font-semibold text-text-primary shrink-0">

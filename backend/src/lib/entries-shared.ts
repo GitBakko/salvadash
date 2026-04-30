@@ -3,7 +3,13 @@ import prisma from './prisma.js';
 import type { Prisma } from '../generated/prisma/client.js';
 
 export const entryInclude = {
-  balances: { include: { account: { select: { name: true, color: true } } } },
+  balances: {
+    include: {
+      account: {
+        select: { name: true, color: true, icon: true, iconUrl: true, sortOrder: true },
+      },
+    },
+  },
   incomes: { include: { incomeSource: { select: { name: true } } } },
 } as const satisfies Prisma.MonthlyEntryInclude;
 
@@ -13,7 +19,15 @@ export interface FormattedEntry {
   id: string;
   date: string;
   notes: string | null;
-  balances: { id: string; accountId: string; accountName: string; amount: number }[];
+  balances: {
+    id: string;
+    accountId: string;
+    accountName: string;
+    accountIcon: string | null;
+    accountIconUrl: string | null;
+    accountColor: string | null;
+    amount: number;
+  }[];
   incomes: { id: string; incomeSourceId: string; incomeSourceName: string; amount: number }[];
   total: number;
   totalIncome: number;
@@ -26,6 +40,9 @@ export function formatEntry(entry: EntryWithRelations): FormattedEntry {
     id: b.id,
     accountId: b.accountId,
     accountName: b.account?.name ?? '',
+    accountIcon: b.account?.icon ?? null,
+    accountIconUrl: b.account?.iconUrl ?? null,
+    accountColor: b.account?.color ?? null,
     amount: Number(b.amount),
   }));
   const incomes = entry.incomes.map((i) => ({
