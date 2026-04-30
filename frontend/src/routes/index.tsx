@@ -132,9 +132,6 @@ function HeroCard({
       animate={{ opacity: 1, y: 0 }}
       className="glass-card p-6 text-center relative overflow-hidden"
     >
-      {/* Subtle glow */}
-      <div className="absolute inset-0 bg-gradient-to-b from-brand/5 to-transparent pointer-events-none" />
-
       <p className="text-text-secondary text-sm font-medium relative">
         {t('dashboard.currentTotal')}
       </p>
