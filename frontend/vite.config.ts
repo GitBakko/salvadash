@@ -24,6 +24,10 @@ export default defineConfig({
 
         // Precache: auto-generated from build output
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // iOS-only Apple Touch splash images (~700 KB) are bundled
+        // for the install banner but never used by the running PWA.
+        // Excluding them from precache trims service-worker install cost.
+        globIgnores: ['**/apple-splash-*.png'],
 
         // ── Runtime caching ────────────────────────────────
         runtimeCaching: [
