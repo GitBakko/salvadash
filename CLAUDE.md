@@ -94,6 +94,21 @@ Prod: `pm2 start backend/ecosystem.config.json`; IIS reverse-proxy `/api`,`/uplo
 
 3. The dev `dist-release/` packaging script needs to be aware of #1 and #2. Re-validate any time the release flow is touched.
 
+4. **NEVER run `iisreset`.** Prod server hosts many other sites — restarting all IIS would impact unrelated services. Restart ONLY the SalvaDash site:
+
+   ```powershell
+   # PowerShell as Administrator
+   Import-Module WebAdministration
+   Stop-Website -Name "Salvadash"
+   Start-Website -Name "Salvadash"
+
+   # OR equivalent via appcmd
+   & "$env:WINDIR\System32\inetsrv\appcmd.exe" stop site /site.name:"Salvadash"
+   & "$env:WINDIR\System32\inetsrv\appcmd.exe" start site /site.name:"Salvadash"
+   ```
+
+   Same applies to recycling: `Restart-WebAppPool -Name "<Salvadash-AppPool>"`, never `iisreset`.
+
 ## Conventions / gotchas
 
 - Routes import Prisma client from `../generated/prisma/client.js` (Prisma 7 ESM output, post-build script `fix-prisma-esm.mjs`). Adapter `PrismaPg` strips `?schema=` before passing URL to `pg`.

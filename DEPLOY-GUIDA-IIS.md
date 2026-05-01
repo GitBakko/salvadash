@@ -575,15 +575,22 @@ Get-Content C:\inetpub\logs\LogFiles\W3SVC*\*.log -Tail 50
 
 ### Riavvio servizi
 
+> **CRITICO**: in prod il server ospita molti altri siti — NON usare `iisreset` (riavvia tutto IIS). Riavvia SOLO il sito SalvaDash.
+
 ```powershell
-# Riavviare IIS
-iisreset
+# Riavviare SOLO il sito SalvaDash (non tutto IIS)
+Import-Module WebAdministration
+Stop-Website -Name "Salvadash"
+Start-Website -Name "Salvadash"
+
+# (Solo se vuoi anche il pool dedicato)
+# Restart-WebAppPool -Name "<Salvadash-AppPool>"
 
 # Riavviare backend
 pm2 restart salvadash-api
 
-# Riavviare PostgreSQL
-Restart-Service -Name postgresql-x64-16
+# Riavviare PostgreSQL (solo se necessario)
+Restart-Service -Name postgresql-x64-18
 ```
 
 ---
