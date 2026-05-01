@@ -1,56 +1,36 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, useRef } from 'react';
-import { motion, useSpring, useTransform, type MotionValue } from 'framer-motion';
-import { AreaChart, Area, ResponsiveContainer } from 'recharts';
+import { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import type { DashboardData } from '@salvadash/shared';
 import { useDashboard } from '../hooks/queries';
 import { useCacheDashboard } from '../hooks/use-offline-sync';
+import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
 import { Card, Skeleton } from '../components/ui';
-import { fmtCurrency, fmtCurrencyCompact, fmtPercent } from '../lib/format';
-import { Lightbulb, CalendarDays, ArrowDown, TrendingUp, ArrowUp, Trophy } from 'lucide-react';
+import { Delta } from '../components/ui/Delta';
+import { MiniSparkline } from '../components/MiniSparkline';
+import {
+  AccountSortControl,
+  sortAccounts,
+  type SortMode,
+  type SortDir,
+} from '../components/AccountSortControl';
+import { fmtCurrency, fmtCurrencyCompact, fmtCurrencyParts, fmtPercent } from '../lib/format';
+import { formatMonthShort, formatMonthLong } from '../lib/intl';
+import { Lightbulb, TrendingUp, TrendingDown } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { AccountIcon } from '../components/AccountIcon';
+import { YearPills } from '../components/YearPills';
+import { brandColor } from '../lib/theme-vars';
 
 export const Route = createFileRoute('/')({
   component: DashboardPage,
 });
 
-// ─── Animated counter ──────────────────────────────────────
-
-function AnimatedNumber({ value, className }: { value: number; className?: string }) {
-  const spring = useSpring(0, { stiffness: 60, damping: 20 });
-  const display = useTransform(spring, (v) => fmtCurrency(v));
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    spring.set(value);
-  }, [spring, value]);
-
-  useEffect(() => {
-    const unsubscribe = display.on('change', (v) => {
-      if (ref.current) ref.current.textContent = v;
-    });
-    return unsubscribe;
-  }, [display]);
-
-  return (
-    <span ref={ref} className={className}>
-      {fmtCurrency(value)}
-    </span>
-  );
-}
-
-// ─── Utilities ─────────────────────────────────────────────
-
-function formatMonth(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleString('it-IT', { month: 'short', year: '2-digit' });
-}
-
 // ─── Dashboard Page ────────────────────────────────────────
 
 function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(String(currentYear));
   const { data, isLoading } = useDashboard(year);
@@ -72,42 +52,31 @@ function DashboardPage() {
 
   return (
     <div className="p-4 max-w-lg mx-auto space-y-4">
+      <h1 className="sr-only">{t('nav.home')}</h1>
       {/* Year selector pills */}
-      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-        {years.map((y) => (
-          <button
-            key={y}
-            onClick={() => setYear(y)}
-            className={`shrink-0 px-3 py-1 rounded-full text-sm font-medium transition-all ${
-              year === y
-                ? 'bg-brand text-surface-base'
-                : 'bg-surface-elevated text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            {y}
-          </button>
-        ))}
-      </div>
+      <YearPills years={years} active={year} onChange={(y) => setYear(y as string)} />
 
       {/* Hero KPI */}
       <HeroCard data={data} t={t} />
 
       {/* Secondary KPIs */}
-      <KPIGrid data={data} t={t} year={year} />
+      <KPIGrid data={data} t={t} year={year} lang={i18n.language} />
 
       {/* Sparkline */}
-      {data.sparklineData.length > 1 && <SparklineCard data={data.sparklineData} />}
+      {data.sparklineData.length > 1 && <SparklineCard data={data.sparklineData} t={t} />}
 
       {/* Account breakdown */}
       {data.accountBreakdown.length > 0 && <AccountBreakdown data={data} t={t} />}
 
       {/* Recent entries */}
-      {data.recentEntries.length > 0 && <RecentEntries entries={data.recentEntries} t={t} />}
+      {data.recentEntries.length > 0 && (
+        <RecentEntries entries={data.recentEntries} t={t} lang={i18n.language} />
+      )}
     </div>
   );
 }
 
-// ─── Hero Card ─────────────────────────────────────────────
+// ─── Hero (Aurora) ─────────────────────────────────────────
 
 function HeroCard({
   data,
@@ -116,128 +85,128 @@ function HeroCard({
   data: DashboardData;
   t: (k: string, o?: Record<string, string>) => string;
 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-6 text-center relative overflow-hidden"
-    >
-      {/* Subtle glow */}
-      <div className="absolute inset-0 bg-gradient-to-b from-brand/5 to-transparent pointer-events-none" />
+  const { integer: integerPart, cents: centsPart } = fmtCurrencyParts(data.currentTotal);
 
-      <p className="text-text-secondary text-sm font-medium relative">
+  const delta = data.currentEntry?.delta ?? null;
+  const deltaPercent = data.currentEntry?.deltaPercent ?? null;
+
+  let chipTone = 'bg-surface-elevated text-text-muted';
+  let ChipIcon: LucideIcon | null = null;
+  if (delta != null) {
+    if (delta > 0) {
+      chipTone = 'bg-positive/12 text-positive';
+      ChipIcon = TrendingUp;
+    } else if (delta < 0) {
+      chipTone = 'bg-negative/12 text-negative';
+      ChipIcon = TrendingDown;
+    }
+  }
+
+  let chipText = '';
+  let ariaText = '';
+  if (delta != null) {
+    const currencyStr = fmtCurrencyCompact(delta);
+    const signedCurrency =
+      delta > 0 && !currencyStr.startsWith('+') ? `+${currencyStr}` : currencyStr;
+    chipText = signedCurrency;
+    if (deltaPercent != null) {
+      chipText += ` · ${fmtPercent(deltaPercent)}`;
+    }
+    ariaText = `${t('dashboard.deltaAria')} ${chipText}`;
+  }
+
+  return (
+    <section className="py-2 px-1">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted mb-3.5">
         {t('dashboard.currentTotal')}
       </p>
-      <div className="relative">
-        <AnimatedNumber
-          value={data.currentTotal}
-          className="font-heading text-[42px] font-bold text-gold leading-tight"
-        />
+      <div className="hero-amount font-heading text-[clamp(3.5rem,11vw,5.5rem)] font-extrabold tracking-[-0.045em] leading-[0.95] text-text-primary tabular-nums">
+        <span>{integerPart}</span>
+        {centsPart && (
+          <span className="text-[2.6rem] font-bold text-text-muted tracking-[-0.03em] ml-1">
+            {centsPart}
+          </span>
+        )}
       </div>
-
-      {data.currentEntry && (
-        <p className="text-text-muted text-xs mt-1 relative">
-          {formatMonth(data.currentEntry.date)}
-          {data.currentEntry.delta != null && (
-            <span
-              className={`ml-2 ${data.currentEntry.delta >= 0 ? 'text-positive' : 'text-negative'}`}
-            >
-              {data.currentEntry.delta >= 0 ? '+' : ''}
-              {fmtCurrencyCompact(data.currentEntry.delta)}
-            </span>
-          )}
-        </p>
+      {delta != null && (
+        <div
+          className={`inline-flex items-center gap-2 mt-4 px-3.5 py-1.5 rounded-full text-sm font-semibold ${chipTone}`}
+          aria-label={ariaText}
+        >
+          {ChipIcon && <ChipIcon size={14} strokeWidth={2.5} aria-hidden="true" />}
+          <span>{chipText}</span>
+        </div>
       )}
-    </motion.div>
+    </section>
   );
 }
 
-// ─── KPI Grid ──────────────────────────────────────────────
+// ─── KPI Grid (Aurora tiles) ───────────────────────────────
 
 function KPIGrid({
   data,
   t,
   year,
+  lang,
 }: {
   data: DashboardData;
   t: (k: string, o?: Record<string, string>) => string;
   year: string;
+  lang: string;
 }) {
-  const kpis: { label: string; value: string; Icon: LucideIcon; color: string }[] = [
-    {
-      label: t('dashboard.yearTotal', { year }),
-      value: data.yearTotal != null ? fmtCurrency(data.yearTotal) : '—',
-      Icon: CalendarDays,
-      color: 'text-info',
-    },
-    {
-      label: t('dashboard.monthlyIncome'),
-      value: fmtCurrency(data.monthlyIncome),
-      Icon: ArrowDown,
-      color: 'text-positive',
-    },
-    {
-      label: t('dashboard.avgMonthly'),
-      value: fmtCurrency(data.avgMonthlyYTD),
-      Icon: TrendingUp,
-      color: 'text-purple',
-    },
-    {
-      label: t('dashboard.growthYTD'),
-      value: fmtPercent(data.growthYTD),
-      Icon: data.growthYTD >= 0 ? ArrowUp : ArrowDown,
-      color: data.growthYTD >= 0 ? 'text-positive' : 'text-negative',
-    },
-  ];
+  // Aurora tile language: plain surface-card-solid divs, no border, no icons,
+  // tight text hierarchy. Mint variant tints the value in `text-positive`.
+  const tileBase = 'bg-surface-card-solid rounded-[18px] p-4';
+  const labelCls = 'text-text-muted text-[11px] font-semibold leading-tight mb-2.5';
+  const valueBase = 'text-[1.45rem] font-bold tracking-[-0.02em] leading-none mb-1.5 tabular-nums';
+  const ctxCls = 'text-text-muted text-[11px] font-medium leading-tight';
+
+  const monthName = data.currentEntry ? formatMonthLong(data.currentEntry.date, lang) : '';
+
+  const growthPositive = data.growthYTD >= 0;
+  const growthValueCls = growthPositive ? 'text-positive' : 'text-negative';
 
   return (
-    <div className="grid grid-cols-2 gap-3">
-      {kpis.map((kpi, i) => (
-        <motion.div
-          key={kpi.label}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 * (i + 1) }}
-        >
-          <Card className="p-3">
-            <div className="flex items-start gap-2">
-              <kpi.Icon size={20} className={kpi.color} />
-              <div className="min-w-0">
-                <p className="text-text-muted text-[10px] uppercase tracking-wider leading-tight">
-                  {kpi.label}
-                </p>
-                <p className="font-heading text-lg font-bold mt-0.5">{kpi.value}</p>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-      ))}
+    <div className="grid grid-cols-2 gap-2.5">
+      {/* Tile 1 — yearTotal */}
+      <div className={tileBase}>
+        <p className={labelCls}>{t('dashboard.yearTotal', { year })}</p>
+        <p className={`${valueBase} text-text-primary`}>
+          {data.yearTotal != null ? fmtCurrency(data.yearTotal) : '—'}
+        </p>
+        <p className={ctxCls}>{year}</p>
+      </div>
 
-      {/* Best month — full width */}
+      {/* Tile 2 — monthlyIncome */}
+      <div className={tileBase}>
+        <p className={labelCls}>{t('dashboard.monthlyIncome')}</p>
+        <p className={`${valueBase} text-text-primary`}>{fmtCurrency(data.monthlyIncome)}</p>
+        <p className={`${ctxCls} capitalize`}>{monthName}</p>
+      </div>
+
+      {/* Tile 3 — growthYTD (mint when positive) */}
+      <div className={tileBase}>
+        <p className={labelCls}>{t('dashboard.growthYTD')}</p>
+        <p className={`${valueBase} ${growthValueCls}`}>{fmtPercent(data.growthYTD)}</p>
+        <p className={ctxCls}>{t('dashboard.vsYearStart')}</p>
+      </div>
+
+      {/* Tile 4 — avgMonthly */}
+      <div className={tileBase}>
+        <p className={labelCls}>{t('dashboard.avgMonthly')}</p>
+        <p className={`${valueBase} text-text-primary`}>{fmtCurrency(data.avgMonthlyYTD)}</p>
+        <p className={ctxCls}>{t('analytics.perMonth')}</p>
+      </div>
+
+      {/* Wide row — bestMonth (mint) */}
       {data.bestMonth && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="col-span-2"
-        >
-          <Card className="p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Trophy size={20} className="text-gold" />
-                <div>
-                  <p className="text-text-muted text-[10px] uppercase tracking-wider">
-                    {t('dashboard.bestMonth')}
-                  </p>
-                  <p className="text-sm font-semibold capitalize">{data.bestMonth.month}</p>
-                </div>
-              </div>
-              <p className="font-heading text-lg font-bold text-positive">
-                +{fmtCurrencyCompact(data.bestMonth.delta)}
-              </p>
-            </div>
-          </Card>
-        </motion.div>
+        <div className={`${tileBase} col-span-2`}>
+          <p className={labelCls}>{t('dashboard.bestMonth')}</p>
+          <p className={`${valueBase} text-positive`}>
+            +{fmtCurrencyCompact(data.bestMonth.delta)}
+          </p>
+          <p className={`${ctxCls} capitalize`}>{data.bestMonth.month}</p>
+        </div>
       )}
     </div>
   );
@@ -245,38 +214,19 @@ function KPIGrid({
 
 // ─── Sparkline Card ────────────────────────────────────────
 
-function SparklineCard({ data }: { data: number[] }) {
-  const chartData = data.map((v, i) => ({ i, v }));
+function SparklineCard({ data, t }: { data: number[]; t: (k: string) => string }) {
+  const reducedMotion = usePrefersReducedMotion();
+  const label = t('dashboard.trend12mo');
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="glass-card p-4 overflow-hidden"
+      className="solid-card p-4 overflow-hidden"
     >
-      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">Trend 12 mesi</p>
-      <div className="h-20 -mx-4 -mb-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#00d4a0" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#00d4a0" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <Area
-              type="monotone"
-              dataKey="v"
-              stroke="#00d4a0"
-              strokeWidth={2}
-              fill="url(#sparkGrad)"
-              dot={false}
-              isAnimationActive
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+      <p className="text-text-muted text-xs font-medium mb-2">{label}</p>
+      <MiniSparkline values={data} className="w-full h-20" ariaLabel={label} />
     </motion.div>
   );
 }
@@ -284,33 +234,51 @@ function SparklineCard({ data }: { data: number[] }) {
 // ─── Account Breakdown ─────────────────────────────────────
 
 function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => string }) {
+  const reducedMotion = usePrefersReducedMotion();
+  // Default: backend order (custom). Client-side view-only sort.
+  const [sortMode, setSortMode] = useState<SortMode>('custom');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const sortedAccounts = useMemo(
+    () => sortAccounts(data.accountBreakdown, sortMode, sortDir),
+    [data.accountBreakdown, sortMode, sortDir],
+  );
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.35 }}
     >
-      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">
-        {t('accounts.title')}
-      </p>
+      <div className="flex items-center justify-between mb-2 gap-2">
+        <p className="text-text-muted text-xs font-medium">{t('accounts.title')}</p>
+        <AccountSortControl
+          mode={sortMode}
+          dir={sortDir}
+          onModeChange={setSortMode}
+          onDirChange={setSortDir}
+        />
+      </div>
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-        {data.accountBreakdown.map((acc) => (
+        {sortedAccounts.map((acc) => (
           <Card key={acc.accountId} className="shrink-0 w-36 p-3">
             <div className="flex items-center gap-2 mb-2">
-              <div
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: acc.color ?? '#00d4a0' }}
+              <AccountIcon
+                iconUrl={acc.iconUrl}
+                icon={acc.icon}
+                name={acc.name}
+                color={acc.color}
+                size={28}
               />
               <span className="text-xs text-text-secondary truncate">{acc.name}</span>
             </div>
-            <p className="font-heading text-base font-bold">{fmtCurrency(acc.amount)}</p>
+            <p className="text-base font-bold">{fmtCurrency(acc.amount)}</p>
             <div className="mt-2 h-1 bg-surface-elevated rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${acc.percent}%`, backgroundColor: acc.color ?? '#00d4a0' }}
+                style={{ width: `${acc.percent}%`, backgroundColor: acc.color ?? brandColor() }}
               />
             </div>
-            <p className="text-[10px] text-text-muted mt-1">{acc.percent.toFixed(1)}%</p>
+            <p className="text-[10px] text-text-secondary mt-1">{acc.percent.toFixed(1)}%</p>
           </Card>
         ))}
       </div>
@@ -323,34 +291,40 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
 function RecentEntries({
   entries,
   t,
+  lang,
 }: {
   entries: DashboardData['recentEntries'];
   t: (k: string) => string;
+  lang: string;
 }) {
+  const reducedMotion = usePrefersReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
     >
-      <p className="text-text-muted text-[10px] uppercase tracking-wider mb-2">
-        {t('dashboard.recentEntries')}
-      </p>
-      <Card className="divide-y divide-border-default">
+      <p className="text-text-muted text-xs font-medium mb-2">{t('dashboard.recentEntries')}</p>
+      <Card className="space-y-1">
         {entries.map((entry) => (
-          <div key={entry.id} className="flex items-center justify-between px-4 py-3">
+          <div
+            key={entry.id}
+            className="flex items-center justify-between rounded-md px-3 py-2 odd:bg-surface-elevated/40"
+          >
             <div>
-              <p className="text-sm font-medium capitalize">{formatMonth(entry.date)}</p>
-              <p className="text-xs text-text-muted">{fmtCurrency(entry.total)}</p>
+              <p className="text-sm font-medium capitalize">{formatMonthShort(entry.date, lang)}</p>
+              <p className="text-xs text-text-secondary">{fmtCurrency(entry.total)}</p>
             </div>
             {entry.delta != null && (
-              <div className={`text-right ${entry.delta >= 0 ? 'text-positive' : 'text-negative'}`}>
-                <p className="text-sm font-mono font-semibold">
-                  {entry.delta >= 0 ? '+' : ''}
-                  {fmtCurrencyCompact(entry.delta)}
-                </p>
+              <div className="text-right flex flex-col items-end gap-0.5">
+                <Delta value={entry.delta} ariaPrefix={t('dashboard.deltaAria')} />
                 {entry.deltaPercent != null && (
-                  <p className="text-[10px]">{fmtPercent(entry.deltaPercent)}</p>
+                  <Delta
+                    value={entry.deltaPercent}
+                    variant="percent"
+                    className="text-[10px]"
+                    ariaPrefix={t('dashboard.deltaAria')}
+                  />
                 )}
               </div>
             )}

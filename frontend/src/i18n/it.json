@@ -14,7 +14,8 @@
     "noData": "Nessun dato",
     "error": "Errore",
     "success": "Operazione riuscita",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "skipToContent": "Salta al contenuto"
   },
   "nav": {
     "accounts": "Conti",
@@ -60,21 +61,32 @@
     "resendError": "Errore nell'invio dell'email di verifica",
     "resendEmail": "Reinvia email di verifica",
     "emailResent": "Email inviata!",
+    "emailVerified": "Email verificata!",
+    "emailVerifiedDesc": "Il tuo account è stato attivato. Ora puoi accedere.",
+    "verifyFailed": "Verifica fallita",
+    "verifyFailedDesc": "Il link di verifica non è valido o è scaduto. Prova a richiedere una nuova email.",
+    "verifying": "Verifica in corso...",
     "newPassword": "Nuova password",
     "passwordResetSuccess": "Password reimpostata con successo!",
     "resetPasswordError": "Errore nel reset della password. Il link potrebbe essere scaduto.",
     "invalidResetLink": "Link di reset non valido o mancante.",
-    "requestNewLink": "Richiedi un nuovo link"
+    "requestNewLink": "Richiedi un nuovo link",
+    "tagline": "Il tuo patrimonio.\nUn colpo d'occhio.",
+    "taglineSub": "Traccia i tuoi risparmi mese dopo mese.",
+    "loginSuccess": "Login effettuato!"
   },
   "dashboard": {
     "currentTotal": "Totale Attuale",
     "yearTotal": "Totale {{year}}",
-    "monthlyIncome": "Income Mensile",
+    "monthlyIncome": "Entrata Mensile",
     "avgMonthly": "Media Mensile YTD",
     "bestMonth": "Mese Migliore",
     "growthYTD": "Crescita YTD",
+    "vsYearStart": "vs inizio anno",
     "recentEntries": "Ultime Rilevazioni",
-    "noEntries": "Nessuna rilevazione ancora"
+    "noEntries": "Nessuna rilevazione ancora",
+    "deltaAria": "variazione di",
+    "trend12mo": "Trend 12 mesi"
   },
   "accounts": {
     "title": "I Tuoi Conti",
@@ -88,7 +100,19 @@
     "active": "Attivo",
     "inactive": "Inattivo",
     "deleteConfirm": "Sei sicuro di voler eliminare questo conto?",
-    "hasEntries": "Questo conto ha rilevazioni: verrà disattivato."
+    "hasEntries": "Questo conto ha rilevazioni: verrà disattivato.",
+    "logo": "Logo",
+    "logoSearch": "Cerca logo",
+    "logoChange": "Cambia logo",
+    "logoClear": "Rimuovi logo",
+    "logoSearchPlaceholder": "Cerca per nome...",
+    "logoNoResults": "Nessun risultato. Prova un altro nome.",
+    "logoSearchError": "Errore di ricerca",
+    "logoImportError": "Errore durante l'importazione",
+    "logoNoteImage": "L'immagine sostituisce l'icona",
+    "logoAfterSave": "Salva il conto, poi torna qui per scegliere un logo.",
+    "logoAutoColor": "Colore aggiornato dal logo",
+    "logoMatchScore": "{{score}}% match"
   },
   "entries": {
     "title": "Storico Rilevazioni",
@@ -133,7 +157,17 @@
     "avgGrowth": "Crescita Media",
     "bestYear": "Anno Migliore",
     "noData": "Aggiungi almeno due rilevazioni per visualizzare le analytics.",
-    "perMonth": "/mese"
+    "perMonth": "/mese",
+    "atLeastOneYear": "Almeno un anno deve essere attivo",
+    "filter": {
+      "label": "Filtra per conto",
+      "allAccounts": "Tutti i conti",
+      "clear": "Reset",
+      "applied": "Filtro: {{count}} di {{total}} conti",
+      "emptyTitle": "Nessun dato",
+      "emptyBody": "I conti selezionati non hanno rilevazioni con saldo.",
+      "showAll": "Mostra tutti"
+    }
   },
   "admin": {
     "title": "Admin Dashboard",
@@ -199,7 +233,8 @@
     "theme": "Tema",
     "dark": "Scuro",
     "light": "Chiaro",
-    "themeDesc": "Il tema chiaro è in anteprima. Sarà completato nella V2.",
+    "system": "Sistema",
+    "themeDesc": "Scegli scuro, chiaro o segui le preferenze di sistema.",
     "profileUpdated": "Profilo aggiornato",
     "changeEmail": "Cambia Email",
     "changePassword": "Cambia Password",
@@ -313,5 +348,13 @@
     "improvements": "Miglioramenti",
     "searchPlaceholder": "Cerca per versione, data o contenuto...",
     "noResults": "Nessun risultato trovato"
+  },
+  "sort": {
+    "label": "Ordina",
+    "name": "Nome",
+    "amount": "Valore",
+    "custom": "Personalizzato",
+    "asc": "Crescente",
+    "desc": "Decrescente"
   }
 }

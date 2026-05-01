@@ -13,8 +13,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { path: '/accounts', Icon: Wallet, labelKey: 'nav.accounts' },
   { path: '/', Icon: Home, labelKey: 'nav.home' },
+  { path: '/accounts', Icon: Wallet, labelKey: 'nav.accounts' },
   { path: '/history', Icon: Clock, labelKey: 'nav.history' },
   { path: '/new-entry', Icon: Plus, labelKey: 'nav.newEntry', isFab: true },
   { path: '/analytics', Icon: BarChart3, labelKey: 'nav.analytics' },

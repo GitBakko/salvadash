@@ -44,7 +44,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
 
           {/* Sheet */}
           <motion.div
-            className="absolute bottom-0 inset-x-0 glass-card rounded-t-2xl max-h-[85dvh] flex flex-col"
+            className="absolute bottom-0 inset-x-0 solid-card rounded-t-2xl max-h-[85dvh] flex flex-col"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}

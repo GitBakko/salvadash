@@ -47,10 +47,12 @@ export interface AccountPublic {
   name: string;
   type: 'MAIN' | 'SUB';
   icon: string | null;
+  iconUrl: string | null;
   color: string | null;
   isActive: boolean;
   sortOrder: number;
   entryCount: number;
+  amount: number;
 }
 
 // ─── Income Source ─────────────────────────────────────────
@@ -68,6 +70,9 @@ export interface EntryBalancePublic {
   id: string;
   accountId: string;
   accountName: string;
+  accountIcon: string | null;
+  accountIconUrl: string | null;
+  accountColor: string | null;
   amount: number;
 }
 
@@ -116,6 +121,9 @@ export interface DashboardData {
     amount: number;
     percent: number;
     color: string | null;
+    icon: string | null;
+    iconUrl: string | null;
+    orderIndex: number;
   }[];
   recentEntries: EntryListItem[];
   sparklineData: number[];
@@ -126,7 +134,16 @@ export interface DashboardData {
 export interface AnalyticsData {
   patrimonyOverTime: { date: string; total: number }[];
   yearComparison: Record<string, { month: number; total: number }[]>;
-  accountBreakdown: { name: string; amount: number; percent: number; color: string | null }[];
+  accountBreakdown: {
+    accountId: string;
+    name: string;
+    amount: number;
+    percent: number;
+    color: string | null;
+    icon: string | null;
+    iconUrl: string | null;
+    orderIndex: number;
+  }[];
   monthlyIncome: { date: string; sources: { name: string; amount: number }[] }[];
   bestMonth: { date: string; delta: number };
   worstMonth: { date: string; delta: number };

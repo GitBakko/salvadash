@@ -14,7 +14,8 @@
     "noData": "No data",
     "error": "Error",
     "success": "Operation successful",
-    "retry": "Retry"
+    "retry": "Retry",
+    "skipToContent": "Skip to content"
   },
   "nav": {
     "accounts": "Accounts",
@@ -60,11 +61,19 @@
     "resendError": "Failed to resend verification email",
     "resendEmail": "Resend verification email",
     "emailResent": "Email sent!",
+    "emailVerified": "Email verified!",
+    "emailVerifiedDesc": "Your account has been activated. You can now log in.",
+    "verifyFailed": "Verification failed",
+    "verifyFailedDesc": "The verification link is invalid or expired. Try requesting a new email.",
+    "verifying": "Verifying...",
     "newPassword": "New password",
     "passwordResetSuccess": "Password reset successful!",
     "resetPasswordError": "Password reset failed. The link may have expired.",
     "invalidResetLink": "Invalid or missing reset link.",
-    "requestNewLink": "Request a new link"
+    "requestNewLink": "Request a new link",
+    "tagline": "Your wealth.\nAt a glance.",
+    "taglineSub": "Track your savings month after month.",
+    "loginSuccess": "Login successful"
   },
   "dashboard": {
     "currentTotal": "Current Total",
@@ -73,8 +82,11 @@
     "avgMonthly": "Monthly Average YTD",
     "bestMonth": "Best Month",
     "growthYTD": "Growth YTD",
+    "vsYearStart": "vs year start",
     "recentEntries": "Recent Entries",
-    "noEntries": "No entries yet"
+    "noEntries": "No entries yet",
+    "deltaAria": "change of",
+    "trend12mo": "12-month trend"
   },
   "accounts": {
     "title": "Your Accounts",
@@ -88,7 +100,19 @@
     "active": "Active",
     "inactive": "Inactive",
     "deleteConfirm": "Are you sure you want to delete this account?",
-    "hasEntries": "This account has entries: it will be deactivated."
+    "hasEntries": "This account has entries: it will be deactivated.",
+    "logo": "Logo",
+    "logoSearch": "Search logo",
+    "logoChange": "Change logo",
+    "logoClear": "Remove logo",
+    "logoSearchPlaceholder": "Search by name...",
+    "logoNoResults": "No results. Try another name.",
+    "logoSearchError": "Search error",
+    "logoImportError": "Import failed",
+    "logoNoteImage": "Image replaces the icon",
+    "logoAfterSave": "Save the account, then come back to choose a logo.",
+    "logoAutoColor": "Color auto-set from logo",
+    "logoMatchScore": "{{score}}% match"
   },
   "entries": {
     "title": "Entry History",
@@ -133,7 +157,17 @@
     "avgGrowth": "Average Growth",
     "bestYear": "Best Year",
     "noData": "Add at least two entries to view analytics.",
-    "perMonth": "/month"
+    "perMonth": "/month",
+    "atLeastOneYear": "At least one year must be active",
+    "filter": {
+      "label": "Filter by account",
+      "allAccounts": "All accounts",
+      "clear": "Reset",
+      "applied": "Filter: {{count}} of {{total}} accounts",
+      "emptyTitle": "No data",
+      "emptyBody": "The selected accounts have no recorded balances.",
+      "showAll": "Show all"
+    }
   },
   "admin": {
     "title": "Admin Dashboard",
@@ -199,7 +233,8 @@
     "theme": "Theme",
     "dark": "Dark",
     "light": "Light",
-    "themeDesc": "Light theme is in preview. Full support coming in V2.",
+    "system": "System",
+    "themeDesc": "Choose dark, light, or follow your system preference.",
     "profileUpdated": "Profile updated",
     "changeEmail": "Change Email",
     "changePassword": "Change Password",
@@ -313,5 +348,13 @@
     "improvements": "Improvements",
     "searchPlaceholder": "Search by version, date or content...",
     "noResults": "No results found"
+  },
+  "sort": {
+    "label": "Sort",
+    "name": "Name",
+    "amount": "Value",
+    "custom": "Custom",
+    "asc": "Ascending",
+    "desc": "Descending"
   }
 }

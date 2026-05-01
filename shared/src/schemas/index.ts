@@ -22,9 +22,15 @@ export {
   createAccountSchema,
   updateAccountSchema,
   reorderAccountsSchema,
+  importLogoSchema,
   AccountType,
 } from './account.js';
-export type { CreateAccountInput, UpdateAccountInput, ReorderAccountsInput } from './account.js';
+export type {
+  CreateAccountInput,
+  UpdateAccountInput,
+  ReorderAccountsInput,
+  ImportLogoInput,
+} from './account.js';
 
 export {
   createIncomeSourceSchema,

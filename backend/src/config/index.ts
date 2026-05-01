@@ -14,6 +14,8 @@ export const config = {
   appUrl: process.env.APP_URL ?? 'http://localhost:5173',
   apiUrl: process.env.API_URL ?? 'http://localhost:3000',
 
+  databaseUrl: requireEnv('DATABASE_URL'),
+
   jwt: {
     accessSecret: requireEnv('JWT_ACCESS_SECRET'),
     refreshSecret: requireEnv('JWT_REFRESH_SECRET'),
@@ -41,5 +43,9 @@ export const config = {
     dir: process.env.BACKUP_DIR ?? './backups',
     retentionDays: parseInt(process.env.BACKUP_RETENTION_DAYS ?? '10', 10),
     cloudEnabled: process.env.BACKUP_CLOUD_ENABLED === 'true',
+  },
+
+  brandfetch: {
+    apiKey: process.env.BRANDFETCH_API_KEY ?? '',
   },
 } as const;

@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, type FormEvent } from 'react';
-import { CircleDollarSign, AlertCircle, Lock } from 'lucide-react';
+import { AlertCircle, Lock } from 'lucide-react';
 import { api } from '../lib/api';
 import { useUIStore } from '../stores/ui-store';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { AuthLayout } from '../components/AuthLayout';
 
 export const Route = createFileRoute('/reset-password')({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -54,76 +55,63 @@ function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className="min-h-dvh flex items-center justify-center p-4">
-        <div className="w-full max-w-sm glass-card p-6 text-center space-y-4">
+      <AuthLayout>
+        <div className="solid-card p-6 text-center space-y-4">
           <AlertCircle size={48} strokeWidth={1.5} className="text-negative mx-auto" />
           <p className="text-text-secondary text-sm">{t('auth.invalidResetLink')}</p>
           <Link to="/forgot-password">
-            <Button variant="secondary" fullWidth>
-              {t('auth.requestNewLink')}
-            </Button>
+            <Button fullWidth>{t('auth.requestNewLink')}</Button>
           </Link>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center p-4">
-      <div className="w-full max-w-sm space-y-8">
-        {/* Logo */}
-        <div className="text-center">
-          <CircleDollarSign size={56} strokeWidth={1.5} className="text-brand mx-auto" />
-          <h1 className="font-heading text-2xl font-bold text-brand mt-2">{t('common.appName')}</h1>
-        </div>
+    <AuthLayout>
+      <form onSubmit={handleSubmit} className="solid-card p-6 space-y-4">
+        <h2 className="font-heading text-lg font-semibold text-center">
+          {t('auth.resetPassword')}
+        </h2>
 
-        <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
-          <h2 className="font-heading text-lg font-semibold text-center">
-            {t('auth.resetPassword')}
-          </h2>
-
-          {error && (
-            <div className="bg-negative/10 border border-negative/30 rounded-[var(--radius-md)] px-4 py-2.5 text-sm text-negative">
-              {error}
-            </div>
-          )}
-
-          <Input
-            label={t('auth.newPassword')}
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            autoComplete="new-password"
-            required
-            icon={<Lock size={20} />}
-          />
-
-          <Input
-            label={t('auth.confirmPassword')}
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="••••••••"
-            autoComplete="new-password"
-            required
-            icon={<Lock size={20} />}
-          />
-
-          <Button type="submit" fullWidth loading={loading}>
-            {t('auth.resetPassword')}
-          </Button>
-
-          <div className="text-center">
-            <Link
-              to="/login"
-              className="text-sm text-brand hover:text-brand-hover transition-colors"
-            >
-              {t('auth.backToLogin')}
-            </Link>
+        {error && (
+          <div className="bg-negative/10 border border-negative/30 rounded-md px-4 py-2.5 text-sm text-negative">
+            {error}
           </div>
-        </form>
-      </div>
-    </div>
+        )}
+
+        <Input
+          label={t('auth.newPassword')}
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          autoComplete="new-password"
+          required
+          icon={<Lock size={20} />}
+        />
+
+        <Input
+          label={t('auth.confirmPassword')}
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="••••••••"
+          autoComplete="new-password"
+          required
+          icon={<Lock size={20} />}
+        />
+
+        <Button type="submit" fullWidth loading={loading}>
+          {t('auth.resetPassword')}
+        </Button>
+
+        <div className="text-center">
+          <Link to="/login" className="text-sm text-brand hover:text-brand-hover transition-colors">
+            {t('auth.backToLogin')}
+          </Link>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

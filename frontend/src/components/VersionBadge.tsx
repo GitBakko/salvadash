@@ -18,8 +18,6 @@ export function VersionBadge({ onClick, className = '' }: VersionBadgeProps) {
   }
 
   return (
-    <span className={`font-mono text-[11px] text-text-muted ${className}`}>
-      v{APP_VERSION}
-    </span>
+    <span className={`font-mono text-[11px] text-text-muted ${className}`}>v{APP_VERSION}</span>
   );
 }

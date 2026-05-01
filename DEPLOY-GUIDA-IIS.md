@@ -1,5 +1,29 @@
 # SalvaDash — Guida al Deploy su Windows Server 2019 + IIS
 
+## Ambiente di produzione attuale
+
+Questa guida copre due topologie:
+
+- **Greenfield** (server vuoti, primo deploy)
+- **Aggiornamento incrementale** (versione precedente già in produzione)
+
+L'ambiente prod attivo è così configurato:
+
+| Componente         | Dettaglio                                                     |
+| ------------------ | ------------------------------------------------------------- |
+| **Server App**     | Windows Server 2019, IIS 10 + Node 20 + PM2                   |
+| **Path app**       | `E:\www\salvadash\` (root del workspace pnpm in prod)         |
+| **Server DB**      | Windows Server 2019, host separato (`192.168.3.243`)          |
+| **PostgreSQL**     | Versione **18**, service `postgresql-x64-18`                  |
+| **DB endpoint**    | `192.168.3.243:5432/salvadash`                                |
+| **DB data dir**    | `E:\postresql\data` (nome cartella senza la "g": `postresql`) |
+| **DB user app**    | `salvadash` (ruolo applicativo, non `postgres` superuser)     |
+| **DB pg_hba.conf** | `host salvadash salvadash 192.168.3.0/24 md5`                 |
+
+> **Nota Postgres 18.** I path config sono in `E:\postresql\data\postgresql.conf` e `E:\postresql\data\pg_hba.conf`. Gli edit richiedono Notepad/VS Code aperto **as Administrator** (ACL ristrette). Reload soft: `net stop postgresql-x64-18 && net start postgresql-x64-18`.
+>
+> **Recovery password superuser `postgres`.** Se persa, edit temporaneo `pg_hba.conf` con righe `trust` per `127.0.0.1/32` e `::1/128`, restart, `psql -U postgres` e `ALTER USER postgres WITH PASSWORD '...';`, poi ripristina pg_hba.conf e restart.
+
 ## Indice
 
 1. [Prerequisiti](#1-prerequisiti)
@@ -17,39 +41,47 @@
 
 ## 1. Prerequisiti
 
-| Componente | Versione minima | Note |
-|---|---|---|
-| Windows Server | 2019 (o successivo) | Con accesso Administrator |
-| Node.js | 20.x LTS | Consigliato 22.x LTS |
-| pnpm | 9.x+ | Package manager |
-| PostgreSQL | 15 o 16 | Può essere sullo stesso server o remoto |
-| IIS | 10.0 | Incluso in Windows Server |
-| URL Rewrite Module | 2.1 | Modulo IIS per rewrite/proxy |
-| ARR (Application Request Routing) | 3.0 | Modulo IIS per reverse proxy |
+| Componente                        | Versione minima     | Note                                                      |
+| --------------------------------- | ------------------- | --------------------------------------------------------- |
+| Windows Server                    | 2019 (o successivo) | Con accesso Administrator                                 |
+| Node.js                           | 20.x LTS            | Consigliato 22.x LTS                                      |
+| pnpm                              | 9.x+                | Package manager                                           |
+| PostgreSQL                        | 15 / 16 / 17 / 18   | Prod attuale: 18. Può essere sullo stesso server o remoto |
+| IIS                               | 10.0                | Incluso in Windows Server                                 |
+| URL Rewrite Module                | 2.1                 | Modulo IIS per rewrite/proxy                              |
+| ARR (Application Request Routing) | 3.0                 | Modulo IIS per reverse proxy                              |
 
 ### File di build necessari
 
-Dalla macchina di sviluppo servono:
+Dalla macchina di sviluppo servono (layout del pacchetto release, NON quello di sviluppo):
 
-```
+```text
 salvadash/
 ├── package.json                    ← Root workspace (per pnpm)
 ├── pnpm-workspace.yaml             ← Configurazione workspace
 ├── pnpm-lock.yaml                  ← Lock file dipendenze
-├── frontend/dist/                  ← Build frontend (file statici)
-├── frontend/web.config             ← Configurazione IIS per SPA + proxy
-├── backend/dist/                   ← Build backend (JS compilato)
+├── frontend/                       ← FLATTENED: index.html, assets/, sw.js direttamente qui
+│   ├── index.html
+│   ├── assets/
+│   ├── sw.js
+│   ├── workbox-*.js
+│   └── manifest.webmanifest
+├── backend/dist/                   ← Build backend (JS compilato — sì, in dist/)
 ├── backend/package.json            ← Per pnpm install sul server
 ├── backend/prisma/                 ← Schema e migrazioni Prisma
 ├── backend/prisma.config.ts        ← Configurazione Prisma 7
-├── backend/.env                    ← Configurazione ambiente (DA CREARE SUL SERVER)
 ├── backend/ecosystem.config.json   ← Configurazione PM2
 ├── shared/dist/                    ← Codice condiviso compilato
 └── shared/package.json             ← Package condiviso
 ```
 
-> **IMPORTANTE**: Il pacchetto `shared` ora viene compilato (`shared/dist/`).
-> Non serve più copiare `shared/src/`.
+> **CRITICO #1 — Frontend asimmetrico rispetto a backend.** In prod IIS punta a `E:\www\salvadash\frontend\` come document root. `index.html` deve stare DIRETTAMENTE lì, NON in `frontend/dist/index.html`. Quando crei il pacchetto release, **appiattisci** il contenuto di `frontend/dist/` (build Vite) dentro `frontend/` del pacchetto. Backend invece mantiene `backend/dist/` perché PM2 esegue `dist/index.js`.
+>
+> **CRITICO #2 — NON includere `frontend/web.config` nel pacchetto release.** Prod ha il suo `web.config` minimo funzionante (3 rewrite rules: API proxy, uploads proxy, SPA fallback). Sostituirlo con quello dev causa 500 su tutte le richieste perché `<outboundRules>` referenzia `RESPONSE_Cache-Control` non registrato in IIS `allowedServerVariables`, e `<httpCompression>`/`<httpProtocol>` referenziano moduli che potrebbero non essere installati. Solo se un upgrade richiede esplicitamente una modifica config, documentala come step manuale separato nella guida UPGRADE.
+>
+> **CRITICO #3 — `backend/.env` NON nel pacchetto.** Si crea una sola volta sul server al primo deploy. Eventuali nuove env vars vanno comunicate nella guida UPGRADE come step manuale (es. `BRANDFETCH_API_KEY` aggiunta in 1.2.0).
+>
+> **NOTA**: Il pacchetto `shared` viene compilato (`shared/dist/`). Non serve più copiare `shared/src/`.
 
 ---
 
@@ -84,6 +116,7 @@ Scaricare e installare:
 **ARR 3.0** → https://www.iis.net/downloads/microsoft/application-request-routing
 
 > **IMPORTANTE**: Dopo l'installazione di ARR, abilitare il proxy:
+>
 > 1. Aprire **IIS Manager**
 > 2. Selezionare il **nodo server** (non il sito)
 > 3. Doppio click su **Application Request Routing Cache**
@@ -116,6 +149,7 @@ npm install -g pnpm pm2 pm2-windows-startup
 Scaricare e installare PostgreSQL 16 da https://www.postgresql.org/download/windows/
 
 Durante l'installazione:
+
 - Annotare la **password** del superuser `postgres`
 - Porta di default: **5432**
 
@@ -238,6 +272,7 @@ BACKUP_CLOUD_ENABLED=false
 ```
 
 > **Generare i segreti JWT** con:
+>
 > ```powershell
 > node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 > ```
@@ -363,6 +398,7 @@ Get-WebGlobalModule | Where-Object { $_.Name -like "*arr*" -or $_.Name -like "*r
 ```
 
 Se il reverse proxy non funziona, verificare:
+
 1. **IIS Manager** → nodo server → **Application Request Routing Cache**
 2. **Server Proxy Settings** → spuntare **Enable proxy** → **Apply**
 
@@ -539,15 +575,22 @@ Get-Content C:\inetpub\logs\LogFiles\W3SVC*\*.log -Tail 50
 
 ### Riavvio servizi
 
+> **CRITICO**: in prod il server ospita molti altri siti — NON usare `iisreset` (riavvia tutto IIS). Riavvia SOLO il sito SalvaDash.
+
 ```powershell
-# Riavviare IIS
-iisreset
+# Riavviare SOLO il sito SalvaDash (non tutto IIS)
+Import-Module WebAdministration
+Stop-Website -Name "Salvadash"
+Start-Website -Name "Salvadash"
+
+# (Solo se vuoi anche il pool dedicato)
+# Restart-WebAppPool -Name "<Salvadash-AppPool>"
 
 # Riavviare backend
 pm2 restart salvadash-api
 
-# Riavviare PostgreSQL
-Restart-Service -Name postgresql-x64-16
+# Riavviare PostgreSQL (solo se necessario)
+Restart-Service -Name postgresql-x64-18
 ```
 
 ---
@@ -601,13 +644,13 @@ Restart-Service -Name postgresql-x64-16
 
 ## Risoluzione problemi comuni
 
-| Problema | Causa probabile | Soluzione |
-|---|---|---|
-| 502 Bad Gateway su `/api/*` | Backend non in esecuzione | `pm2 status` → `pm2 restart salvadash-api` |
-| 404 su tutte le route | URL Rewrite non installato | Installare URL Rewrite Module |
-| Reverse proxy non funziona | ARR non abilitato | IIS Manager → ARR Cache → Enable proxy |
-| Service Worker non registrato | Manca HTTPS | Configurare certificato SSL |
-| PWA non installabile | Errore manifest o no HTTPS | Verificare DevTools → Application |
-| Database connection failed | PostgreSQL non avviato | `Get-Service postgresql*` → `Start-Service` |
-| Errore Prisma generate | Node.js non nel PATH | Riavviare terminale dopo installazione Node |
-| Asset non caricati (MIME) | Tipi MIME mancanti | Il web.config già configura i tipi necessari |
+| Problema                      | Causa probabile            | Soluzione                                    |
+| ----------------------------- | -------------------------- | -------------------------------------------- |
+| 502 Bad Gateway su `/api/*`   | Backend non in esecuzione  | `pm2 status` → `pm2 restart salvadash-api`   |
+| 404 su tutte le route         | URL Rewrite non installato | Installare URL Rewrite Module                |
+| Reverse proxy non funziona    | ARR non abilitato          | IIS Manager → ARR Cache → Enable proxy       |
+| Service Worker non registrato | Manca HTTPS                | Configurare certificato SSL                  |
+| PWA non installabile          | Errore manifest o no HTTPS | Verificare DevTools → Application            |
+| Database connection failed    | PostgreSQL non avviato     | `Get-Service postgresql*` → `Start-Service`  |
+| Errore Prisma generate        | Node.js non nel PATH       | Riavviare terminale dopo installazione Node  |
+| Asset non caricati (MIME)     | Tipi MIME mancanti         | Il web.config già configura i tipi necessari |

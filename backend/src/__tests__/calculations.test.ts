@@ -204,4 +204,44 @@ describe('computeAnalytics', () => {
     expect(result.yearComparison).toEqual({});
     expect(result.avgGrowth).toBe(0);
   });
+
+  describe('with accountIds filter', () => {
+    it('restricts patrimony to selected accounts only', () => {
+      // Only Conto A — patrimony should reflect Conto A balances only
+      const result = computeAnalytics(rows, { accountIds: ['acc-Conto A'] });
+      const latest = result.patrimonyOverTime[result.patrimonyOverTime.length - 1];
+      expect(latest.total).toBe(15000); // Conto A only on 2025-03-01
+    });
+
+    it('restricts accountBreakdown to selected accounts', () => {
+      const result = computeAnalytics(rows, { accountIds: ['acc-Conto A'] });
+      expect(result.accountBreakdown).toHaveLength(1);
+      expect(result.accountBreakdown[0].name).toBe('Conto A');
+      expect(result.accountBreakdown[0].percent).toBe(100);
+    });
+
+    it('recomputes deltas on filtered totals', () => {
+      const fullA = computeAnalytics(rows, { accountIds: ['acc-Conto A'] });
+      // Conto A goes 10000→11000→12000→13000→15000 — best delta = +2000 (Feb→Mar)
+      expect(fullA.bestMonth.delta).toBe(2000);
+    });
+
+    it('leaves monthlyIncome untouched (income not account-bound)', () => {
+      const all = computeAnalytics(rows);
+      const filtered = computeAnalytics(rows, { accountIds: ['acc-Conto A'] });
+      expect(filtered.monthlyIncome).toEqual(all.monthlyIncome);
+    });
+
+    it('treats empty accountIds array as no filter', () => {
+      const all = computeAnalytics(rows);
+      const empty = computeAnalytics(rows, { accountIds: [] });
+      expect(empty.accountBreakdown).toHaveLength(all.accountBreakdown.length);
+    });
+
+    it('returns zero totals when no balances match the filter', () => {
+      const result = computeAnalytics(rows, { accountIds: ['acc-NonExistent'] });
+      expect(result.accountBreakdown).toHaveLength(0);
+      expect(result.patrimonyOverTime.every((p) => p.total === 0)).toBe(true);
+    });
+  });
 });

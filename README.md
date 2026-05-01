@@ -51,12 +51,12 @@ salvadash/
 └── package.json       pnpm monorepo workspace
 ```
 
-| Layer | Stack |
-| --- | --- |
+| Layer        | Stack                                                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | **Frontend** | React 19, Vite 6, TanStack Router & Query, Zustand, Framer Motion, Recharts, Tailwind CSS v4, Dexie (IndexedDB), i18next |
-| **Backend** | Express 4, Prisma 7, JWT auth (access + refresh), Nodemailer, Web Push, node-cron, XLSX export |
-| **Shared** | Zod schemas, TypeScript types — contratto API type-safe end-to-end |
-| **Infra** | Docker Compose (dev), PM2 (prod), IIS reverse proxy (Windows Server), GitHub Actions CI/CD |
+| **Backend**  | Express 4, Prisma 7, JWT auth (access + refresh), Nodemailer, Web Push, node-cron, XLSX export                           |
+| **Shared**   | Zod schemas, TypeScript types — contratto API type-safe end-to-end                                                       |
+| **Infra**    | Docker Compose (dev), PM2 (prod), IIS reverse proxy (Windows Server), GitHub Actions CI/CD                               |
 
 ### Schema del deploy
 
@@ -120,29 +120,29 @@ pnpm db:seed        # (opzionale) Popola dati di esempio
 pnpm dev            # Backend + Frontend in parallelo
 ```
 
-| Servizio | URL |
-| --- | --- |
-| Frontend | `http://localhost:5173` |
-| Backend API | `http://localhost:3000/api` |
-| Prisma Studio | `pnpm db:studio` |
+| Servizio      | URL                         |
+| ------------- | --------------------------- |
+| Frontend      | `http://localhost:5173`     |
+| Backend API   | `http://localhost:3000/api` |
+| Prisma Studio | `pnpm db:studio`            |
 
 ---
 
 ## Script disponibili
 
-| Comando | Descrizione |
-| --- | --- |
-| `pnpm dev` | Avvia tutti i servizi in sviluppo |
-| `pnpm build` | Build di produzione (shared + backend + frontend) |
-| `pnpm test` | Esegui tutti i test (Vitest) |
-| `pnpm lint` | Linting con ESLint |
-| `pnpm format` | Formattazione con Prettier |
-| `pnpm db:generate` | Rigenera Prisma Client |
-| `pnpm db:migrate` | Crea ed esegui migrazioni |
-| `pnpm db:push` | Sync schema -> DB (dev) |
-| `pnpm db:seed` | Popola database |
-| `pnpm db:studio` | Apri Prisma Studio GUI |
-| `pnpm clean` | Rimuovi node_modules e dist |
+| Comando            | Descrizione                                       |
+| ------------------ | ------------------------------------------------- |
+| `pnpm dev`         | Avvia tutti i servizi in sviluppo                 |
+| `pnpm build`       | Build di produzione (shared + backend + frontend) |
+| `pnpm test`        | Esegui tutti i test (Vitest)                      |
+| `pnpm lint`        | Linting con ESLint                                |
+| `pnpm format`      | Formattazione con Prettier                        |
+| `pnpm db:generate` | Rigenera Prisma Client                            |
+| `pnpm db:migrate`  | Crea ed esegui migrazioni                         |
+| `pnpm db:push`     | Sync schema -> DB (dev)                           |
+| `pnpm db:seed`     | Popola database                                   |
+| `pnpm db:studio`   | Apri Prisma Studio GUI                            |
+| `pnpm clean`       | Rimuovi node_modules e dist                       |
 
 ---
 
@@ -193,16 +193,16 @@ Guida completa in [DEPLOY-GUIDA-IIS.md](DEPLOY-GUIDA-IIS.md) — include:
 
 Tutte le variabili d'ambiente sono documentate in [`.env.example`](.env.example):
 
-| Variabile | Descrizione |
-| --- | --- |
-| `DATABASE_URL` | Stringa di connessione PostgreSQL |
-| `JWT_ACCESS_SECRET` | Chiave segreta per access token (15m) |
-| `JWT_REFRESH_SECRET` | Chiave segreta per refresh token (7d) |
-| `SMTP_*` | Configurazione email (SMTP) |
-| `VAPID_*` | Chiavi per Web Push notifications |
-| `APP_URL` | URL del frontend |
-| `API_URL` / `API_PORT` | URL e porta del backend |
-| `BACKUP_DIR` | Directory per backup automatici |
+| Variabile               | Descrizione                             |
+| ----------------------- | --------------------------------------- |
+| `DATABASE_URL`          | Stringa di connessione PostgreSQL       |
+| `JWT_ACCESS_SECRET`     | Chiave segreta per access token (15m)   |
+| `JWT_REFRESH_SECRET`    | Chiave segreta per refresh token (7d)   |
+| `SMTP_*`                | Configurazione email (SMTP)             |
+| `VAPID_*`               | Chiavi per Web Push notifications       |
+| `APP_URL`               | URL del frontend                        |
+| `API_URL` / `API_PORT`  | URL e porta del backend                 |
+| `BACKUP_DIR`            | Directory per backup automatici         |
 | `BACKUP_RETENTION_DAYS` | Giorni di retention backup (default 30) |
 
 ---
@@ -282,15 +282,15 @@ User (ROOT/ADMIN/BASE)
 
 ## Sicurezza
 
-| Area | Implementazione |
-| --- | --- |
+| Area               | Implementazione                                     |
+| ------------------ | --------------------------------------------------- |
 | **Autenticazione** | JWT access (15m) + refresh (7d) in httpOnly cookies |
-| **Password** | bcrypt 12 rounds |
-| **Autorizzazione** | RBAC middleware (ROOT > ADMIN > BASE) |
-| **Validazione** | Zod schemas su ogni endpoint (shared package) |
-| **HTTP** | Helmet.js (CSP, X-Frame-Options, HSTS) |
-| **CORS** | Origin ristretto al frontend |
-| **Token reset** | 32-byte cryptographic random con scadenza |
+| **Password**       | bcrypt 12 rounds                                    |
+| **Autorizzazione** | RBAC middleware (ROOT > ADMIN > BASE)               |
+| **Validazione**    | Zod schemas su ogni endpoint (shared package)       |
+| **HTTP**           | Helmet.js (CSP, X-Frame-Options, HSTS)              |
+| **CORS**           | Origin ristretto al frontend                        |
+| **Token reset**    | 32-byte cryptographic random con scadenza           |
 
 ---
 

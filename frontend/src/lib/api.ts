@@ -4,16 +4,24 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
 }
 
+let refreshInFlight: Promise<boolean> | null = null;
+
 async function refreshTokens(): Promise<boolean> {
-  try {
-    const res = await fetch(`${API_BASE}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = (async () => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      return res.ok;
+    } catch {
+      return false;
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+  return refreshInFlight;
 }
 
 async function request<T = unknown>(

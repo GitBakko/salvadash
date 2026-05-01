@@ -3,6 +3,7 @@ import { sendNotificationSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { sendPushToUser, sendPushToUsers } from '../lib/push.js';
+import { isValidationOk } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -132,12 +133,7 @@ router.post(
   async (req: Request, res: Response): Promise<void> => {
     try {
       const parsed = sendNotificationSchema.safeParse(req.body);
-      if (!parsed.success) {
-        res
-          .status(400)
-          .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-        return;
-      }
+      if (!isValidationOk(res, parsed)) return;
 
       const { userId, type, title, body } = parsed.data;
 

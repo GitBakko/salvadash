@@ -10,7 +10,10 @@ export const Route = createFileRoute('/release-history')({
   component: ReleaseHistoryPage,
 });
 
-const categoryConfig: Record<ChangelogCategoryType, { Icon: LucideIcon; color: string; labelKey: string }> = {
+const categoryConfig: Record<
+  ChangelogCategoryType,
+  { Icon: LucideIcon; color: string; labelKey: string }
+> = {
   feature: { Icon: Sparkles, color: 'text-brand', labelKey: 'version.features' },
   fix: { Icon: Bug, color: 'text-negative', labelKey: 'version.fixes' },
   improvement: { Icon: TrendingUp, color: 'text-positive', labelKey: 'version.improvements' },
@@ -28,12 +31,14 @@ function ReleaseHistoryPage() {
       (entry) =>
         entry.version.includes(q) ||
         entry.date.includes(q) ||
-        entry.categories.some((cat) => cat.items.some((item) => item[lang].toLowerCase().includes(q))),
+        entry.categories.some((cat) =>
+          cat.items.some((item) => item[lang].toLowerCase().includes(q)),
+        ),
     );
   }, [search, lang]);
 
   return (
-    <div className="p-4 max-w-lg mx-auto space-y-4 pb-24">
+    <div className="p-4 max-w-lg mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Link to="/settings" className="text-text-muted hover:text-text-primary transition-colors">
@@ -49,7 +54,11 @@ function ReleaseHistoryPage() {
       </div>
 
       {/* Search */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+      >
         <div className="relative">
           <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
           <input
@@ -78,7 +87,7 @@ function ReleaseHistoryPage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + idx * 0.05 }}
-            className="glass-card p-4 space-y-3"
+            className="solid-card p-4 space-y-3"
           >
             <div className="flex items-center justify-between">
               <h2 className="font-heading font-semibold">v{entry.version}</h2>
@@ -91,7 +100,9 @@ function ReleaseHistoryPage() {
                 <div key={cat.type} className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <config.Icon size={16} className={config.color} />
-                    <span className="text-xs font-semibold text-text-secondary">{t(config.labelKey)}</span>
+                    <span className="text-xs font-semibold text-text-secondary">
+                      {t(config.labelKey)}
+                    </span>
                   </div>
                   <ul className="space-y-1 ml-6">
                     {cat.items.map((item, i) => (

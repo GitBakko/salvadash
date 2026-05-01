@@ -9,7 +9,13 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    TanStackRouterVite(),
+    TanStackRouterVite({
+      // Ignore compiled .js/.d.ts artifacts that tsc -b emits alongside sources.
+      // Without this, the generator chokes on .d.ts files (which export `Route`
+      // as a type, not a CallExpression) and silently skips routeTree regeneration —
+      // breaking lazy-route discovery.
+      routeFileIgnorePattern: '\\.(js|d\\.ts|js\\.map|d\\.ts\\.map)$',
+    }),
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
@@ -18,6 +24,10 @@ export default defineConfig({
 
         // Precache: auto-generated from build output
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // iOS-only Apple Touch splash images (~700 KB) are bundled
+        // for the install banner but never used by the running PWA.
+        // Excluding them from precache trims service-worker install cost.
+        globIgnores: ['**/apple-splash-*.png'],
 
         // ── Runtime caching ────────────────────────────────
         runtimeCaching: [
@@ -62,8 +72,8 @@ export default defineConfig({
         name: 'SalvaDash',
         short_name: 'SalvaDash',
         description: 'Personal savings tracker',
-        theme_color: '#0a0a0f',
-        background_color: '#0a0a0f',
+        theme_color: '#191919',
+        background_color: '#191919',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',

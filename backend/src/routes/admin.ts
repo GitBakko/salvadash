@@ -2,6 +2,7 @@ import { Router, type Router as RouterType, type Request, type Response } from '
 import { adminUpdateUserSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
+import { isValidationOk } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -190,13 +191,7 @@ router.put('/users/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const id = req.params.id as string;
     const parsed = adminUpdateUserSchema.safeParse(req.body);
-
-    if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.flatten() });
-      return;
-    }
+    if (!isValidationOk(res, parsed)) return;
 
     const target = await prisma.user.findUnique({ where: { id } });
     if (!target) {

@@ -51,7 +51,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
 
           {/* Content */}
           <motion.div
-            className={`relative w-full ${sizeClasses[size]} glass-card p-6 shadow-2xl`}
+            className={`relative w-full ${sizeClasses[size]} solid-card p-6 shadow-2xl`}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}

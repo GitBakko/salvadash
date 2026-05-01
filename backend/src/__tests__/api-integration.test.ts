@@ -180,9 +180,12 @@ describe('API Integration Tests', () => {
           name: 'Conto A',
           type: 'MAIN',
           icon: null,
+          iconUrl: null,
           color: null,
           isActive: true,
           sortOrder: 0,
+          _count: { balances: 3 },
+          balances: [{ amount: '1234.56' }],
         },
       ]);
 
@@ -190,6 +193,8 @@ describe('API Integration Tests', () => {
       expect(res.status).toBe(200);
       expect(res.body.data).toHaveLength(1);
       expect(res.body.data[0].name).toBe('Conto A');
+      expect(res.body.data[0].amount).toBe(1234.56);
+      expect(res.body.data[0].entryCount).toBe(3);
     });
   });
 
@@ -202,6 +207,7 @@ describe('API Integration Tests', () => {
         name: 'New Bank',
         type: 'MAIN',
         icon: null,
+        iconUrl: null,
         color: null,
         isActive: true,
         sortOrder: 0,

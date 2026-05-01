@@ -12,9 +12,9 @@ export function Skeleton({
   height,
 }: SkeletonProps) {
   const variantClasses = {
-    text: 'rounded-[var(--radius-sm)] h-4',
+    text: 'rounded-sm h-4',
     circular: 'rounded-full',
-    rectangular: 'rounded-[var(--radius-md)]',
+    rectangular: 'rounded-md',
   };
 
   return (
@@ -27,7 +27,7 @@ export function Skeleton({
 
 export function SkeletonCard() {
   return (
-    <div className="glass-card p-4 space-y-3">
+    <div className="solid-card p-4 space-y-3">
       <Skeleton width="60%" height={20} />
       <Skeleton width="100%" height={14} />
       <Skeleton width="80%" height={14} />

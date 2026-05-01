@@ -1,0 +1,19 @@
+name: SalvaDash CodeQL config
+
+# CSRF mitigation strategy is documented in SECURITY.md:
+# - All session cookies use SameSite=strict + httpOnly + secure in production
+#   (see backend/src/lib/auth.ts: ACCESS_COOKIE_OPTIONS / REFRESH_COOKIE_OPTIONS)
+# - CORS restricts origin to APP_URL only (see backend/src/index.ts)
+# - These controls together prevent CSRF without a per-request token system,
+#   which would add complexity without raising the security bar for our threat model
+#   (single-tenant per user, same-origin SPA, no third-party iframes).
+#
+# We disable the missing-csrf-middleware query since SameSite=strict is the
+# documented mitigation. Re-enable if cookie SameSite is ever relaxed.
+queries:
+  - uses: security-and-quality
+  - uses: security-extended
+
+query-filters:
+  - exclude:
+      id: js/missing-token-validation

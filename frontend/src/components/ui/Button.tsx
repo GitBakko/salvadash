@@ -1,13 +1,9 @@
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
-import { motion } from 'framer-motion';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-interface ButtonProps extends Omit<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart'
-> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
@@ -15,7 +11,7 @@ interface ButtonProps extends Omit<
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-brand text-surface-base hover:bg-brand-hover active:scale-[0.97] glow-brand',
+  primary: 'bg-brand text-surface-base hover:bg-brand-hover',
   secondary:
     'bg-surface-elevated text-text-primary border border-border-default hover:border-brand/40',
   ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface-elevated/50',
@@ -23,9 +19,9 @@ const variantClasses: Record<ButtonVariant, string> = {
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-sm rounded-[var(--radius-sm)]',
-  md: 'px-4 py-2.5 text-sm rounded-[var(--radius-md)]',
-  lg: 'px-6 py-3 text-base rounded-[var(--radius-lg)]',
+  sm: 'px-3 py-1.5 text-sm rounded-sm',
+  md: 'px-4 py-2.5 text-sm rounded-md',
+  lg: 'px-6 py-3 text-base rounded-lg',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -43,12 +39,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     return (
-      <motion.button
+      <button
         ref={ref}
-        whileTap={{ scale: disabled || loading ? 1 : 0.97 }}
         className={`
           inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200
+          focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2
+          active:scale-[0.97]
           disabled:opacity-50 disabled:cursor-not-allowed
+          disabled:active:scale-100
           ${variantClasses[variant]}
           ${sizeClasses[size]}
           ${fullWidth ? 'w-full' : ''}
@@ -75,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           </svg>
         )}
         {children}
-      </motion.button>
+      </button>
     );
   },
 );
