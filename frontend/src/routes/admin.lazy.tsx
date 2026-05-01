@@ -74,7 +74,7 @@ const ROLE_COLORS: Record<string, string> = {
 const ROLE_BG: Record<string, string> = {
   ROOT: 'bg-red-500/15 text-red-400',
   ADMIN: 'bg-gold/15 text-gold',
-  BASE: 'bg-surface-2 text-text-muted',
+  BASE: 'bg-surface-elevated text-text-muted',
 };
 
 const TAB_ICONS: Record<string, LucideIcon> = {
@@ -127,7 +127,7 @@ function AdminPage() {
               className={`px-4 py-2 rounded-xl font-medium text-sm transition-all whitespace-nowrap flex items-center gap-1 ${
                 activeTab === tab
                   ? 'bg-brand/15 text-brand'
-                  : 'bg-surface-2 text-text-muted hover:text-text-primary'
+                  : 'bg-surface-elevated text-text-muted hover:text-text-primary'
               }`}
             >
               <TabIcon size={16} />
@@ -282,13 +282,13 @@ function UsersSection({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('admin.searchPlaceholder')}
-            className="w-full bg-surface-2 border border-border-default rounded-xl py-2 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand"
+            className="w-full bg-surface-elevated border border-border-default rounded-xl py-2 pl-10 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand"
           />
         </div>
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="bg-surface-2 border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-brand"
+          className="bg-surface-elevated border border-border-default rounded-xl px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-brand"
         >
           <option value="">{t('admin.allRoles')}</option>
           <option value="ROOT">ROOT</option>
@@ -329,7 +329,7 @@ function UsersSection({
                     {/* Avatar */}
                     <div
                       className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
-                        u.isActive ? 'bg-brand/15 text-brand' : 'bg-surface-3 text-text-muted'
+                        u.isActive ? 'bg-brand/15 text-brand' : 'bg-surface-elevated text-text-muted'
                       }`}
                     >
                       {u.name.charAt(0).toUpperCase()}
@@ -428,11 +428,11 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-lg bg-surface-1 rounded-t-2xl border-t border-border-default p-5 pb-8 max-h-[80vh] overflow-y-auto"
+        className="relative w-full max-w-lg bg-surface-card-solid rounded-t-2xl border-t border-border-default p-5 pb-8 max-h-[80vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle */}
-        <div className="w-10 h-1 rounded-full bg-surface-3 mx-auto mb-4" />
+        <div className="w-10 h-1 rounded-full bg-surface-elevated mx-auto mb-4" />
 
         {isLoading || !user ? (
           <div className="space-y-3">
@@ -446,7 +446,7 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
             <div className="flex items-center gap-3">
               <div
                 className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
-                  user.isActive ? 'bg-brand/15 text-brand' : 'bg-surface-3 text-text-muted'
+                  user.isActive ? 'bg-brand/15 text-brand' : 'bg-surface-elevated text-text-muted'
                 }`}
               >
                 {user.name.charAt(0).toUpperCase()}
@@ -515,7 +515,7 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
                           className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                             user.role === r
                               ? 'bg-brand/20 text-brand'
-                              : 'bg-surface-2 text-text-muted hover:text-text-primary'
+                              : 'bg-surface-elevated text-text-muted hover:text-text-primary'
                           }`}
                         >
                           {r}
@@ -556,7 +556,7 @@ function UserDetailSheet({ userId, onClose }: { userId: string; onClose: () => v
                         <div className="flex gap-2">
                           <button
                             onClick={() => setShowDeleteConfirm(false)}
-                            className="flex-1 py-2 rounded-lg text-sm bg-surface-2 text-text-muted hover:text-text-primary transition-all"
+                            className="flex-1 py-2 rounded-lg text-sm bg-surface-elevated text-text-muted hover:text-text-primary transition-all"
                           >
                             {t('common.cancel')}
                           </button>
@@ -601,7 +601,7 @@ function StatItem({
   small?: boolean;
 }) {
   return (
-    <div className="bg-surface-2 rounded-xl p-2.5">
+    <div className="bg-surface-elevated rounded-xl p-2.5">
       <div className="flex items-center gap-1.5 mb-0.5">
         <Icon size={14} className="text-text-muted" />
         <span className="text-[10px] text-text-muted uppercase tracking-wide">{label}</span>
@@ -764,7 +764,7 @@ function BroadcastSection() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   type === nt
                     ? 'bg-brand/20 text-brand'
-                    : 'bg-surface-2 text-text-muted hover:text-text-primary'
+                    : 'bg-surface-elevated text-text-muted hover:text-text-primary'
                 }`}
               >
                 {t(`notifications.type${nt}`)}
@@ -783,7 +783,7 @@ function BroadcastSection() {
             value={targetUserId}
             onChange={(e) => setTargetUserId(e.target.value)}
             placeholder={t('notifications.broadcastAll')}
-            className="w-full bg-surface-2 border border-border-default rounded-xl py-2 px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand"
+            className="w-full bg-surface-elevated border border-border-default rounded-xl py-2 px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand"
           />
           <p className="text-[10px] text-text-muted mt-1">
             {targetUserId ? t('notifications.broadcastUser') : t('notifications.broadcastAll')}
@@ -800,7 +800,7 @@ function BroadcastSection() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={200}
-            className="w-full bg-surface-2 border border-border-default rounded-xl py-2 px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand"
+            className="w-full bg-surface-elevated border border-border-default rounded-xl py-2 px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand"
           />
         </div>
 
@@ -814,7 +814,7 @@ function BroadcastSection() {
             onChange={(e) => setBody(e.target.value)}
             maxLength={2000}
             rows={3}
-            className="w-full bg-surface-2 border border-border-default rounded-xl py-2 px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand resize-none"
+            className="w-full bg-surface-elevated border border-border-default rounded-xl py-2 px-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand resize-none"
           />
         </div>
 
@@ -1063,7 +1063,7 @@ function BackupSection() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => setRestoreConfirmId(null)}
-                        className="flex-1 py-1.5 rounded-lg text-xs bg-surface-2 text-text-muted hover:text-text-primary transition-all"
+                        className="flex-1 py-1.5 rounded-lg text-xs bg-surface-elevated text-text-muted hover:text-text-primary transition-all"
                       >
                         {t('common.cancel')}
                       </button>
@@ -1089,7 +1089,7 @@ function BackupSection() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => setDeleteConfirmId(null)}
-                        className="flex-1 py-1.5 rounded-lg text-xs bg-surface-2 text-text-muted hover:text-text-primary transition-all"
+                        className="flex-1 py-1.5 rounded-lg text-xs bg-surface-elevated text-text-muted hover:text-text-primary transition-all"
                       >
                         {t('common.cancel')}
                       </button>

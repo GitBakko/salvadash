@@ -43,6 +43,10 @@ export const config = {
     dir: process.env.BACKUP_DIR ?? './backups',
     retentionDays: parseInt(process.env.BACKUP_RETENTION_DAYS ?? '10', 10),
     cloudEnabled: process.env.BACKUP_CLOUD_ENABLED === 'true',
+    // Absolute path to PostgreSQL bin dir on app server (must contain pg_dump + psql).
+    // Required when DB is on a remote host and pg_dump is not on system PATH.
+    // Example (Windows): C:\Program Files\PostgreSQL\18\bin
+    pgBinPath: process.env.PG_BIN_PATH ?? '',
   },
 
   brandfetch: {

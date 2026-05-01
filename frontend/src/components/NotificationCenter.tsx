@@ -64,11 +64,11 @@ export function NotificationCenter({ onClose }: { onClose: () => void }) {
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-lg bg-surface-1 rounded-t-2xl border-t border-border-default p-5 pb-8 max-h-[80vh] overflow-y-auto no-scrollbar"
+        className="relative w-full max-w-lg bg-surface-card-solid rounded-t-2xl border-t border-border-default p-5 pb-8 max-h-[80vh] overflow-y-auto no-scrollbar shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle */}
-        <div className="w-10 h-1 rounded-full bg-surface-3 mx-auto mb-4" />
+        <div className="w-10 h-1 rounded-full bg-text-muted/30 mx-auto mb-4" />
 
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
