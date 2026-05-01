@@ -140,6 +140,48 @@ npm --version
 npm install -g pnpm pm2 pm2-windows-startup
 ```
 
+### 2.6 Installare PostgreSQL 18 client tools sul server APP (per i backup)
+
+In prod il server APP è separato dal server DB. Lo scheduler di backup gira lato APP e invoca `pg_dump` / `psql` per fare un dump remoto verso `192.168.3.243`. Servono quindi i **client tools** Postgres 18 sul server APP (NON il server completo).
+
+1. Scaricare l'installer Postgres 18 da https://www.postgresql.org/download/windows/
+2. Lanciare l'installer e nel selettore componenti **deselezionare**:
+   - PostgreSQL Server
+   - pgAdmin 4
+   - Stack Builder
+
+   Lasciare attivo SOLO **Command Line Tools**.
+
+3. Path di default: `C:\Program Files\PostgreSQL\18\bin` (contiene `pg_dump.exe`, `psql.exe`, `pg_restore.exe`).
+4. Verifica:
+
+   ```powershell
+   & "C:\Program Files\PostgreSQL\18\bin\pg_dump.exe" --version
+   # PostgreSQL 18.x
+   ```
+
+5. Configurare l'app per usare quel path: nel `.env` di backend impostare
+
+   ```dotenv
+   PG_BIN_PATH="C:\Program Files\PostgreSQL\18\bin"
+   ```
+
+   In alternativa, aggiungere il path alla variabile di sistema `PATH` (lasciando `PG_BIN_PATH` vuoto). Sconsigliato se il server ha più versioni di Postgres installate.
+
+6. Test connessione remota dal server APP:
+
+   ```powershell
+   $env:PGPASSWORD="<password_user_salvadash>"
+   & "C:\Program Files\PostgreSQL\18\bin\pg_dump.exe" `
+     --host 192.168.3.243 --port 5432 `
+     --username salvadash --dbname salvadash `
+     --schema-only --no-owner --no-privileges | Select-Object -First 5
+   ```
+
+   Se ritorna le prime righe del dump (header `-- PostgreSQL database dump`) il path di rete + credenziali + pg_hba.conf sono OK e i backup giornalieri 03:00 funzioneranno.
+
+> **Versione client === versione server.** `pg_dump` rifiuta server con major version superiore al client. Postgres 18 server richiede client 18+ (i client 16/17 falliscono con "server version too high").
+
 ---
 
 ## 3. Setup PostgreSQL
@@ -269,6 +311,10 @@ SEED_EXCEL_PATH="./prisma/data/Risparmi.xlsx"
 BACKUP_DIR="./backups"
 BACKUP_RETENTION_DAYS=30
 BACKUP_CLOUD_ENABLED=false
+# Path al bin di PostgreSQL 18 sul server APP (deve contenere pg_dump.exe + psql.exe).
+# OBBLIGATORIO in prod: il DB sta su un host LAN separato, e per fare i backup
+# il server APP deve avere installati i client tools di Postgres 18 e puntarli qui.
+PG_BIN_PATH="C:\Program Files\PostgreSQL\18\bin"
 ```
 
 > **Generare i segreti JWT** con:

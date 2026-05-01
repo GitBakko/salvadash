@@ -22,6 +22,25 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: '1.2.5',
+    date: '2026-05-01',
+    categories: [
+      {
+        type: 'fix',
+        items: [
+          {
+            it: 'Pannello notifiche e schermate admin: sfondi resi opachi (token Tailwind inesistenti producevano pannelli trasparenti illeggibili).',
+            en: 'Notifications panel and admin screens: backgrounds restored to opaque (broken Tailwind tokens were rendering as transparent unreadable panels).',
+          },
+          {
+            it: 'Backup database remoto: supporto per server DB su host LAN separato. Nuova var ambiente `PG_BIN_PATH` per puntare ai client tools Postgres 18 installati sul server APP.',
+            en: 'Remote database backup: support for DB server on separate LAN host. New `PG_BIN_PATH` env var pointing to Postgres 18 client tools installed on APP server.',
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '1.2.4',
     date: '2026-05-01',
     categories: [

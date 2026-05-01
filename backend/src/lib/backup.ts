@@ -17,6 +17,17 @@ async function ensureBackupDir(): Promise<void> {
   await fs.mkdir(getBackupDir(), { recursive: true });
 }
 
+// Resolve PG client binary path. When PG_BIN_PATH is set we use the explicit
+// install dir (required on Windows app servers where the DB is on a separate
+// host and only client tools are installed). Otherwise we fall back to the
+// system PATH, which is fine on dev / single-host deployments.
+function pgBin(name: 'pg_dump' | 'psql'): string {
+  const dir = config.backup.pgBinPath;
+  if (!dir) return name;
+  const exe = process.platform === 'win32' ? `${name}.exe` : name;
+  return path.join(dir, exe);
+}
+
 function pgDumpArgs(): string[] {
   const url = new URL(process.env.DATABASE_URL ?? '');
   return [
@@ -61,7 +72,7 @@ export async function createBackup(
       const args = pgDumpArgs();
       const env = { ...process.env, PGPASSWORD: new URL(process.env.DATABASE_URL ?? '').password };
 
-      const dump = execFile('pg_dump', args, { env, maxBuffer: 500 * 1024 * 1024 });
+      const dump = execFile(pgBin('pg_dump'), args, { env, maxBuffer: 500 * 1024 * 1024 });
       const gzip = createGzip({ level: 6 });
       const out = createWriteStream(filepath);
 
@@ -133,7 +144,7 @@ export async function restoreBackup(filename: string): Promise<void> {
     ];
     const env = { ...process.env, PGPASSWORD: url.password };
 
-    const psql = execFile('psql', args, { env, maxBuffer: 500 * 1024 * 1024 });
+    const psql = execFile(pgBin('psql'), args, { env, maxBuffer: 500 * 1024 * 1024 });
     const gunzip = createGunzip();
     const input = createReadStream(filepath);
 
