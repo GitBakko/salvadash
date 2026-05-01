@@ -329,7 +329,9 @@ function UsersSection({
                     {/* Avatar */}
                     <div
                       className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
-                        u.isActive ? 'bg-brand/15 text-brand' : 'bg-surface-elevated text-text-muted'
+                        u.isActive
+                          ? 'bg-brand/15 text-brand'
+                          : 'bg-surface-elevated text-text-muted'
                       }`}
                     >
                       {u.name.charAt(0).toUpperCase()}

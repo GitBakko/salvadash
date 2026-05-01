@@ -151,6 +151,7 @@ In prod il server APP è separato dal server DB. Lo scheduler di backup gira lat
    - Stack Builder
 
    Lasciare attivo SOLO **Command Line Tools**.
+
 3. Path di default: `C:\Program Files\PostgreSQL\18\bin` (contiene `pg_dump.exe`, `psql.exe`, `pg_restore.exe`).
 4. Verifica:
 
