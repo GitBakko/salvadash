@@ -22,6 +22,21 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: '1.2.2',
+    date: '2026-05-01',
+    categories: [
+      {
+        type: 'fix',
+        items: [
+          {
+            it: 'Mobile/PWA standalone: pulsante "Modifica conto" e "Nuovo conto" ora aprono correttamente la schermata. Prima header e bottom-nav scomparivano lasciando schermata vuota.',
+            en: 'Mobile/PWA standalone: "Edit account" and "New account" buttons now open correctly. Previously header and bottom-nav disappeared, leaving a blank screen.',
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '1.2.1',
     date: '2026-04-30',
     categories: [

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Outlet, useChildMatches, useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useMemo, useState } from 'react';
 import { Reorder, AnimatePresence, useDragControls, motion } from 'framer-motion';
@@ -52,6 +52,15 @@ function AccountsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isDesktop = useMediaQuery('(min-width: 768px)');
+  // TanStack Router treats `routes/accounts.tsx` as parent layout for
+  // `accounts/$id/edit.tsx` and `accounts/new.tsx`. When a child route is
+  // active we MUST render only <Outlet/> — without this, the child component
+  // never mounts (no Outlet here), the URL changes, FULLSCREEN_REGEX in
+  // __root hides chrome, and the user is stuck on a blank/list view.
+  const childMatches = useChildMatches();
+  if (childMatches.length > 0) {
+    return <Outlet />;
+  }
   const { data: accounts, isLoading } = useAccounts();
   const deleteAccount = useDeleteAccount();
   const updateAccount = useUpdateAccount();
