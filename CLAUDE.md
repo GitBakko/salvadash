@@ -94,7 +94,9 @@ Prod: `pm2 start backend/ecosystem.config.json`; IIS reverse-proxy `/api`,`/uplo
 
 3. The dev `dist-release/` packaging script needs to be aware of #1 and #2. Re-validate any time the release flow is touched.
 
-4. **NEVER run `iisreset`.** Prod server hosts many other sites — restarting all IIS would impact unrelated services. Restart ONLY the SalvaDash site:
+4. **Staging path on prod is `E:\www\salvadash-v<version>\`, NOT `E:\install\`.** The release zip is uploaded next to the running app under `E:\www\` and extracted there. Deploy guides and UPGRADE docs must use `E:\www\salvadash-v<version>\` as the source path when copying files into `E:\www\salvadash\`.
+
+5. **NEVER run `iisreset`.** Prod server hosts many other sites — restarting all IIS would impact unrelated services. Restart ONLY the SalvaDash site:
 
    ```powershell
    # PowerShell as Administrator

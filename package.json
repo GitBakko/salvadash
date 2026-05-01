@@ -7,7 +7,7 @@
     "dev": "pnpm --parallel -r run dev",
     "dev:backend": "pnpm --filter backend run dev",
     "dev:frontend": "pnpm --filter frontend run dev",
-    "build": "pnpm -r run build",
+    "build": "pnpm --filter shared run build && pnpm --filter backend run build && pnpm --filter frontend run build",
     "build:backend": "pnpm --filter backend run build",
     "build:frontend": "pnpm --filter frontend run build",
     "lint": "pnpm -r run lint",
