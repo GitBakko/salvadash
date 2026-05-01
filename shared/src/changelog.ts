@@ -22,6 +22,29 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: '1.2.4',
+    date: '2026-05-01',
+    categories: [
+      {
+        type: 'fix',
+        items: [
+          {
+            it: 'Mobile/PWA standalone: risolto crash "Something went wrong" aprendo modifica conto. Causa: violazione Rules of Hooks in lista conti.',
+            en: 'Mobile/PWA standalone: fixed "Something went wrong" crash when opening account edit. Cause: Rules of Hooks violation in account list.',
+          },
+          {
+            it: "Splash screen iOS: sfondo allineato al colore dell'icona (#191919) — niente più bordo nero attorno all'icona durante il caricamento.",
+            en: 'iOS splash screen: background aligned with icon color (#191919) — no more black border around the icon while loading.',
+          },
+          {
+            it: 'PWA theme/background color allineati al nuovo branding (#191919).',
+            en: 'PWA theme/background color aligned with new branding (#191919).',
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '1.2.3',
     date: '2026-05-01',
     categories: [

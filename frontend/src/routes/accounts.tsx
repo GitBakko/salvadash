@@ -49,18 +49,15 @@ function getAccountColor(account: AccountPublic, index: number): string {
 // ─── Main page ─────────────────────────────────────────────
 
 function AccountsPage() {
+  // ALL hooks MUST run unconditionally on every render. We must NOT early-return
+  // before declaring all hooks below, otherwise React throws "Rendered fewer hooks
+  // than during the previous render" when navigating between /accounts (no child)
+  // and /accounts/$id/edit (child match). The child-route conditional render is
+  // placed AFTER every hook in this component.
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isDesktop = useMediaQuery('(min-width: 768px)');
-  // TanStack Router treats `routes/accounts.tsx` as parent layout for
-  // `accounts/$id/edit.tsx` and `accounts/new.tsx`. When a child route is
-  // active we MUST render only <Outlet/> — without this, the child component
-  // never mounts (no Outlet here), the URL changes, FULLSCREEN_REGEX in
-  // __root hides chrome, and the user is stuck on a blank/list view.
   const childMatches = useChildMatches();
-  if (childMatches.length > 0) {
-    return <Outlet />;
-  }
   const { data: accounts, isLoading } = useAccounts();
   const deleteAccount = useDeleteAccount();
   const updateAccount = useUpdateAccount();
@@ -105,6 +102,14 @@ function AccountsPage() {
       sortDir,
     );
   }, [inactiveAccounts, sortMode, sortDir]);
+
+  // Child-route hand-off: TanStack Router treats `routes/accounts.tsx` as the
+  // parent layout for `accounts/$id/edit.tsx` and `accounts/new.tsx`. When a
+  // child is active we render only <Outlet/>. Placed AFTER all hooks so the hook
+  // count stays stable across renders.
+  if (childMatches.length > 0) {
+    return <Outlet />;
+  }
 
   // Sync key for resetting Reorder.Group when server data changes
   const serverActiveKey = activeAccounts.map((a) => a.id).join(',');

@@ -29,7 +29,17 @@ if (!src) {
   process.exit(1);
 }
 
-const BG = { r: 10, g: 10, b: 15, alpha: 1 }; // #0A0A0F
+// Auto-sample the icon's corner pixel to use as the splash/maskable canvas color.
+// This guarantees the icon blends into the splash background instead of sitting
+// on a contrasting block (which looks broken on iOS PWA launch).
+const cornerBuf = await sharp(src)
+  .extract({ left: 0, top: 0, width: 1, height: 1 })
+  .raw()
+  .toBuffer();
+const BG = { r: cornerBuf[0], g: cornerBuf[1], b: cornerBuf[2], alpha: 1 };
+const BG_HEX =
+  '#' + [BG.r, BG.g, BG.b].map((c) => c.toString(16).padStart(2, '0').toUpperCase()).join('');
+console.log(`Sampled icon bg color: ${BG_HEX} (rgb ${BG.r}, ${BG.g}, ${BG.b})`);
 
 // ── PWA standard icons (transparent OK, but source is opaque so output opaque) ──
 const pwaSizes = [48, 72, 96, 128, 144, 192, 384, 512];
