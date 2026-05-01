@@ -22,6 +22,21 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: '1.2.3',
+    date: '2026-05-01',
+    categories: [
+      {
+        type: 'feature',
+        items: [
+          {
+            it: "Nuova icona app: moneta violet con S in mano e ribbon mint dell'aurora. Aggiornata su iOS, Android, Windows, favicon e splash screen.",
+            en: 'New app icon: violet coin with S in hand and mint aurora ribbon. Updated across iOS, Android, Windows, favicon, and splash screens.',
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '1.2.2',
     date: '2026-05-01',
     categories: [
