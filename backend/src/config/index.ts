@@ -28,6 +28,9 @@ const envSchema = z.object({
   SENTRY_TRACES_SAMPLE_RATE: numEnv(0),
 
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  DB_POOL_MAX: numEnv(10),
+  DB_POOL_IDLE_TIMEOUT_MS: numEnv(10_000),
+  DB_POOL_CONNECTION_TIMEOUT_MS: numEnv(10_000),
 
   JWT_ACCESS_SECRET: z.string().min(1, 'JWT_ACCESS_SECRET is required'),
   JWT_REFRESH_SECRET: z.string().min(1, 'JWT_REFRESH_SECRET is required'),
@@ -78,6 +81,12 @@ export function parseEnv(env: NodeJS.ProcessEnv) {
     },
 
     databaseUrl: e.DATABASE_URL,
+
+    db: {
+      poolMax: e.DB_POOL_MAX,
+      idleTimeoutMs: e.DB_POOL_IDLE_TIMEOUT_MS,
+      connectionTimeoutMs: e.DB_POOL_CONNECTION_TIMEOUT_MS,
+    },
 
     jwt: {
       accessSecret: e.JWT_ACCESS_SECRET,

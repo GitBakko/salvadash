@@ -7,7 +7,17 @@ const dbUrl = new URL(config.databaseUrl);
 const schema = dbUrl.searchParams.get('schema') || 'public';
 dbUrl.searchParams.delete('schema');
 
-const adapter = new PrismaPg(dbUrl.toString(), { schema });
+// Configure the underlying pg connection pool. Defaults are conservative and
+// env-overridable so prod can size the pool to the DB host's max_connections.
+const adapter = new PrismaPg(
+  {
+    connectionString: dbUrl.toString(),
+    max: config.db.poolMax,
+    idleTimeoutMillis: config.db.idleTimeoutMs,
+    connectionTimeoutMillis: config.db.connectionTimeoutMs,
+  },
+  { schema },
+);
 
 const prisma = new PrismaClient({
   adapter,
