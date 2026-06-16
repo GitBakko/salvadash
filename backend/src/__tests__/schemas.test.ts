@@ -31,9 +31,10 @@ describe('loginSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejects short password', () => {
-    const result = loginSchema.safeParse({ email: 'a@b.com', password: '123' });
-    expect(result.success).toBe(false);
+  it('rejects empty password but accepts any non-empty (legacy passwords keep working)', () => {
+    expect(loginSchema.safeParse({ email: 'a@b.com', password: '' }).success).toBe(false);
+    // Login must not enforce the new complexity policy, or existing users lock out.
+    expect(loginSchema.safeParse({ email: 'a@b.com', password: '123' }).success).toBe(true);
   });
 
   it('rejects too long password', () => {
@@ -53,8 +54,8 @@ describe('registerSchema', () => {
   const validData = {
     name: 'Mario Rossi',
     email: 'mario@test.com',
-    password: 'password123',
-    confirmPassword: 'password123',
+    password: 'Str0ngPass2026',
+    confirmPassword: 'Str0ngPass2026',
     inviteCode: 'ABC123',
   };
 
@@ -139,12 +140,16 @@ describe('forgotPasswordSchema', () => {
 
 describe('resetPasswordSchema', () => {
   it('accepts valid input', () => {
-    const data = { token: 'abc123', password: '12345678', confirmPassword: '12345678' };
+    const data = {
+      token: 'abc123',
+      password: 'Str0ngPass2026',
+      confirmPassword: 'Str0ngPass2026',
+    };
     expect(resetPasswordSchema.safeParse(data).success).toBe(true);
   });
 
   it('rejects password mismatch', () => {
-    const data = { token: 'abc', password: 'password1', confirmPassword: 'password2' };
+    const data = { token: 'abc', password: 'Str0ngPass2026', confirmPassword: 'Str0ngPass2027' };
     expect(resetPasswordSchema.safeParse(data).success).toBe(false);
   });
 });

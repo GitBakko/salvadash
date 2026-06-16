@@ -7,6 +7,7 @@ import { useUIStore } from '../stores/ui-store';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { AuthLayout } from '../components/AuthLayout';
+import { passwordErrorKey } from '../lib/password';
 
 export const Route = createFileRoute('/register')({
   component: RegisterPage,
@@ -35,8 +36,9 @@ function RegisterPage() {
       return;
     }
 
-    if (password.length < 8) {
-      setError(t('auth.passwordTooShort'));
+    const pwError = passwordErrorKey(password);
+    if (pwError) {
+      setError(t(pwError));
       return;
     }
 
@@ -98,6 +100,8 @@ function RegisterPage() {
           required
           icon={<Lock size={20} />}
         />
+
+        <p className="-mt-1 text-xs text-text-secondary">{t('auth.passwordRequirements')}</p>
 
         <Input
           label={t('auth.confirmPassword')}

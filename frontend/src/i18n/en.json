@@ -58,6 +58,13 @@
     "inviteCodePlaceholder": "Enter your invite code",
     "passwordMismatch": "Passwords don't match",
     "passwordTooShort": "Password must be at least 8 characters",
+    "passwordRequirements": "At least 12 characters, including letters and numbers",
+    "password": {
+      "tooShort": "Password must be at least 12 characters",
+      "tooLong": "Password must not exceed 128 characters",
+      "needsLetterNumber": "Password must include at least one letter and one number",
+      "tooCommon": "This password is too common — choose a less predictable one"
+    },
     "forgotPasswordError": "Failed to send reset link",
     "forgotPasswordDesc": "Enter your email and we'll send you a link to reset your password.",
     "resetEmailSent": "We've sent you an email with a reset link. Check your inbox.",

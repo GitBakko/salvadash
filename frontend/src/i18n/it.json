@@ -58,6 +58,13 @@
     "inviteCodePlaceholder": "Inserisci il codice invito",
     "passwordMismatch": "Le password non coincidono",
     "passwordTooShort": "La password deve avere almeno 8 caratteri",
+    "passwordRequirements": "Almeno 12 caratteri, con lettere e numeri",
+    "password": {
+      "tooShort": "La password deve avere almeno 12 caratteri",
+      "tooLong": "La password non può superare 128 caratteri",
+      "needsLetterNumber": "La password deve contenere almeno una lettera e un numero",
+      "tooCommon": "Questa password è troppo comune: scegline una meno prevedibile"
+    },
     "forgotPasswordError": "Errore nell'invio del link di reset",
     "forgotPasswordDesc": "Inserisci la tua email e ti invieremo un link per reimpostare la password.",
     "resetEmailSent": "Ti abbiamo inviato un'email con il link di reset. Controlla la tua casella di posta.",
