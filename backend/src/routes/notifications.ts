@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { sendNotificationSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
@@ -42,7 +43,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       nextCursor: hasMore ? data[data.length - 1].id : null,
     });
   } catch (err) {
-    console.error('List notifications error:', err);
+    log.error('List notifications error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -56,7 +57,7 @@ router.get('/unread-count', async (req: Request, res: Response): Promise<void> =
     });
     res.json({ success: true, data: { count } });
   } catch (err) {
-    console.error('Unread count error:', err);
+    log.error('Unread count error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -82,7 +83,7 @@ router.put('/:id/read', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, data: { message: 'Marked as read' } });
   } catch (err) {
-    console.error('Mark read error:', err);
+    log.error('Mark read error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -98,7 +99,7 @@ router.put('/read-all', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, data: { message: 'All marked as read' } });
   } catch (err) {
-    console.error('Mark all read error:', err);
+    log.error('Mark all read error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -120,7 +121,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
     await prisma.notification.delete({ where: { id } });
     res.json({ success: true, data: { message: 'Notification deleted' } });
   } catch (err) {
-    console.error('Delete notification error:', err);
+    log.error('Delete notification error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -175,7 +176,7 @@ router.post(
           .json({ success: true, data: { message: 'Broadcast sent', count: users.length } });
       }
     } catch (err) {
-      console.error('Broadcast notification error:', err);
+      log.error('Broadcast notification error:', err);
       res.status(500).json({ success: false, error: 'Internal server error' });
     }
   },

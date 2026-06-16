@@ -14,6 +14,13 @@ export const config = {
   appUrl: process.env.APP_URL ?? 'http://localhost:5173',
   apiUrl: process.env.API_URL ?? 'http://localhost:3000',
 
+  logLevel: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === 'production' ? 'info' : 'debug'),
+
+  sentry: {
+    dsn: process.env.SENTRY_DSN ?? '',
+    tracesSampleRate: parseFloat(process.env.SENTRY_TRACES_SAMPLE_RATE ?? '0'),
+  },
+
   databaseUrl: requireEnv('DATABASE_URL'),
 
   jwt: {

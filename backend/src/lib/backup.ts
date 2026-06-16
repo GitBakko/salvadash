@@ -1,3 +1,4 @@
+import { log } from './logger.js';
 import { execFile } from 'node:child_process';
 import { createReadStream, createWriteStream } from 'node:fs';
 import fs from 'node:fs/promises';
@@ -225,7 +226,7 @@ export async function runDbMaintenance(): Promise<{
     results.vacuum = true;
     results.analyze = true;
   } catch (err) {
-    console.error('VACUUM ANALYZE failed:', err);
+    log.error('VACUUM ANALYZE failed:', err);
   }
 
   try {
@@ -233,7 +234,7 @@ export async function runDbMaintenance(): Promise<{
     await prisma.$executeRawUnsafe(`REINDEX DATABASE "${dbName}"`);
     results.reindex = true;
   } catch (err) {
-    console.error('REINDEX failed:', err);
+    log.error('REINDEX failed:', err);
   }
 
   return results;

@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { createEntrySchema, updateEntrySchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
@@ -60,7 +61,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       limit: limitNum,
     });
   } catch (error) {
-    console.error('GET /entries error:', error);
+    log.error('GET /entries error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -84,7 +85,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, data: formatEntry(entry) });
   } catch (error) {
-    console.error('GET /entries/:id error:', error);
+    log.error('GET /entries/:id error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -136,7 +137,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json({ success: true, data: formatEntry(entry) });
   } catch (error) {
-    console.error('POST /entries error:', error);
+    log.error('POST /entries error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -202,7 +203,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, data: formatEntry(entry) });
   } catch (error) {
-    console.error('PUT /entries/:id error:', error);
+    log.error('PUT /entries/:id error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -223,7 +224,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
     await prisma.monthlyEntry.delete({ where: { id } });
     res.json({ success: true, message: 'Entry deleted' });
   } catch (error) {
-    console.error('DELETE /entries/:id error:', error);
+    log.error('DELETE /entries/:id error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });

@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import {
   loginSchema,
@@ -124,7 +125,7 @@ router.post('/register', authRateLimit, async (req: Request, res: Response): Pro
 
     // Send verification email (don't await to not block response)
     sendVerificationEmail(email, name, emailVerifyToken).catch((err) => {
-      console.error('Failed to send verification email:', err);
+      log.error('Failed to send verification email:', err);
     });
 
     res.status(201).json({
@@ -138,7 +139,7 @@ router.post('/register', authRateLimit, async (req: Request, res: Response): Pro
       },
     });
   } catch (err) {
-    console.error('Register error:', err);
+    log.error('Register error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -194,7 +195,7 @@ router.post('/login', authRateLimit, async (req: Request, res: Response): Promis
       },
     });
   } catch (err) {
-    console.error('Login error:', err);
+    log.error('Login error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -222,7 +223,7 @@ router.post('/verify-email', authRateLimit, async (req: Request, res: Response):
 
     res.json({ success: true, data: { message: 'Email verified successfully' } });
   } catch (err) {
-    console.error('Verify email error:', err);
+    log.error('Verify email error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -261,12 +262,12 @@ router.post(
       });
 
       sendPasswordResetEmail(user.email, user.name, resetToken).catch((err) => {
-        console.error('Failed to send password reset email:', err);
+        log.error('Failed to send password reset email:', err);
       });
 
       res.json(successMsg);
     } catch (err) {
-      console.error('Forgot password error:', err);
+      log.error('Forgot password error:', err);
       res.status(500).json({ success: false, error: 'Internal server error' });
     }
   },
@@ -299,7 +300,7 @@ router.post(
 
       res.json({ success: true, data: { message: 'Password reset successfully' } });
     } catch (err) {
-      console.error('Reset password error:', err);
+      log.error('Reset password error:', err);
       res.status(500).json({ success: false, error: 'Internal server error' });
     }
   },
@@ -346,7 +347,7 @@ router.post('/refresh', authRateLimit, async (req: Request, res: Response): Prom
 
     res.json({ success: true, data: { message: 'Tokens refreshed' } });
   } catch (err) {
-    console.error('Refresh error:', err);
+    log.error('Refresh error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -387,7 +388,7 @@ router.get('/me', authenticate, async (req: Request, res: Response): Promise<voi
 
     res.json({ success: true, data: { user } });
   } catch (err) {
-    console.error('Get me error:', err);
+    log.error('Get me error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -424,7 +425,7 @@ router.put('/profile', authenticate, async (req: Request, res: Response): Promis
 
     res.json({ success: true, data: { user } });
   } catch (err) {
-    console.error('Update profile error:', err);
+    log.error('Update profile error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -458,7 +459,7 @@ router.put('/change-password', authenticate, async (req: Request, res: Response)
 
     res.json({ success: true, data: { message: 'Password changed successfully' } });
   } catch (err) {
-    console.error('Change password error:', err);
+    log.error('Change password error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -511,7 +512,7 @@ router.put('/change-email', authenticate, async (req: Request, res: Response): P
 
     res.json({ success: true, data: { user: updatedUser } });
   } catch (err) {
-    console.error('Change email error:', err);
+    log.error('Change email error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -567,7 +568,7 @@ router.post('/avatar', authenticate, (req: Request, res: Response): void => {
 
       res.json({ success: true, data: { user } });
     } catch (error) {
-      console.error('Avatar upload error:', error);
+      log.error('Avatar upload error:', error);
       res.status(500).json({ success: false, error: 'Internal server error' });
     }
   });
@@ -608,7 +609,7 @@ router.delete('/avatar', authenticate, async (req: Request, res: Response): Prom
 
     res.json({ success: true, data: { user } });
   } catch (err) {
-    console.error('Delete avatar error:', err);
+    log.error('Delete avatar error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -646,12 +647,12 @@ router.post(
       });
 
       sendVerificationEmail(user.email, user.name, newToken).catch((err) => {
-        console.error('Failed to resend verification email:', err);
+        log.error('Failed to resend verification email:', err);
       });
 
       res.json(successMsg);
     } catch (err) {
-      console.error('Resend verification error:', err);
+      log.error('Resend verification error:', err);
       res.status(500).json({ success: false, error: 'Internal server error' });
     }
   },

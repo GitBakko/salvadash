@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import fs from 'node:fs/promises';
 import { authenticate, requireRole } from '../middleware/auth.js';
@@ -26,7 +27,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
     const backups = await listBackups();
     res.json({ success: true, data: backups });
   } catch (err) {
-    console.error('List backups error:', err);
+    log.error('List backups error:', err);
     res.status(500).json({ success: false, error: 'Failed to list backups' });
   }
 });
@@ -64,7 +65,7 @@ router.get('/:id/download', async (req: Request, res: Response): Promise<void> =
     const stream = createReadStream(filepath);
     stream.pipe(res);
   } catch (err) {
-    console.error('Download backup error:', err);
+    log.error('Download backup error:', err);
     res.status(500).json({ success: false, error: 'Download failed' });
   }
 });
@@ -113,7 +114,7 @@ router.post('/retention', async (_req: Request, res: Response): Promise<void> =>
     const deleted = await applyRetention();
     res.json({ success: true, data: { deleted } });
   } catch (err) {
-    console.error('Retention cleanup error:', err);
+    log.error('Retention cleanup error:', err);
     res.status(500).json({ success: false, error: 'Retention cleanup failed' });
   }
 });
@@ -125,7 +126,7 @@ router.post('/maintenance', async (_req: Request, res: Response): Promise<void> 
     const results = await runDbMaintenance();
     res.json({ success: true, data: results });
   } catch (err) {
-    console.error('DB maintenance error:', err);
+    log.error('DB maintenance error:', err);
     res.status(500).json({ success: false, error: 'DB maintenance failed' });
   }
 });
