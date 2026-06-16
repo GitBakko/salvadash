@@ -13,6 +13,7 @@ import { authenticate } from '../middleware/auth.js';
 import { writeRateLimit } from '../middleware/rate-limit.js';
 import { isValidationOk } from '../lib/http.js';
 import { config } from '../config/index.js';
+import { safeFetchBuffer, SafeFetchError } from '../lib/safe-fetch.js';
 
 const router: RouterType = Router();
 
@@ -167,17 +168,16 @@ router.post('/import-logo', writeRateLimit, async (req: Request, res: Response):
       return;
     }
 
-    // Download CDN bytes
+    // Download bytes via SSRF-hardened fetch (blocks private/metadata hosts,
+    // re-validates redirects, caps size).
     let buf: Buffer;
     try {
-      const resp = await fetch(iconUrl, { redirect: 'follow' });
-      if (!resp.ok) {
-        console.error('Logo download failed:', resp.status, iconUrl);
-        res.status(502).json({ success: false, error: 'Failed to fetch logo' });
+      buf = await safeFetchBuffer(iconUrl);
+    } catch (err) {
+      if (err instanceof SafeFetchError) {
+        res.status(400).json({ success: false, error: 'Invalid or disallowed logo URL' });
         return;
       }
-      buf = Buffer.from(await resp.arrayBuffer());
-    } catch (err) {
       console.error('Logo download error:', err);
       res.status(502).json({ success: false, error: 'Failed to fetch logo' });
       return;

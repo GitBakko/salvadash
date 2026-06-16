@@ -27,6 +27,7 @@ import { sendVerificationEmail, sendPasswordResetEmail } from '../lib/email-temp
 import { authenticate } from '../middleware/auth.js';
 import type { AuthPayload } from '../middleware/auth.js';
 import { isValidationOk } from '../lib/http.js';
+import { authRateLimit } from '../middleware/rate-limit.js';
 
 const router: RouterType = Router();
 
@@ -56,7 +57,7 @@ const avatarUpload = multer({
 
 // ─── POST /auth/register ───────────────────────────────────
 
-router.post('/register', async (req: Request, res: Response): Promise<void> => {
+router.post('/register', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = registerSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
@@ -144,7 +145,7 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
 
 // ─── POST /auth/login ──────────────────────────────────────
 
-router.post('/login', async (req: Request, res: Response): Promise<void> => {
+router.post('/login', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = loginSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
@@ -200,7 +201,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
 
 // ─── POST /auth/verify-email ───────────────────────────────
 
-router.post('/verify-email', async (req: Request, res: Response): Promise<void> => {
+router.post('/verify-email', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const { token } = req.body;
     if (!token || typeof token !== 'string') {
@@ -228,77 +229,85 @@ router.post('/verify-email', async (req: Request, res: Response): Promise<void> 
 
 // ─── POST /auth/forgot-password ────────────────────────────
 
-router.post('/forgot-password', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const parsed = forgotPasswordSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ success: false, error: 'Validation failed' });
-      return;
-    }
+router.post(
+  '/forgot-password',
+  authRateLimit,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const parsed = forgotPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ success: false, error: 'Validation failed' });
+        return;
+      }
 
-    // Always respond 200 to prevent email enumeration
-    const successMsg = {
-      success: true,
-      data: { message: 'If the email exists, a reset link has been sent.' },
-    };
+      // Always respond 200 to prevent email enumeration
+      const successMsg = {
+        success: true,
+        data: { message: 'If the email exists, a reset link has been sent.' },
+      };
 
-    const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
-    if (!user || !user.isActive) {
+      const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+      if (!user || !user.isActive) {
+        res.json(successMsg);
+        return;
+      }
+
+      const resetToken = generateRandomToken();
+      const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { passwordResetToken: resetToken, passwordResetExpires: expires },
+      });
+
+      sendPasswordResetEmail(user.email, user.name, resetToken).catch((err) => {
+        console.error('Failed to send password reset email:', err);
+      });
+
       res.json(successMsg);
-      return;
+    } catch (err) {
+      console.error('Forgot password error:', err);
+      res.status(500).json({ success: false, error: 'Internal server error' });
     }
-
-    const resetToken = generateRandomToken();
-    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { passwordResetToken: resetToken, passwordResetExpires: expires },
-    });
-
-    sendPasswordResetEmail(user.email, user.name, resetToken).catch((err) => {
-      console.error('Failed to send password reset email:', err);
-    });
-
-    res.json(successMsg);
-  } catch (err) {
-    console.error('Forgot password error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  },
+);
 
 // ─── POST /auth/reset-password ─────────────────────────────
 
-router.post('/reset-password', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const parsed = resetPasswordSchema.safeParse(req.body);
-    if (!isValidationOk(res, parsed)) return;
+router.post(
+  '/reset-password',
+  authRateLimit,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const parsed = resetPasswordSchema.safeParse(req.body);
+      if (!isValidationOk(res, parsed)) return;
 
-    const { token, password } = parsed.data;
-    const user = await prisma.user.findUnique({ where: { passwordResetToken: token } });
+      const { token, password } = parsed.data;
+      const user = await prisma.user.findUnique({ where: { passwordResetToken: token } });
 
-    if (!user || !user.passwordResetExpires || user.passwordResetExpires < new Date()) {
-      res.status(400).json({ success: false, error: 'Invalid or expired reset token' });
-      return;
+      if (!user || !user.passwordResetExpires || user.passwordResetExpires < new Date()) {
+        res.status(400).json({ success: false, error: 'Invalid or expired reset token' });
+        return;
+      }
+
+      const passwordHash = await hashPassword(password);
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { passwordHash, passwordResetToken: null, passwordResetExpires: null },
+      });
+
+      res.json({ success: true, data: { message: 'Password reset successfully' } });
+    } catch (err) {
+      console.error('Reset password error:', err);
+      res.status(500).json({ success: false, error: 'Internal server error' });
     }
-
-    const passwordHash = await hashPassword(password);
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { passwordHash, passwordResetToken: null, passwordResetExpires: null },
-    });
-
-    res.json({ success: true, data: { message: 'Password reset successfully' } });
-  } catch (err) {
-    console.error('Reset password error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  },
+);
 
 // ─── POST /auth/refresh ────────────────────────────────────
 
-router.post('/refresh', async (req: Request, res: Response): Promise<void> => {
+router.post('/refresh', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const token = req.cookies?.refreshToken as string | undefined;
     if (!token) {
@@ -606,42 +615,46 @@ router.delete('/avatar', authenticate, async (req: Request, res: Response): Prom
 
 // ─── POST /auth/resend-verification ─────────────────────────
 
-router.post('/resend-verification', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { email } = req.body;
-    if (!email || typeof email !== 'string') {
-      res.status(400).json({ success: false, error: 'Email required' });
-      return;
-    }
+router.post(
+  '/resend-verification',
+  authRateLimit,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email } = req.body;
+      if (!email || typeof email !== 'string') {
+        res.status(400).json({ success: false, error: 'Email required' });
+        return;
+      }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+      const user = await prisma.user.findUnique({ where: { email } });
 
-    // Always respond 200 to prevent email enumeration
-    const successMsg = {
-      success: true,
-      data: { message: 'If the email exists and is not verified, a new link has been sent.' },
-    };
+      // Always respond 200 to prevent email enumeration
+      const successMsg = {
+        success: true,
+        data: { message: 'If the email exists and is not verified, a new link has been sent.' },
+      };
 
-    if (!user || user.emailVerified || !user.isActive) {
+      if (!user || user.emailVerified || !user.isActive) {
+        res.json(successMsg);
+        return;
+      }
+
+      const newToken = generateRandomToken();
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerifyToken: newToken },
+      });
+
+      sendVerificationEmail(user.email, user.name, newToken).catch((err) => {
+        console.error('Failed to resend verification email:', err);
+      });
+
       res.json(successMsg);
-      return;
+    } catch (err) {
+      console.error('Resend verification error:', err);
+      res.status(500).json({ success: false, error: 'Internal server error' });
     }
-
-    const newToken = generateRandomToken();
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { emailVerifyToken: newToken },
-    });
-
-    sendVerificationEmail(user.email, user.name, newToken).catch((err) => {
-      console.error('Failed to resend verification email:', err);
-    });
-
-    res.json(successMsg);
-  } catch (err) {
-    console.error('Resend verification error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  },
+);
 
 export default router;
