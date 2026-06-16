@@ -13,6 +13,7 @@ import { startBackupScheduler, stopBackupScheduler } from './lib/backup-schedule
 import { apiRateLimit } from './middleware/rate-limit.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 import { healthHandler } from './middleware/health.js';
+import { metricsHandler } from './middleware/metrics.js';
 
 initSentry();
 
@@ -45,6 +46,9 @@ app.use('/uploads', express.static(path.resolve(import.meta.dirname, '../uploads
 
 // ─── Health Check ──────────────────────────────────────────
 app.get('/api/health', healthHandler);
+
+// ─── Metrics (Prometheus) — token-gated, disabled unless METRICS_TOKEN set ──
+app.get('/api/metrics', metricsHandler);
 
 // ─── API Routes ────────────────────────────────────────────
 import apiRoutes from './routes/index.js';
