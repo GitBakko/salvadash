@@ -1,4 +1,3 @@
-import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import {
   createIncomeSourceSchema,
@@ -7,7 +6,7 @@ import {
 } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
-import { isValidationOk } from '../lib/http.js';
+import { asyncHandler, HttpError, isValidationOk } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -15,8 +14,9 @@ router.use(authenticate);
 
 // ─── GET /income-sources ───────────────────────────────────
 
-router.get('/', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const sources = await prisma.incomeSource.findMany({
       where: { userId: req.user!.userId },
       orderBy: { sortOrder: 'asc' },
@@ -31,16 +31,14 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
         sortOrder: s.sortOrder,
       })),
     });
-  } catch (error) {
-    log.error('GET /income-sources error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /income-sources ──────────────────────────────────
 
-router.post('/', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.post(
+  '/',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = createIncomeSourceSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -51,39 +49,38 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       _max: { sortOrder: true },
     });
 
-    const source = await prisma.incomeSource.create({
-      data: {
-        ...parsed.data,
-        userId,
-        sortOrder: (maxSort._max.sortOrder ?? -1) + 1,
-      },
-    });
+    try {
+      const source = await prisma.incomeSource.create({
+        data: {
+          ...parsed.data,
+          userId,
+          sortOrder: (maxSort._max.sortOrder ?? -1) + 1,
+        },
+      });
 
-    res.status(201).json({
-      success: true,
-      data: {
-        id: source.id,
-        name: source.name,
-        isActive: source.isActive,
-        sortOrder: source.sortOrder,
-      },
-    });
-  } catch (error: any) {
-    if (error?.code === 'P2002') {
-      res
-        .status(409)
-        .json({ success: false, error: 'An income source with this name already exists' });
-      return;
+      res.status(201).json({
+        success: true,
+        data: {
+          id: source.id,
+          name: source.name,
+          isActive: source.isActive,
+          sortOrder: source.sortOrder,
+        },
+      });
+    } catch (err) {
+      if ((err as { code?: string })?.code === 'P2002') {
+        throw new HttpError(409, 'An income source with this name already exists');
+      }
+      throw err;
     }
-    log.error('POST /income-sources error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── PUT /income-sources/:id ────────────────────────────────
 
-router.put('/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.put(
+  '/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = updateIncomeSourceSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -99,36 +96,35 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const source = await prisma.incomeSource.update({
-      where: { id },
-      data: parsed.data,
-    });
+    try {
+      const source = await prisma.incomeSource.update({
+        where: { id },
+        data: parsed.data,
+      });
 
-    res.json({
-      success: true,
-      data: {
-        id: source.id,
-        name: source.name,
-        isActive: source.isActive,
-        sortOrder: source.sortOrder,
-      },
-    });
-  } catch (error: any) {
-    if (error?.code === 'P2002') {
-      res
-        .status(409)
-        .json({ success: false, error: 'An income source with this name already exists' });
-      return;
+      res.json({
+        success: true,
+        data: {
+          id: source.id,
+          name: source.name,
+          isActive: source.isActive,
+          sortOrder: source.sortOrder,
+        },
+      });
+    } catch (err) {
+      if ((err as { code?: string })?.code === 'P2002') {
+        throw new HttpError(409, 'An income source with this name already exists');
+      }
+      throw err;
     }
-    log.error('PUT /income-sources/:id error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── DELETE /income-sources/:id ─────────────────────────────
 
-router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.delete(
+  '/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
     const id = req.params.id as string;
 
@@ -153,16 +149,14 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
 
     await prisma.incomeSource.delete({ where: { id } });
     res.json({ success: true, message: 'Income source deleted' });
-  } catch (error) {
-    log.error('DELETE /income-sources/:id error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── PUT /income-sources/reorder ────────────────────────────
 
-router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.put(
+  '/reorder',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = reorderIncomeSourcesSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -178,10 +172,7 @@ router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
     );
 
     res.json({ success: true, message: 'Income sources reordered' });
-  } catch (error) {
-    log.error('PUT /income-sources/reorder error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 export default router;

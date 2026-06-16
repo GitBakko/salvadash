@@ -12,7 +12,7 @@ import {
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 import { writeRateLimit } from '../middleware/rate-limit.js';
-import { isValidationOk } from '../lib/http.js';
+import { asyncHandler, HttpError, isValidationOk } from '../lib/http.js';
 import { config } from '../config/index.js';
 import { safeFetchBuffer, SafeFetchError } from '../lib/safe-fetch.js';
 
@@ -55,8 +55,9 @@ function accountIconPublicUrl(accountId: string): string {
 
 // ─── GET /accounts ─────────────────────────────────────────
 
-router.get('/', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const accounts = await prisma.account.findMany({
       where: { userId: req.user!.userId },
       orderBy: { sortOrder: 'asc' },
@@ -85,17 +86,15 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
         amount: a.balances[0] ? Number(a.balances[0].amount) : 0,
       })),
     });
-  } catch (error) {
-    log.error('GET /accounts error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── GET /accounts/search-logo ─────────────────────────────
 // NOTE: Must be before /:id to avoid Express matching "search-logo" as an :id param.
 
-router.get('/search-logo', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/search-logo',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const q = String(req.query.q ?? '').trim();
     if (q.length < 2) {
       res.status(400).json({ success: false, error: 'Query must be at least 2 characters' });
@@ -143,17 +142,16 @@ router.get('/search-logo', async (req: Request, res: Response): Promise<void> =>
       }));
 
     res.json({ success: true, data: top });
-  } catch (err) {
-    log.error('GET /accounts/search-logo error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /accounts/import-logo ────────────────────────────
 // Body: { accountId, iconUrl } — downloads from CDN, resizes, extracts dominant color.
 
-router.post('/import-logo', writeRateLimit, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.post(
+  '/import-logo',
+  writeRateLimit,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = importLogoSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -220,63 +218,62 @@ router.post('/import-logo', writeRateLimit, async (req: Request, res: Response):
     });
 
     res.json({ success: true, data: { iconUrl: publicUrl, color: hex } });
-  } catch (err) {
-    log.error('POST /accounts/import-logo error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /accounts ────────────────────────────────────────
 
-router.post('/', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const parsed = createAccountSchema.safeParse(req.body);
-    if (!isValidationOk(res, parsed)) return;
+router.post(
+  '/',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    try {
+      const parsed = createAccountSchema.safeParse(req.body);
+      if (!isValidationOk(res, parsed)) return;
 
-    const userId = req.user!.userId;
+      const userId = req.user!.userId;
 
-    // Get next sortOrder
-    const maxSort = await prisma.account.aggregate({
-      where: { userId },
-      _max: { sortOrder: true },
-    });
+      // Get next sortOrder
+      const maxSort = await prisma.account.aggregate({
+        where: { userId },
+        _max: { sortOrder: true },
+      });
 
-    const account = await prisma.account.create({
-      data: {
-        ...parsed.data,
-        userId,
-        sortOrder: (maxSort._max.sortOrder ?? -1) + 1,
-      },
-    });
+      const account = await prisma.account.create({
+        data: {
+          ...parsed.data,
+          userId,
+          sortOrder: (maxSort._max.sortOrder ?? -1) + 1,
+        },
+      });
 
-    res.status(201).json({
-      success: true,
-      data: {
-        id: account.id,
-        name: account.name,
-        type: account.type,
-        icon: account.icon,
-        iconUrl: account.iconUrl,
-        color: account.color,
-        isActive: account.isActive,
-        sortOrder: account.sortOrder,
-      },
-    });
-  } catch (error: unknown) {
-    if ((error as { code?: string })?.code === 'P2002') {
-      res.status(409).json({ success: false, error: 'An account with this name already exists' });
-      return;
+      res.status(201).json({
+        success: true,
+        data: {
+          id: account.id,
+          name: account.name,
+          type: account.type,
+          icon: account.icon,
+          iconUrl: account.iconUrl,
+          color: account.color,
+          isActive: account.isActive,
+          sortOrder: account.sortOrder,
+        },
+      });
+    } catch (err) {
+      if ((err as { code?: string })?.code === 'P2002') {
+        throw new HttpError(409, 'An account with this name already exists');
+      }
+      throw err;
     }
-    log.error('POST /accounts error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── PUT /accounts/reorder ──────────────────────────────────
 // NOTE: Must be before /:id to avoid Express matching "reorder" as an :id param
 
-router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.put(
+  '/reorder',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = reorderAccountsSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -292,64 +289,64 @@ router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
     );
 
     res.json({ success: true, message: 'Accounts reordered' });
-  } catch (error) {
-    log.error('PUT /accounts/reorder error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── PUT /accounts/:id ─────────────────────────────────────
 
-router.put('/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const parsed = updateAccountSchema.safeParse(req.body);
-    if (!isValidationOk(res, parsed)) return;
+router.put(
+  '/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    try {
+      const parsed = updateAccountSchema.safeParse(req.body);
+      if (!isValidationOk(res, parsed)) return;
 
-    const userId = req.user!.userId;
-    const id = req.params.id as string;
+      const userId = req.user!.userId;
+      const id = req.params.id as string;
 
-    const existing = await prisma.account.findFirst({
-      where: { id, userId },
-    });
+      const existing = await prisma.account.findFirst({
+        where: { id, userId },
+      });
 
-    if (!existing) {
-      res.status(404).json({ success: false, error: 'Account not found' });
-      return;
+      if (!existing) {
+        res.status(404).json({ success: false, error: 'Account not found' });
+        return;
+      }
+
+      const account = await prisma.account.update({
+        where: { id },
+        data: parsed.data,
+      });
+
+      res.json({
+        success: true,
+        data: {
+          id: account.id,
+          name: account.name,
+          type: account.type,
+          icon: account.icon,
+          iconUrl: account.iconUrl,
+          color: account.color,
+          isActive: account.isActive,
+          sortOrder: account.sortOrder,
+        },
+      });
+    } catch (err) {
+      if ((err as { code?: string })?.code === 'P2002') {
+        throw new HttpError(409, 'An account with this name already exists');
+      }
+      throw err;
     }
-
-    const account = await prisma.account.update({
-      where: { id },
-      data: parsed.data,
-    });
-
-    res.json({
-      success: true,
-      data: {
-        id: account.id,
-        name: account.name,
-        type: account.type,
-        icon: account.icon,
-        iconUrl: account.iconUrl,
-        color: account.color,
-        isActive: account.isActive,
-        sortOrder: account.sortOrder,
-      },
-    });
-  } catch (error: unknown) {
-    if ((error as { code?: string })?.code === 'P2002') {
-      res.status(409).json({ success: false, error: 'An account with this name already exists' });
-      return;
-    }
-    log.error('PUT /accounts/:id error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── DELETE /accounts/:id/icon ──────────────────────────────
 // Clear icon (revert to lucide fallback). Color is preserved — user choice.
 
-router.delete('/:id/icon', writeRateLimit, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.delete(
+  '/:id/icon',
+  writeRateLimit,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
     const id = req.params.id as string;
 
@@ -377,16 +374,15 @@ router.delete('/:id/icon', writeRateLimit, async (req: Request, res: Response): 
     });
 
     res.json({ success: true, message: 'Icon cleared' });
-  } catch (error) {
-    log.error('DELETE /accounts/:id/icon error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── DELETE /accounts/:id ───────────────────────────────────
 
-router.delete('/:id', writeRateLimit, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.delete(
+  '/:id',
+  writeRateLimit,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
     const id = req.params.id as string;
 
@@ -423,10 +419,7 @@ router.delete('/:id', writeRateLimit, async (req: Request, res: Response): Promi
     });
 
     res.json({ success: true, message: 'Account deleted' });
-  } catch (error) {
-    log.error('DELETE /accounts/:id error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 export default router;

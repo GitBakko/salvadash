@@ -27,7 +27,7 @@ import {
 import { sendVerificationEmail, sendPasswordResetEmail } from '../lib/email-templates.js';
 import { authenticate } from '../middleware/auth.js';
 import type { AuthPayload } from '../middleware/auth.js';
-import { isValidationOk } from '../lib/http.js';
+import { asyncHandler, isValidationOk } from '../lib/http.js';
 import { authRateLimit } from '../middleware/rate-limit.js';
 
 const router: RouterType = Router();
@@ -58,8 +58,10 @@ const avatarUpload = multer({
 
 // ─── POST /auth/register ───────────────────────────────────
 
-router.post('/register', authRateLimit, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.post(
+  '/register',
+  authRateLimit,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = registerSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -138,16 +140,15 @@ router.post('/register', authRateLimit, async (req: Request, res: Response): Pro
         message: 'Registration successful. Please verify your email.',
       },
     });
-  } catch (err) {
-    log.error('Register error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /auth/login ──────────────────────────────────────
 
-router.post('/login', authRateLimit, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.post(
+  '/login',
+  authRateLimit,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = loginSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -194,16 +195,15 @@ router.post('/login', authRateLimit, async (req: Request, res: Response): Promis
         },
       },
     });
-  } catch (err) {
-    log.error('Login error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /auth/verify-email ───────────────────────────────
 
-router.post('/verify-email', authRateLimit, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.post(
+  '/verify-email',
+  authRateLimit,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { token } = req.body;
     if (!token || typeof token !== 'string') {
       res.status(400).json({ success: false, error: 'Token required' });
@@ -222,55 +222,47 @@ router.post('/verify-email', authRateLimit, async (req: Request, res: Response):
     });
 
     res.json({ success: true, data: { message: 'Email verified successfully' } });
-  } catch (err) {
-    log.error('Verify email error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /auth/forgot-password ────────────────────────────
 
 router.post(
   '/forgot-password',
   authRateLimit,
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const parsed = forgotPasswordSchema.safeParse(req.body);
-      if (!parsed.success) {
-        res.status(400).json({ success: false, error: 'Validation failed' });
-        return;
-      }
-
-      // Always respond 200 to prevent email enumeration
-      const successMsg = {
-        success: true,
-        data: { message: 'If the email exists, a reset link has been sent.' },
-      };
-
-      const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
-      if (!user || !user.isActive) {
-        res.json(successMsg);
-        return;
-      }
-
-      const resetToken = generateRandomToken();
-      const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { passwordResetToken: resetToken, passwordResetExpires: expires },
-      });
-
-      sendPasswordResetEmail(user.email, user.name, resetToken).catch((err) => {
-        log.error('Failed to send password reset email:', err);
-      });
-
-      res.json(successMsg);
-    } catch (err) {
-      log.error('Forgot password error:', err);
-      res.status(500).json({ success: false, error: 'Internal server error' });
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const parsed = forgotPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ success: false, error: 'Validation failed' });
+      return;
     }
-  },
+
+    // Always respond 200 to prevent email enumeration
+    const successMsg = {
+      success: true,
+      data: { message: 'If the email exists, a reset link has been sent.' },
+    };
+
+    const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+    if (!user || !user.isActive) {
+      res.json(successMsg);
+      return;
+    }
+
+    const resetToken = generateRandomToken();
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordResetToken: resetToken, passwordResetExpires: expires },
+    });
+
+    sendPasswordResetEmail(user.email, user.name, resetToken).catch((err) => {
+      log.error('Failed to send password reset email:', err);
+    });
+
+    res.json(successMsg);
+  }),
 );
 
 // ─── POST /auth/reset-password ─────────────────────────────
@@ -278,38 +270,35 @@ router.post(
 router.post(
   '/reset-password',
   authRateLimit,
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const parsed = resetPasswordSchema.safeParse(req.body);
-      if (!isValidationOk(res, parsed)) return;
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const parsed = resetPasswordSchema.safeParse(req.body);
+    if (!isValidationOk(res, parsed)) return;
 
-      const { token, password } = parsed.data;
-      const user = await prisma.user.findUnique({ where: { passwordResetToken: token } });
+    const { token, password } = parsed.data;
+    const user = await prisma.user.findUnique({ where: { passwordResetToken: token } });
 
-      if (!user || !user.passwordResetExpires || user.passwordResetExpires < new Date()) {
-        res.status(400).json({ success: false, error: 'Invalid or expired reset token' });
-        return;
-      }
-
-      const passwordHash = await hashPassword(password);
-
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { passwordHash, passwordResetToken: null, passwordResetExpires: null },
-      });
-
-      res.json({ success: true, data: { message: 'Password reset successfully' } });
-    } catch (err) {
-      log.error('Reset password error:', err);
-      res.status(500).json({ success: false, error: 'Internal server error' });
+    if (!user || !user.passwordResetExpires || user.passwordResetExpires < new Date()) {
+      res.status(400).json({ success: false, error: 'Invalid or expired reset token' });
+      return;
     }
-  },
+
+    const passwordHash = await hashPassword(password);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash, passwordResetToken: null, passwordResetExpires: null },
+    });
+
+    res.json({ success: true, data: { message: 'Password reset successfully' } });
+  }),
 );
 
 // ─── POST /auth/refresh ────────────────────────────────────
 
-router.post('/refresh', authRateLimit, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.post(
+  '/refresh',
+  authRateLimit,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const token = req.cookies?.refreshToken as string | undefined;
     if (!token) {
       res.status(401).json({ success: false, error: 'No refresh token' });
@@ -346,11 +335,8 @@ router.post('/refresh', authRateLimit, async (req: Request, res: Response): Prom
     res.cookie('refreshToken', newRefreshToken, REFRESH_COOKIE_OPTIONS);
 
     res.json({ success: true, data: { message: 'Tokens refreshed' } });
-  } catch (err) {
-    log.error('Refresh error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /auth/logout ─────────────────────────────────────
 
@@ -362,8 +348,10 @@ router.post('/logout', (_req: Request, res: Response): void => {
 
 // ─── GET /auth/me ───────────────────────────────────────────
 
-router.get('/me', authenticate, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/me',
+  authenticate,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.userId },
       select: {
@@ -387,16 +375,15 @@ router.get('/me', authenticate, async (req: Request, res: Response): Promise<voi
     }
 
     res.json({ success: true, data: { user } });
-  } catch (err) {
-    log.error('Get me error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── PUT /auth/profile ──────────────────────────────────────
 
-router.put('/profile', authenticate, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.put(
+  '/profile',
+  authenticate,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { name, language, currency } = req.body;
     const data: Record<string, string> = {};
     if (name && typeof name === 'string') data.name = name;
@@ -424,16 +411,15 @@ router.put('/profile', authenticate, async (req: Request, res: Response): Promis
     });
 
     res.json({ success: true, data: { user } });
-  } catch (err) {
-    log.error('Update profile error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── PUT /auth/change-password ──────────────────────────────
 
-router.put('/change-password', authenticate, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.put(
+  '/change-password',
+  authenticate,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = changePasswordSchema.safeParse(req.body);
     if (!parsed.success) {
       const firstMessage = parsed.error.issues[0]?.message ?? 'Dati non validi';
@@ -458,16 +444,15 @@ router.put('/change-password', authenticate, async (req: Request, res: Response)
     await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
 
     res.json({ success: true, data: { message: 'Password changed successfully' } });
-  } catch (err) {
-    log.error('Change password error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── PUT /auth/change-email ─────────────────────────────────
 
-router.put('/change-email', authenticate, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.put(
+  '/change-email',
+  authenticate,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = changeEmailSchema.safeParse(req.body);
     if (!parsed.success) {
       const firstMessage = parsed.error.issues[0]?.message ?? 'Dati non validi';
@@ -511,11 +496,8 @@ router.put('/change-email', authenticate, async (req: Request, res: Response): P
     });
 
     res.json({ success: true, data: { user: updatedUser } });
-  } catch (err) {
-    log.error('Change email error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /auth/avatar ──────────────────────────────────────
 
@@ -576,8 +558,10 @@ router.post('/avatar', authenticate, (req: Request, res: Response): void => {
 
 // ─── DELETE /auth/avatar ────────────────────────────────────
 
-router.delete('/avatar', authenticate, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.delete(
+  '/avatar',
+  authenticate,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const current = await prisma.user.findUnique({
       where: { id: req.user!.userId },
       select: { avatarUrl: true },
@@ -608,54 +592,46 @@ router.delete('/avatar', authenticate, async (req: Request, res: Response): Prom
     });
 
     res.json({ success: true, data: { user } });
-  } catch (err) {
-    log.error('Delete avatar error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /auth/resend-verification ─────────────────────────
 
 router.post(
   '/resend-verification',
   authRateLimit,
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { email } = req.body;
-      if (!email || typeof email !== 'string') {
-        res.status(400).json({ success: false, error: 'Email required' });
-        return;
-      }
-
-      const user = await prisma.user.findUnique({ where: { email } });
-
-      // Always respond 200 to prevent email enumeration
-      const successMsg = {
-        success: true,
-        data: { message: 'If the email exists and is not verified, a new link has been sent.' },
-      };
-
-      if (!user || user.emailVerified || !user.isActive) {
-        res.json(successMsg);
-        return;
-      }
-
-      const newToken = generateRandomToken();
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { emailVerifyToken: newToken },
-      });
-
-      sendVerificationEmail(user.email, user.name, newToken).catch((err) => {
-        log.error('Failed to resend verification email:', err);
-      });
-
-      res.json(successMsg);
-    } catch (err) {
-      log.error('Resend verification error:', err);
-      res.status(500).json({ success: false, error: 'Internal server error' });
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { email } = req.body;
+    if (!email || typeof email !== 'string') {
+      res.status(400).json({ success: false, error: 'Email required' });
+      return;
     }
-  },
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    // Always respond 200 to prevent email enumeration
+    const successMsg = {
+      success: true,
+      data: { message: 'If the email exists and is not verified, a new link has been sent.' },
+    };
+
+    if (!user || user.emailVerified || !user.isActive) {
+      res.json(successMsg);
+      return;
+    }
+
+    const newToken = generateRandomToken();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { emailVerifyToken: newToken },
+    });
+
+    sendVerificationEmail(user.email, user.name, newToken).catch((err) => {
+      log.error('Failed to resend verification email:', err);
+    });
+
+    res.json(successMsg);
+  }),
 );
 
 export default router;

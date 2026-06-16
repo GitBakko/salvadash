@@ -1,11 +1,10 @@
-import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { createEntrySchema, updateEntrySchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { entryInclude, formatEntry, validateUserOwnership } from '../lib/entries-shared.js';
-import { isValidationOk } from '../lib/http.js';
+import { asyncHandler, isValidationOk } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -13,8 +12,9 @@ router.use(authenticate);
 
 // ─── GET /entries ───────────────────────────────────────────
 
-router.get('/', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
     const { year, page = '1', limit = '50' } = req.query;
 
@@ -60,16 +60,14 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       page: pageNum,
       limit: limitNum,
     });
-  } catch (error) {
-    log.error('GET /entries error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── GET /entries/:id ───────────────────────────────────────
 
-router.get('/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
     const id = req.params.id as string;
 
@@ -84,16 +82,14 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     }
 
     res.json({ success: true, data: formatEntry(entry) });
-  } catch (error) {
-    log.error('GET /entries/:id error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── POST /entries ──────────────────────────────────────────
 
-router.post('/', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.post(
+  '/',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = createEntrySchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -136,16 +132,14 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     });
 
     res.status(201).json({ success: true, data: formatEntry(entry) });
-  } catch (error) {
-    log.error('POST /entries error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── PUT /entries/:id ───────────────────────────────────────
 
-router.put('/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.put(
+  '/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = updateEntrySchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -202,16 +196,14 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
     });
 
     res.json({ success: true, data: formatEntry(entry) });
-  } catch (error) {
-    log.error('PUT /entries/:id error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── DELETE /entries/:id ────────────────────────────────────
 
-router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.delete(
+  '/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
     const id = req.params.id as string;
 
@@ -223,10 +215,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
 
     await prisma.monthlyEntry.delete({ where: { id } });
     res.json({ success: true, message: 'Entry deleted' });
-  } catch (error) {
-    log.error('DELETE /entries/:id error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 export default router;

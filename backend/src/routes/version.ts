@@ -1,8 +1,8 @@
-import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { APP_VERSION, changelog } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
+import { asyncHandler } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -32,18 +32,17 @@ router.get('/current', (_req: Request, res: Response): void => {
 // ─── PUT /version/seen ─────────────────────────────────────
 // Authenticated — marks the current version as seen by the user
 
-router.put('/seen', authenticate, async (req: Request, res: Response): Promise<void> => {
-  try {
+router.put(
+  '/seen',
+  authenticate,
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     await prisma.user.update({
       where: { id: req.user!.userId },
       data: { lastSeenVersion: APP_VERSION },
     });
 
     res.json({ success: true, data: { lastSeenVersion: APP_VERSION } });
-  } catch (err) {
-    log.error('Mark version seen error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 export default router;
