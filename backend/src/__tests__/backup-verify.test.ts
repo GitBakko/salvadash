@@ -3,7 +3,6 @@ import fs from 'node:fs/promises';
 import { createWriteStream } from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { randomUUID } from 'node:crypto';
 import { createGzip } from 'node:zlib';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
@@ -14,7 +13,8 @@ vi.mock('../lib/prisma.js', () => ({ default: {} }));
 
 import { verifyBackupFile } from '../lib/backup.js';
 
-const tmpDir = path.join(os.tmpdir(), `salvadash-backup-test-${randomUUID()}`);
+// Created securely (random suffix, 0700 perms) in beforeAll via fs.mkdtemp.
+let tmpDir: string;
 
 async function writeGz(name: string, content: string): Promise<string> {
   const fp = path.join(tmpDir, name);
@@ -41,7 +41,7 @@ const NO_SENTINEL = Array.from(
 
 describe('verifyBackupFile', () => {
   beforeAll(async () => {
-    await fs.mkdir(tmpDir, { recursive: true });
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'salvadash-backup-test-'));
   });
   afterAll(async () => {
     await fs.rm(tmpDir, { recursive: true, force: true });
