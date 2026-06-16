@@ -1,0 +1,30 @@
+version: 2
+updates:
+  # ─── npm / pnpm workspaces ───────────────────────────────
+  - package-ecosystem: 'npm'
+    directories:
+      - '/'
+      - '/frontend'
+      - '/backend'
+      - '/shared'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(deps)'
+      prefix-development: 'chore(deps-dev)'
+    groups:
+      # Bundle low-risk minor/patch bumps into a single PR to cut noise; majors
+      # and security updates still open their own PRs.
+      minor-and-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+
+  # ─── GitHub Actions ──────────────────────────────────────
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    commit-message:
+      prefix: 'ci(deps)'
