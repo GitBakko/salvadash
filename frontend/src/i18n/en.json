@@ -17,6 +17,12 @@
     "retry": "Retry",
     "skipToContent": "Skip to content"
   },
+  "errors": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred. Please try again.",
+    "retry": "Try again",
+    "reload": "Reload page"
+  },
   "nav": {
     "accounts": "Accounts",
     "home": "Home",
