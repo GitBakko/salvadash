@@ -1,5 +1,6 @@
-import { type ReactNode, useEffect, useCallback } from 'react';
+import { type ReactNode, useEffect, useCallback, useRef, useId } from 'react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { useFocusTrap } from '../../hooks/use-focus-trap';
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -10,6 +11,9 @@ interface BottomSheetProps {
 
 export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetProps) {
   const dragControls = useDragControls();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  useFocusTrap(contentRef, isOpen);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -44,6 +48,11 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
 
           {/* Sheet */}
           <motion.div
+            ref={contentRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={title ? titleId : undefined}
+            tabIndex={-1}
             className="absolute bottom-0 inset-x-0 solid-card rounded-t-2xl max-h-[85dvh] flex flex-col"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -67,7 +76,9 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
 
             {title && (
               <div className="px-4 pb-3 border-b border-border-default">
-                <h2 className="font-heading text-lg font-semibold">{title}</h2>
+                <h2 id={titleId} className="font-heading text-lg font-semibold">
+                  {title}
+                </h2>
               </div>
             )}
 

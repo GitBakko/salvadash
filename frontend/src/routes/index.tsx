@@ -7,6 +7,7 @@ import { useDashboard } from '../hooks/queries';
 import { useCacheDashboard } from '../hooks/use-offline-sync';
 import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
 import { Card, Skeleton } from '../components/ui';
+import { QueryErrorState } from '../components/QueryErrorState';
 import { Delta } from '../components/ui/Delta';
 import { MiniSparkline } from '../components/MiniSparkline';
 import {
@@ -33,7 +34,7 @@ function DashboardPage() {
   const { t, i18n } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(String(currentYear));
-  const { data, isLoading } = useDashboard(year);
+  const { data, isLoading, isError, refetch } = useDashboard(year);
 
   // Cache dashboard data to IndexedDB for offline fallback
   useCacheDashboard(data);
@@ -41,6 +42,7 @@ function DashboardPage() {
   const years = Array.from({ length: currentYear - 2022 }, (_, i) => String(currentYear - i));
 
   if (isLoading) return <DashboardSkeleton />;
+  if (isError && !data) return <QueryErrorState onRetry={() => refetch()} />;
   if (!data) {
     return (
       <div className="p-4 max-w-lg mx-auto flex flex-col items-center justify-center py-20 text-center">

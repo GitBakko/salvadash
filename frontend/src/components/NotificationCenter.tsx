@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { useEffect, useRef, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, BellOff, Clock, Trophy, AlertTriangle, ShieldCheck, Info, X } from 'lucide-react';
+import { useFocusTrap } from '../hooks/use-focus-trap';
 import type { LucideIcon } from 'lucide-react';
 import type { NotificationPublic } from '@salvadash/shared';
 import {
@@ -40,6 +42,22 @@ function timeAgo(date: string): string {
 
 export function NotificationCenter({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  useFocusTrap(sheetRef, true);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
   const { data: notifications, isLoading } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
@@ -60,6 +78,11 @@ export function NotificationCenter({ onClose }: { onClose: () => void }) {
 
       {/* Sheet */}
       <motion.div
+        ref={sheetRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
@@ -72,7 +95,10 @@ export function NotificationCenter({ onClose }: { onClose: () => void }) {
 
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-heading text-lg font-bold text-text-primary flex items-center gap-2">
+          <h3
+            id={titleId}
+            className="font-heading text-lg font-bold text-text-primary flex items-center gap-2"
+          >
             <Bell size={22} className="text-brand" />
             {t('notifications.title')}
           </h3>

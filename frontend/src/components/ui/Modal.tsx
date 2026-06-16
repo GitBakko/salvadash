@@ -1,7 +1,9 @@
-import { type ReactNode, useEffect, useCallback } from 'react';
+import { type ReactNode, useEffect, useCallback, useRef, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useFocusTrap } from '../../hooks/use-focus-trap';
 
 interface ModalProps {
   isOpen: boolean;
@@ -18,6 +20,11 @@ const sizeClasses = {
 };
 
 export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
+  const { t } = useTranslation();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  useFocusTrap(contentRef, isOpen);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -51,6 +58,11 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
 
           {/* Content */}
           <motion.div
+            ref={contentRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={title ? titleId : undefined}
+            tabIndex={-1}
             className={`relative w-full ${sizeClasses[size]} solid-card p-6 shadow-2xl`}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -59,11 +71,13 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
           >
             {title && (
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-heading text-lg font-semibold">{title}</h2>
+                <h2 id={titleId} className="font-heading text-lg font-semibold">
+                  {title}
+                </h2>
                 <button
                   onClick={onClose}
                   className="text-text-muted hover:text-text-primary transition-colors p-1"
-                  aria-label="Close"
+                  aria-label={t('common.close')}
                 >
                   <X size={22} />
                 </button>

@@ -12,6 +12,7 @@ import {
 import { useMediaQuery } from '../hooks/use-media-query';
 import { useUIStore } from '../stores/ui-store';
 import { Button, Card, Skeleton, Toggle } from '../components/ui';
+import { QueryErrorState } from '../components/QueryErrorState';
 import { AccountFormModal } from '../components/AccountFormModal';
 import { AccountIcon } from '../components/AccountIcon';
 import {
@@ -58,7 +59,7 @@ function AccountsPage() {
   const navigate = useNavigate();
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const childMatches = useChildMatches();
-  const { data: accounts, isLoading } = useAccounts();
+  const { data: accounts, isLoading, isError, refetch } = useAccounts();
   const deleteAccount = useDeleteAccount();
   const updateAccount = useUpdateAccount();
   const reorderAccounts = useReorderAccounts();
@@ -190,6 +191,12 @@ function AccountsPage() {
         ))}
       </div>
     );
+  }
+
+  // ─── Error ─────────────────────────────────────────────────
+
+  if (isError && !accounts) {
+    return <QueryErrorState onRetry={() => refetch()} />;
   }
 
   // ─── Empty state ───────────────────────────────────────────
