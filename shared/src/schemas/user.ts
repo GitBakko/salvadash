@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { getPasswordIssue, PASSWORD_ISSUE_MESSAGE_IT, PASSWORD_MAX_LENGTH } from '../password.js';
 
 export const Role = {
   ROOT: 'ROOT',
@@ -8,16 +9,26 @@ export const Role = {
 
 export type Role = (typeof Role)[keyof typeof Role];
 
+// Complexity policy — applied ONLY where a NEW password is set (register/reset/change).
+const strongPassword = z.string().superRefine((val, ctx) => {
+  const issue = getPasswordIssue(val);
+  if (issue) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: PASSWORD_ISSUE_MESSAGE_IT[issue] });
+  }
+});
+
+// Login must NOT enforce strength: existing users keep their (possibly old, weak)
+// passwords. Only require a non-empty value; the hash check is the real gate.
 export const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8).max(128),
+  password: z.string().min(1).max(PASSWORD_MAX_LENGTH),
 });
 
 export const registerSchema = z
   .object({
     name: z.string().min(2).max(100),
     email: z.string().email(),
-    password: z.string().min(8).max(128),
+    password: strongPassword,
     confirmPassword: z.string(),
     inviteCode: z.string().min(1),
     language: z.enum(['it', 'en']).default('it'),
@@ -37,10 +48,7 @@ export const updateProfileSchema = z.object({
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, 'La password attuale è obbligatoria'),
-    newPassword: z
-      .string()
-      .min(8, 'La nuova password deve avere almeno 8 caratteri')
-      .max(128, 'La password è troppo lunga'),
+    newPassword: strongPassword,
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -60,7 +68,7 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z
   .object({
     token: z.string(),
-    password: z.string().min(8).max(128),
+    password: strongPassword,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

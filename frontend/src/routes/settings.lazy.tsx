@@ -46,6 +46,7 @@ import {
   useResetData,
 } from '../hooks/queries';
 import { api } from '../lib/api';
+import { passwordErrorKey } from '../lib/password';
 import { Card, Input, Modal, Toggle } from '../components/ui';
 import { WhatsNewModal } from '../components/WhatsNewModal';
 
@@ -250,6 +251,11 @@ function ProfileSection() {
       setPasswordError(t('settings.passwordMismatch'));
       return;
     }
+    const pwError = passwordErrorKey(passwordForm.newPassword);
+    if (pwError) {
+      setPasswordError(t(pwError));
+      return;
+    }
     setPasswordError('');
     try {
       await changePassword.mutateAsync(passwordForm);
@@ -452,6 +458,7 @@ function ProfileSection() {
               setPasswordError('');
             }}
           />
+          <p className="-mt-1 text-xs text-text-secondary">{t('auth.passwordRequirements')}</p>
           <Input
             label={t('settings.confirmNewPassword')}
             type="password"
