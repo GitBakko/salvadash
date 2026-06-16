@@ -1,10 +1,11 @@
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { rawEntryToRow, computeDashboard, computeAnalytics } from '../lib/calculations.js';
 import { entryInclude } from '../lib/entries-shared.js';
+import { sheetToMatrix } from '../lib/xlsx-import.js';
 
 const router: RouterType = Router();
 
@@ -84,8 +85,9 @@ router.post('/import', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const buffer = Buffer.from(req.body.fileBase64 as string, 'base64');
-    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const bytes = new Uint8Array(Buffer.from(req.body.fileBase64 as string, 'base64'));
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(bytes.buffer as ArrayBuffer);
 
     // Get user's accounts and income sources (by name)
     const accounts = await prisma.account.findMany({ where: { userId } });
@@ -97,11 +99,9 @@ router.post('/import', async (req: Request, res: Response): Promise<void> => {
     let skippedCount = 0;
     const errors: string[] = [];
 
-    for (const sheetName of workbook.SheetNames) {
-      const sheet = workbook.Sheets[sheetName];
-      if (!sheet) continue;
-
-      const data: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    for (const sheet of workbook.worksheets) {
+      const sheetName = sheet.name;
+      const data = sheetToMatrix(sheet);
       if (data.length < 2) continue;
 
       // First row (after headers) contains month labels or dates
@@ -112,21 +112,14 @@ router.post('/import', async (req: Request, res: Response): Promise<void> => {
         const rawDate = headerRow[col];
         if (!rawDate) continue;
 
-        // Parse date — could be Excel serial, string, or Date
+        // Parse date — exceljs yields a Date for date-formatted cells, otherwise
+        // a number (Excel serial) or string.
         let entryDate: Date;
-        if (typeof rawDate === 'number') {
-          entryDate = XLSX.SSF.parse_date_code(rawDate) as any;
-          if (!entryDate || typeof (entryDate as any).y !== 'number') {
-            // Use xlsx date parsing
-            const d = new Date((rawDate - 25569) * 86400 * 1000);
-            entryDate = d;
-          } else {
-            entryDate = new Date(
-              (entryDate as any).y,
-              (entryDate as any).m - 1,
-              (entryDate as any).d,
-            );
-          }
+        if (rawDate instanceof Date) {
+          entryDate = rawDate;
+        } else if (typeof rawDate === 'number') {
+          // Excel serial date → ms since Unix epoch (serial epoch 1899-12-30)
+          entryDate = new Date(Math.round((rawDate - 25569) * 86400 * 1000));
         } else if (typeof rawDate === 'string') {
           entryDate = new Date(rawDate);
         } else {
