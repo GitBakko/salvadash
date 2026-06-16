@@ -2,6 +2,7 @@ import { createLazyFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { QueryErrorState } from '../components/QueryErrorState';
 import {
   AreaChart,
   Area,
@@ -72,12 +73,13 @@ function AnalyticsPage() {
   const reducedMotion = usePrefersReducedMotion();
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
   const { data: accounts } = useAccounts();
-  const { data, isLoading } = useAnalytics(selectedAccountIds);
+  const { data, isLoading, isError, refetch } = useAnalytics(selectedAccountIds);
 
   const isFilterActive = selectedAccountIds.length > 0;
   const hasFilteredData = !!data && data.patrimonyOverTime.some((p) => p.total !== 0);
 
   if (isLoading && !data) return <AnalyticsSkeleton />;
+  if (isError && !data) return <QueryErrorState onRetry={() => refetch()} />;
 
   // No data at all (no entries yet) — keep original empty state
   if (!data || data.patrimonyOverTime.length < 2) {

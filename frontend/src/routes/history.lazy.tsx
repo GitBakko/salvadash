@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp, ChevronRight, Pencil, Trash2, CalendarDays } from '
 import type { EntryListItem } from '@salvadash/shared';
 import { useEntries, useEntry, useDeleteEntry } from '../hooks/queries';
 import { Card, Skeleton, BottomSheet, Button } from '../components/ui';
+import { QueryErrorState } from '../components/QueryErrorState';
 import { AccountIcon } from '../components/AccountIcon';
 import { fmtCurrency } from '../lib/format';
 import { formatDateLongDay, formatDateShort, formatMonthName } from '../lib/intl';
@@ -35,7 +36,7 @@ function HistoryPage() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(String(currentYear));
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const { data, isLoading } = useEntries(year);
+  const { data, isLoading, isError, refetch } = useEntries(year);
 
   const years = Array.from({ length: currentYear - 2022 }, (_, i) => String(currentYear - i));
   const entries = data?.data ?? [];
@@ -65,6 +66,8 @@ function HistoryPage() {
       {/* Content */}
       {isLoading ? (
         <HistorySkeleton />
+      ) : isError ? (
+        <QueryErrorState onRetry={() => refetch()} />
       ) : entries.length === 0 ? (
         <EmptyState t={t} />
       ) : (
