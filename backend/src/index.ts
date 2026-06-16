@@ -1,13 +1,18 @@
 import express, { type Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import morgan from 'morgan';
+import { pinoHttp } from 'pino-http';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import { randomUUID } from 'crypto';
 import { config } from './config/index.js';
 import prisma from './lib/prisma.js';
+import { logger, log } from './lib/logger.js';
+import { initSentry, flushSentry } from './lib/sentry.js';
 import { startBackupScheduler, stopBackupScheduler } from './lib/backup-scheduler.js';
 import { apiRateLimit } from './middleware/rate-limit.js';
+
+initSentry();
 
 export const app: Express = express();
 
@@ -23,7 +28,13 @@ app.use(
     credentials: true,
   }),
 );
-app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));
+app.use(
+  pinoHttp({
+    logger,
+    // Correlate logs across a request; honor an upstream x-request-id if present.
+    genReqId: (req) => (req.headers['x-request-id'] as string) || randomUUID(),
+  }),
+);
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
 
@@ -51,7 +62,7 @@ app.use((_req, res) => {
 
 // ─── Error Handler ─────────────────────────────────────────
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Unhandled error:', err);
+  log.error('Unhandled error:', err);
   res.status(500).json({
     success: false,
     error: config.nodeEnv === 'development' ? err.message : 'Internal server error',
@@ -60,9 +71,9 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 // ─── Start Server ──────────────────────────────────────────
 const server = app.listen(config.port, () => {
-  console.log(`🚀 SalvaDash API running on port ${config.port}`);
-  console.log(`📊 Environment: ${config.nodeEnv}`);
-  console.log(`🌐 Frontend URL: ${config.appUrl}`);
+  log.info(`🚀 SalvaDash API running on port ${config.port}`);
+  log.info(`📊 Environment: ${config.nodeEnv}`);
+  log.info(`🌐 Frontend URL: ${config.appUrl}`);
   startBackupScheduler();
 });
 
@@ -73,11 +84,11 @@ let shuttingDown = false;
 async function shutdown(signal: string): Promise<void> {
   if (shuttingDown) return;
   shuttingDown = true;
-  console.log(`\n${signal} received — shutting down gracefully...`);
+  log.info(`\n${signal} received — shutting down gracefully...`);
 
   // Force-exit guard if cleanup hangs past 10s
   const forceTimer = setTimeout(() => {
-    console.error('Graceful shutdown timed out — forcing exit');
+    log.error('Graceful shutdown timed out — forcing exit');
     process.exit(1);
   }, 10_000);
   forceTimer.unref();
@@ -88,11 +99,12 @@ async function shutdown(signal: string): Promise<void> {
       server.close((err) => (err ? reject(err) : resolve()));
     });
     await prisma.$disconnect();
+    await flushSentry();
     clearTimeout(forceTimer);
-    console.log('Shutdown complete.');
+    log.info('Shutdown complete.');
     process.exit(0);
   } catch (err) {
-    console.error('Error during shutdown:', err);
+    log.error('Error during shutdown:', err);
     process.exit(1);
   }
 }
@@ -102,10 +114,10 @@ process.on('SIGINT', () => void shutdown('SIGINT'));
 
 // Last-resort safety nets: a stray rejection/exception must not silently wedge prod.
 process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled promise rejection:', reason);
+  log.error('Unhandled promise rejection:', reason);
 });
 process.on('uncaughtException', (err) => {
-  console.error('Uncaught exception:', err);
+  log.error('Uncaught exception:', err);
   void shutdown('uncaughtException');
 });
 

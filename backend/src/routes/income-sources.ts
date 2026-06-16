@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import {
   createIncomeSourceSchema,
@@ -31,7 +32,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       })),
     });
   } catch (error) {
-    console.error('GET /income-sources error:', error);
+    log.error('GET /income-sources error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -74,7 +75,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
         .json({ success: false, error: 'An income source with this name already exists' });
       return;
     }
-    console.error('POST /income-sources error:', error);
+    log.error('POST /income-sources error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -119,7 +120,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
         .json({ success: false, error: 'An income source with this name already exists' });
       return;
     }
-    console.error('PUT /income-sources/:id error:', error);
+    log.error('PUT /income-sources/:id error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -153,7 +154,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
     await prisma.incomeSource.delete({ where: { id } });
     res.json({ success: true, message: 'Income source deleted' });
   } catch (error) {
-    console.error('DELETE /income-sources/:id error:', error);
+    log.error('DELETE /income-sources/:id error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -178,7 +179,7 @@ router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, message: 'Income sources reordered' });
   } catch (error) {
-    console.error('PUT /income-sources/reorder error:', error);
+    log.error('PUT /income-sources/reorder error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });

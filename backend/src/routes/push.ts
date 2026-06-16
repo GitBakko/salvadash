@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { z } from 'zod';
 import prisma from '../lib/prisma.js';
@@ -46,7 +47,7 @@ router.post('/subscribe', async (req: Request, res: Response): Promise<void> => 
 
     res.status(201).json({ success: true, data: { message: 'Subscribed' } });
   } catch (err) {
-    console.error('Push subscribe error:', err);
+    log.error('Push subscribe error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -67,7 +68,7 @@ router.delete('/unsubscribe', async (req: Request, res: Response): Promise<void>
 
     res.json({ success: true, data: { message: 'Unsubscribed' } });
   } catch (err) {
-    console.error('Push unsubscribe error:', err);
+    log.error('Push unsubscribe error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -81,7 +82,7 @@ router.get('/status', async (req: Request, res: Response): Promise<void> => {
     });
     res.json({ success: true, data: { subscribed: count > 0, count } });
   } catch (err) {
-    console.error('Push status error:', err);
+    log.error('Push status error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });

@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -85,7 +86,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       })),
     });
   } catch (error) {
-    console.error('GET /accounts error:', error);
+    log.error('GET /accounts error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -112,7 +113,7 @@ router.get('/search-logo', async (req: Request, res: Response): Promise<void> =>
 
     if (!resp.ok) {
       const body = await resp.text().catch(() => '');
-      console.error('Brandfetch search failed:', resp.status, body);
+      log.error('Brandfetch search failed:', resp.status, body);
       res.status(502).json({ success: false, error: 'Logo search upstream error' });
       return;
     }
@@ -143,7 +144,7 @@ router.get('/search-logo', async (req: Request, res: Response): Promise<void> =>
 
     res.json({ success: true, data: top });
   } catch (err) {
-    console.error('GET /accounts/search-logo error:', err);
+    log.error('GET /accounts/search-logo error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -178,7 +179,7 @@ router.post('/import-logo', writeRateLimit, async (req: Request, res: Response):
         res.status(400).json({ success: false, error: 'Invalid or disallowed logo URL' });
         return;
       }
-      console.error('Logo download error:', err);
+      log.error('Logo download error:', err);
       res.status(502).json({ success: false, error: 'Failed to fetch logo' });
       return;
     }
@@ -207,7 +208,7 @@ router.post('/import-logo', writeRateLimit, async (req: Request, res: Response):
         .webp({ quality: 90 })
         .toFile(fullPath);
     } catch (err) {
-      console.error('Sharp processing error:', err);
+      log.error('Sharp processing error:', err);
       res.status(422).json({ success: false, error: 'Downloaded file is not a valid image' });
       return;
     }
@@ -220,7 +221,7 @@ router.post('/import-logo', writeRateLimit, async (req: Request, res: Response):
 
     res.json({ success: true, data: { iconUrl: publicUrl, color: hex } });
   } catch (err) {
-    console.error('POST /accounts/import-logo error:', err);
+    log.error('POST /accounts/import-logo error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -266,7 +267,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       res.status(409).json({ success: false, error: 'An account with this name already exists' });
       return;
     }
-    console.error('POST /accounts error:', error);
+    log.error('POST /accounts error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -292,7 +293,7 @@ router.put('/reorder', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, message: 'Accounts reordered' });
   } catch (error) {
-    console.error('PUT /accounts/reorder error:', error);
+    log.error('PUT /accounts/reorder error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -339,7 +340,7 @@ router.put('/:id', async (req: Request, res: Response): Promise<void> => {
       res.status(409).json({ success: false, error: 'An account with this name already exists' });
       return;
     }
-    console.error('PUT /accounts/:id error:', error);
+    log.error('PUT /accounts/:id error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -377,7 +378,7 @@ router.delete('/:id/icon', writeRateLimit, async (req: Request, res: Response): 
 
     res.json({ success: true, message: 'Icon cleared' });
   } catch (error) {
-    console.error('DELETE /accounts/:id/icon error:', error);
+    log.error('DELETE /accounts/:id/icon error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -423,7 +424,7 @@ router.delete('/:id', writeRateLimit, async (req: Request, res: Response): Promi
 
     res.json({ success: true, message: 'Account deleted' });
   } catch (error) {
-    console.error('DELETE /accounts/:id error:', error);
+    log.error('DELETE /accounts/:id error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });

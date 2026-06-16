@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { adminUpdateUserSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
@@ -50,7 +51,7 @@ router.get('/overview', async (_req: Request, res: Response): Promise<void> => {
       data: { totalUsers, totalEntries, avgGrowth, activeUsers30d },
     });
   } catch (err) {
-    console.error('Admin overview error:', err);
+    log.error('Admin overview error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -119,7 +120,7 @@ router.get('/users', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, data, total, page, limit });
   } catch (err) {
-    console.error('Admin list users error:', err);
+    log.error('Admin list users error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -180,7 +181,7 @@ router.get('/users/:id', async (req: Request, res: Response): Promise<void> => {
       },
     });
   } catch (err) {
-    console.error('Admin get user error:', err);
+    log.error('Admin get user error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -225,7 +226,7 @@ router.put('/users/:id', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, data: updated });
   } catch (err) {
-    console.error('Admin update user error:', err);
+    log.error('Admin update user error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -265,7 +266,7 @@ router.delete('/users/:id', async (req: Request, res: Response): Promise<void> =
 
     res.json({ success: true, data: { message: 'User deleted' } });
   } catch (err) {
-    console.error('Admin delete user error:', err);
+    log.error('Admin delete user error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });

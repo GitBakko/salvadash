@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import * as ExcelJS from 'exceljs';
 import prisma from '../lib/prisma.js';
@@ -27,7 +28,7 @@ router.get('/dashboard', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, data: dashboard });
   } catch (error) {
-    console.error('GET /data/dashboard error:', error);
+    log.error('GET /data/dashboard error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -69,7 +70,7 @@ router.get('/analytics', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, data: analytics });
   } catch (error) {
-    console.error('GET /data/analytics error:', error);
+    log.error('GET /data/analytics error:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -193,7 +194,7 @@ router.post('/import', async (req: Request, res: Response): Promise<void> => {
       data: { imported: importedCount, skipped: skippedCount, errors },
     });
   } catch (error) {
-    console.error('POST /data/import error:', error);
+    log.error('POST /data/import error:', error);
     res.status(500).json({ success: false, error: 'Import failed' });
   }
 });
@@ -275,7 +276,7 @@ router.get('/export/csv', async (req: Request, res: Response): Promise<void> => 
     );
     res.send(csvContent);
   } catch (error) {
-    console.error('GET /data/export/csv error:', error);
+    log.error('GET /data/export/csv error:', error);
     res.status(500).json({ success: false, error: 'Export failed' });
   }
 });
@@ -310,7 +311,7 @@ router.get('/export/json', async (req: Request, res: Response): Promise<void> =>
       },
     });
   } catch (error) {
-    console.error('GET /data/export/json error:', error);
+    log.error('GET /data/export/json error:', error);
     res.status(500).json({ success: false, error: 'Export failed' });
   }
 });
@@ -339,7 +340,7 @@ router.delete('/reset', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, message: 'All entries deleted' });
   } catch (error) {
-    console.error('DELETE /data/reset error:', error);
+    log.error('DELETE /data/reset error:', error);
     res.status(500).json({ success: false, error: 'Reset failed' });
   }
 });

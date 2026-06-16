@@ -1,3 +1,4 @@
+import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { createInviteCodeSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
@@ -44,7 +45,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       },
     });
   } catch (err) {
-    console.error('Create invite code error:', err);
+    log.error('Create invite code error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -74,7 +75,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
       })),
     });
   } catch (err) {
-    console.error('List invite codes error:', err);
+    log.error('List invite codes error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
@@ -103,7 +104,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
 
     res.json({ success: true, data: { message: 'Invite code deactivated' } });
   } catch (err) {
-    console.error('Delete invite code error:', err);
+    log.error('Delete invite code error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
