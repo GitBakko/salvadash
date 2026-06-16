@@ -24,6 +24,9 @@ const envSchema = z.object({
 
   LOG_LEVEL: z.string().optional(),
 
+  // Bearer token guarding GET /api/metrics. Unset → the endpoint is disabled.
+  METRICS_TOKEN: z.string().default(''),
+
   SENTRY_DSN: z.string().default(''),
   SENTRY_TRACES_SAMPLE_RATE: numEnv(0),
 
@@ -74,6 +77,10 @@ export function parseEnv(env: NodeJS.ProcessEnv) {
     apiUrl: e.API_URL,
 
     logLevel: e.LOG_LEVEL ?? (e.NODE_ENV === 'production' ? 'info' : 'debug'),
+
+    metrics: {
+      token: e.METRICS_TOKEN,
+    },
 
     sentry: {
       dsn: e.SENTRY_DSN,
