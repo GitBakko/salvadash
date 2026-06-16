@@ -1,6 +1,7 @@
 import type { Response } from 'express';
 import prisma from './prisma.js';
 import type { Prisma } from '../generated/prisma/client.js';
+import { sumMoney } from './money.js';
 
 export const entryInclude = {
   balances: {
@@ -57,8 +58,8 @@ export function formatEntry(entry: EntryWithRelations): FormattedEntry {
     notes: entry.notes,
     balances,
     incomes,
-    total: balances.reduce((sum, b) => sum + b.amount, 0),
-    totalIncome: incomes.reduce((sum, i) => sum + i.amount, 0),
+    total: sumMoney(balances.map((b) => b.amount)),
+    totalIncome: sumMoney(incomes.map((i) => i.amount)),
     createdAt: entry.createdAt.toISOString(),
     updatedAt: entry.updatedAt.toISOString(),
   };

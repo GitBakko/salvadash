@@ -3,6 +3,8 @@
  * All functions are stateless — they take data in, return results out.
  */
 
+import { toCents, fromCents } from './money.js';
+
 // ─── Types ──────────────────────────────────────────────────
 
 interface EntryRow {
@@ -18,12 +20,6 @@ interface EntryRow {
     orderIndex: number;
   }[];
   incomes: { incomeSourceId: string; incomeSourceName: string; amount: number }[];
-}
-
-interface MonthlyPoint {
-  date: string; // YYYY-MM-DD
-  total: number;
-  totalIncome: number;
 }
 
 // Structural input — accepted by both Prisma payloads and test mocks.
@@ -77,20 +73,22 @@ export function rawEntryToRow(entry: RawEntryInput): EntryRow {
   };
 }
 
+// Totals are summed in integer cents so repeated additions stay exact, then
+// converted back to euros at the boundary.
+function entryTotalCents(row: EntryRow): number {
+  return row.balances.reduce((sum, b) => sum + toCents(b.amount), 0);
+}
+
+function entryIncomeCents(row: EntryRow): number {
+  return row.incomes.reduce((sum, i) => sum + toCents(i.amount), 0);
+}
+
 function entryTotal(row: EntryRow): number {
-  return row.balances.reduce((sum, b) => sum + b.amount, 0);
+  return fromCents(entryTotalCents(row));
 }
 
 function entryTotalIncome(row: EntryRow): number {
-  return row.incomes.reduce((sum, i) => sum + i.amount, 0);
-}
-
-function toMonthlyPoint(row: EntryRow): MonthlyPoint {
-  return {
-    date: row.date.toISOString().split('T')[0],
-    total: entryTotal(row),
-    totalIncome: entryTotalIncome(row),
-  };
+  return fromCents(entryIncomeCents(row));
 }
 
 // ─── Dashboard Calculations ─────────────────────────────────
@@ -118,26 +116,28 @@ export function computeDashboard(
   // Monthly income for the latest filled month
   const monthlyIncome = currentEntry ? entryTotalIncome(currentEntry) : 0;
 
-  // Avg monthly delta YTD
-  const yearPoints = yearEntries.map(toMonthlyPoint);
-  const deltas: number[] = [];
-  for (let i = 0; i < yearPoints.length - 1; i++) {
-    deltas.push(yearPoints[i].total - yearPoints[i + 1].total);
+  // Avg monthly delta YTD (computed in cents, then back to euros)
+  const yearDeltaCents: number[] = [];
+  for (let i = 0; i < yearEntries.length - 1; i++) {
+    yearDeltaCents.push(entryTotalCents(yearEntries[i]) - entryTotalCents(yearEntries[i + 1]));
   }
   const avgMonthlyYTD =
-    deltas.length > 0
-      ? Math.round((deltas.reduce((a, b) => a + b, 0) / deltas.length) * 100) / 100
+    yearDeltaCents.length > 0
+      ? fromCents(Math.round(yearDeltaCents.reduce((a, b) => a + b, 0) / yearDeltaCents.length))
       : 0;
 
   // Best month (highest positive delta)
-  let bestMonth: { month: string; delta: number } | null = null;
+  let bestMonthAcc: { month: string; deltaCents: number } | null = null;
   for (let i = 0; i < filledEntries.length - 1; i++) {
-    const delta = entryTotal(filledEntries[i]) - entryTotal(filledEntries[i + 1]);
+    const deltaCents = entryTotalCents(filledEntries[i]) - entryTotalCents(filledEntries[i + 1]);
     const month = filledEntries[i].date.toISOString().substring(0, 7);
-    if (!bestMonth || delta > bestMonth.delta) {
-      bestMonth = { month, delta };
+    if (!bestMonthAcc || deltaCents > bestMonthAcc.deltaCents) {
+      bestMonthAcc = { month, deltaCents };
     }
   }
+  const bestMonth = bestMonthAcc
+    ? { month: bestMonthAcc.month, delta: fromCents(bestMonthAcc.deltaCents) }
+    : null;
 
   // Growth YTD (percent)
   const growthYTD =
@@ -161,15 +161,17 @@ export function computeDashboard(
 
   // Recent entries (last 6)
   const recentEntries = filledEntries.slice(0, 6).map((entry, i) => {
-    const total = entryTotal(entry);
-    const prev = filledEntries[i + 1] ? entryTotal(filledEntries[i + 1]) : null;
-    const delta = prev !== null ? total - prev : null;
+    const totalCents = entryTotalCents(entry);
+    const prevCents = filledEntries[i + 1] ? entryTotalCents(filledEntries[i + 1]) : null;
+    const delta = prevCents !== null ? fromCents(totalCents - prevCents) : null;
     const deltaPercent =
-      prev !== null && prev !== 0 ? Math.round(((total - prev) / prev) * 10000) / 100 : null;
+      prevCents !== null && prevCents !== 0
+        ? Math.round(((totalCents - prevCents) / prevCents) * 10000) / 100
+        : null;
     return {
       id: entry.id,
       date: entry.date.toISOString().split('T')[0],
-      total,
+      total: fromCents(totalCents),
       totalIncome: entryTotalIncome(entry),
       delta,
       deltaPercent,
@@ -253,11 +255,13 @@ export function computeAnalytics(entries: EntryRow[], options: AnalyticsOptions 
     sources: e.incomes.map((i) => ({ name: i.incomeSourceName, amount: i.amount })),
   }));
 
-  // Monthly deltas
+  // Monthly deltas (differences computed in cents to stay exact)
   const deltas: { date: string; delta: number }[] = [];
+  const deltaCents: number[] = [];
   for (let i = 1; i < sorted.length; i++) {
-    const delta = entryTotal(sorted[i]) - entryTotal(sorted[i - 1]);
-    deltas.push({ date: sorted[i].date.toISOString().split('T')[0], delta });
+    const dc = entryTotalCents(sorted[i]) - entryTotalCents(sorted[i - 1]);
+    deltaCents.push(dc);
+    deltas.push({ date: sorted[i].date.toISOString().split('T')[0], delta: fromCents(dc) });
   }
 
   const bestMonth = deltas.reduce<{ date: string; delta: number } | null>(
@@ -271,8 +275,8 @@ export function computeAnalytics(entries: EntryRow[], options: AnalyticsOptions 
   ) ?? { date: '', delta: 0 };
 
   const avgGrowth =
-    deltas.length > 0
-      ? Math.round((deltas.reduce((sum, d) => sum + d.delta, 0) / deltas.length) * 100) / 100
+    deltaCents.length > 0
+      ? fromCents(Math.round(deltaCents.reduce((a, b) => a + b, 0) / deltaCents.length))
       : 0;
 
   // Best year (highest absolute growth)
@@ -281,7 +285,10 @@ export function computeAnalytics(entries: EntryRow[], options: AnalyticsOptions 
     if (points.length >= 2) {
       const start = points[0].total;
       const end = points[points.length - 1].total;
-      yearGrowths.push({ year: parseInt(year, 10), growth: end - start });
+      yearGrowths.push({
+        year: parseInt(year, 10),
+        growth: fromCents(toCents(end) - toCents(start)),
+      });
     }
   }
   const bestYear = yearGrowths.reduce<{ year: number; growth: number } | null>(

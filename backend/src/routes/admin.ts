@@ -3,6 +3,7 @@ import { adminUpdateUserSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { asyncHandler, isValidationOk } from '../lib/http.js';
+import { sumMoney, toCents, fromCents } from '../lib/money.js';
 
 const router: RouterType = Router();
 
@@ -33,17 +34,17 @@ router.get(
       }),
     ]);
 
-    // Compute avg growth across all entries
+    // Compute avg growth across all entries (in cents to stay exact)
     let avgGrowth = 0;
     if (allEntries.length > 1) {
-      const totals = allEntries.map((e) =>
-        e.balances.reduce((sum, b) => sum + Number(b.amount), 0),
+      const totalsCents = allEntries.map((e) =>
+        e.balances.reduce((sum, b) => sum + toCents(b.amount), 0),
       );
-      const deltas: number[] = [];
-      for (let i = 1; i < totals.length; i++) {
-        deltas.push(totals[i] - totals[i - 1]);
+      const deltasCents: number[] = [];
+      for (let i = 1; i < totalsCents.length; i++) {
+        deltasCents.push(totalsCents[i] - totalsCents[i - 1]);
       }
-      avgGrowth = deltas.reduce((s, d) => s + d, 0) / deltas.length;
+      avgGrowth = fromCents(deltasCents.reduce((s, d) => s + d, 0) / deltasCents.length);
     }
 
     res.json({
@@ -98,9 +99,7 @@ router.get(
 
     const data = users.map((u) => {
       const lastEntry = u.entries[0] ?? null;
-      const totalSavings = lastEntry
-        ? lastEntry.balances.reduce((sum, b) => sum + Number(b.amount), 0)
-        : 0;
+      const totalSavings = lastEntry ? sumMoney(lastEntry.balances.map((b) => b.amount)) : 0;
 
       return {
         id: u.id,
@@ -152,9 +151,7 @@ router.get(
     });
 
     const lastEntry = user.entries[0] ?? null;
-    const totalSavings = lastEntry
-      ? lastEntry.balances.reduce((sum: number, b) => sum + Number(b.amount), 0)
-      : 0;
+    const totalSavings = lastEntry ? sumMoney(lastEntry.balances.map((b) => b.amount)) : 0;
 
     res.json({
       success: true,
