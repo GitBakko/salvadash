@@ -10,6 +10,7 @@ import { rawEntryToRow, computeDashboard, computeAnalytics } from '../lib/calcul
 import { entryInclude } from '../lib/entries-shared.js';
 import { sheetToMatrix } from '../lib/xlsx-import.js';
 import { csvCell } from '../lib/csv-safe.js';
+import { sumMoney } from '../lib/money.js';
 import {
   ImportError,
   decodeImportFile,
@@ -293,8 +294,8 @@ router.get(
 
       const balanceValues = sortedAccounts.map((name) => balanceMap.get(name) ?? 0);
       const incomeValues = sortedSources.map((name) => incomeMap.get(name) ?? 0);
-      const total = balanceValues.reduce((a, b) => a + b, 0);
-      const totalIncome = incomeValues.reduce((a, b) => a + b, 0);
+      const total = sumMoney(balanceValues);
+      const totalIncome = sumMoney(incomeValues);
 
       return [
         entry.date.toISOString().split('T')[0],
@@ -343,8 +344,8 @@ router.get(
           date: r.date.toISOString().split('T')[0],
           balances: r.balances,
           incomes: r.incomes,
-          total: r.balances.reduce((sum, b) => sum + b.amount, 0),
-          totalIncome: r.incomes.reduce((sum, i) => sum + i.amount, 0),
+          total: sumMoney(r.balances.map((b) => b.amount)),
+          totalIncome: sumMoney(r.incomes.map((i) => i.amount)),
         })),
         analytics,
         exportedAt: new Date().toISOString(),

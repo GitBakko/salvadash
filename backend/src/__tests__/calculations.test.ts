@@ -245,3 +245,39 @@ describe('computeAnalytics', () => {
     });
   });
 });
+
+// ─── Money precision (cents-exact sums/deltas) ──────────────
+
+describe('money precision', () => {
+  // Fractional-cent amounts that drift under naive float addition.
+  const driftEntries = [
+    makeEntry('2025-02-01', [
+      { name: 'A', amount: 0.1 },
+      { name: 'B', amount: 0.2 },
+    ]),
+    makeEntry('2025-01-01', [
+      { name: 'A', amount: 0.1 },
+      { name: 'B', amount: 0.7 },
+    ]),
+  ];
+  const driftRows = driftEntries.map(rawEntryToRow);
+
+  it('sums dashboard totals exactly (0.1 + 0.2 === 0.3)', () => {
+    const result = computeDashboard(driftRows, '2025');
+    expect(result.currentTotal).toBe(0.3);
+    expect(result.recentEntries[0].total).toBe(0.3);
+  });
+
+  it('computes deltas exactly from drift-prone amounts', () => {
+    // Feb total 0.3, Jan total 0.8 → most-recent-first delta = 0.3 - 0.8 = -0.5
+    const result = computeDashboard(driftRows, '2025');
+    expect(result.recentEntries[0].delta).toBe(-0.5);
+  });
+
+  it('analytics patrimony + deltas stay exact', () => {
+    const result = computeAnalytics(driftRows);
+    // ascending: Jan 0.8, Feb 0.3
+    expect(result.patrimonyOverTime.map((p) => p.total)).toEqual([0.8, 0.3]);
+    expect(result.bestMonth.delta).toBe(-0.5);
+  });
+});
