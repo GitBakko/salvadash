@@ -12,6 +12,7 @@ import { initSentry, flushSentry } from './lib/sentry.js';
 import { startBackupScheduler, stopBackupScheduler } from './lib/backup-scheduler.js';
 import { apiRateLimit } from './middleware/rate-limit.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
+import { healthHandler } from './middleware/health.js';
 
 initSentry();
 
@@ -43,14 +44,7 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.resolve(import.meta.dirname, '../uploads')));
 
 // ─── Health Check ──────────────────────────────────────────
-app.get('/api/health', async (_req, res) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-  } catch {
-    res.status(503).json({ status: 'error', message: 'Database connection failed' });
-  }
-});
+app.get('/api/health', healthHandler);
 
 // ─── API Routes ────────────────────────────────────────────
 import apiRoutes from './routes/index.js';

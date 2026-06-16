@@ -4,9 +4,17 @@ import { createReadStream, createWriteStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
+import { Writable, PassThrough } from 'node:stream';
+import { createHash } from 'node:crypto';
 import { createGzip, createGunzip } from 'node:zlib';
 import { config } from '../config/index.js';
 import prisma from './prisma.js';
+
+// A valid gzipped pg_dump is always well above this; anything smaller means the
+// dump was truncated or never produced real output.
+const MIN_BACKUP_BYTES = 100;
+// Sentinel that pg_dump (plain format) writes near the top of every dump.
+const DUMP_SENTINEL = 'PostgreSQL database dump';
 
 // ─── Helpers ───────────────────────────────────────────────
 
@@ -45,6 +53,46 @@ function pgDumpArgs(): string[] {
     '--no-owner',
     '--no-privileges',
   ];
+}
+
+// ─── Verify Backup ─────────────────────────────────────────
+// Confirms a freshly written backup is non-trivial in size, is a valid gzip
+// stream (decompresses without error), and actually contains a PostgreSQL dump.
+// Returns the file size and a sha256 of the compressed file.
+export async function verifyBackupFile(
+  filepath: string,
+): Promise<{ sizeBytes: number; sha256: string }> {
+  const stat = await fs.stat(filepath);
+  if (stat.size < MIN_BACKUP_BYTES) {
+    throw new Error(`Backup file too small (${stat.size} bytes) — likely incomplete`);
+  }
+
+  const hash = createHash('sha256');
+  const tap = new PassThrough();
+  tap.on('data', (chunk: Buffer) => hash.update(chunk));
+
+  let head = '';
+  let sawSentinel = false;
+  const sink = new Writable({
+    write(chunk: Buffer, _enc, cb) {
+      if (!sawSentinel) {
+        head += chunk.toString('utf8');
+        if (head.includes(DUMP_SENTINEL)) sawSentinel = true;
+        // Bound memory: keep only the tail that could still hold a split sentinel.
+        else if (head.length > 1 << 16) head = head.slice(-DUMP_SENTINEL.length);
+      }
+      cb();
+    },
+  });
+
+  // file → tap (hashes compressed bytes) → gunzip (throws on corruption) → sink
+  await pipeline(createReadStream(filepath), tap, createGunzip(), sink);
+
+  if (!sawSentinel) {
+    throw new Error('Backup content does not look like a PostgreSQL dump');
+  }
+
+  return { sizeBytes: stat.size, sha256: hash.digest('hex') };
 }
 
 // ─── Create Backup ─────────────────────────────────────────
@@ -92,14 +140,14 @@ export async function createBackup(
       });
     });
 
-    // Get file size
-    const stat = await fs.stat(filepath);
+    // Verify the dump is complete + restorable before marking it COMPLETED.
+    const { sizeBytes } = await verifyBackupFile(filepath);
 
     await prisma.backupLog.update({
       where: { id: log.id },
       data: {
         status: 'COMPLETED',
-        sizeBytes: stat.size,
+        sizeBytes,
         completedAt: new Date(),
       },
     });

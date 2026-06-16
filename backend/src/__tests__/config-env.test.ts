@@ -24,6 +24,15 @@ describe('parseEnv', () => {
     expect(c.jwt.accessExpiresIn).toBe('15m');
     expect(c.logLevel).toBe('debug');
     expect(c.sentry.dsn).toBe('');
+    expect(c.db.poolMax).toBe(10);
+    expect(c.db.idleTimeoutMs).toBe(10_000);
+    expect(c.db.connectionTimeoutMs).toBe(10_000);
+  });
+
+  it('coerces DB pool overrides from strings', () => {
+    const c = parseEnv({ ...base, DB_POOL_MAX: '20', DB_POOL_CONNECTION_TIMEOUT_MS: '5000' });
+    expect(c.db.poolMax).toBe(20);
+    expect(c.db.connectionTimeoutMs).toBe(5000);
   });
 
   it('coerces numbers/booleans and derives prod log level', () => {

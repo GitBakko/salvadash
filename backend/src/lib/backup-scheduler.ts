@@ -6,12 +6,20 @@ import { createBackup, applyRetention, runDbMaintenance } from '../lib/backup.js
 // Runs daily at 03:00 — creates backup, applies retention, and runs DB maintenance
 
 let backupTask: ScheduledTask | null = null;
+let isRunning = false;
 
 export function startBackupScheduler(): void {
   if (backupTask) return;
 
   // Every day at 03:00
   backupTask = cron.schedule('0 3 * * *', async () => {
+    // Overlap guard: if a previous run is still going (slow dump / large DB),
+    // skip this tick rather than running two backups + maintenance at once.
+    if (isRunning) {
+      log.warn('[backup-scheduler] Previous run still in progress — skipping this tick');
+      return;
+    }
+    isRunning = true;
     log.info('[backup-scheduler] Starting daily backup...');
     try {
       const result = await createBackup('scheduler');
@@ -37,6 +45,8 @@ export function startBackupScheduler(): void {
     } catch (err) {
       log.error('[backup-scheduler] DB maintenance failed:', err);
     }
+
+    isRunning = false;
   });
 
   log.info('📦 Backup scheduler started (daily at 03:00)');
