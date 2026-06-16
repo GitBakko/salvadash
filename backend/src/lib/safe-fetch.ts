@@ -20,9 +20,7 @@ export class SafeFetchError extends Error {
 }
 
 function ipToLong(ip: string): number {
-  return (
-    ip.split('.').reduce((acc, oct) => (acc << 8) + Number(oct), 0) >>> 0
-  );
+  return ip.split('.').reduce((acc, oct) => (acc << 8) + Number(oct), 0) >>> 0;
 }
 
 function inRange(ip: string, base: string, bits: number): boolean {

@@ -16,9 +16,9 @@ describe('xlsx-import helpers', () => {
 
     it('unwraps formula, hyperlink and rich-text cell objects', () => {
       expect(normalizeCell({ formula: 'A1+B1', result: 7 } as ExcelJS.CellValue)).toBe(7);
-      expect(
-        normalizeCell({ text: 'Site', hyperlink: 'https://x' } as ExcelJS.CellValue),
-      ).toBe('Site');
+      expect(normalizeCell({ text: 'Site', hyperlink: 'https://x' } as ExcelJS.CellValue)).toBe(
+        'Site',
+      );
       expect(
         normalizeCell({ richText: [{ text: 'foo' }, { text: 'bar' }] } as ExcelJS.CellValue),
       ).toBe('foobar');
