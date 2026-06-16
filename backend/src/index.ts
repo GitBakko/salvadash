@@ -11,6 +11,10 @@ import { apiRateLimit } from './middleware/rate-limit.js';
 
 export const app: Express = express();
 
+// Behind the IIS reverse-proxy (ARR, single hop) in prod: trust the first proxy
+// so express-rate-limit & req.ip key on the real client IP, not the proxy's.
+app.set('trust proxy', 1);
+
 // ─── Middleware ─────────────────────────────────────────────
 app.use(helmet());
 app.use(

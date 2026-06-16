@@ -27,6 +27,7 @@ import { sendVerificationEmail, sendPasswordResetEmail } from '../lib/email-temp
 import { authenticate } from '../middleware/auth.js';
 import type { AuthPayload } from '../middleware/auth.js';
 import { isValidationOk } from '../lib/http.js';
+import { authRateLimit } from '../middleware/rate-limit.js';
 
 const router: RouterType = Router();
 
@@ -56,7 +57,7 @@ const avatarUpload = multer({
 
 // ─── POST /auth/register ───────────────────────────────────
 
-router.post('/register', async (req: Request, res: Response): Promise<void> => {
+router.post('/register', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = registerSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
@@ -144,7 +145,7 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
 
 // ─── POST /auth/login ──────────────────────────────────────
 
-router.post('/login', async (req: Request, res: Response): Promise<void> => {
+router.post('/login', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = loginSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
@@ -200,7 +201,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
 
 // ─── POST /auth/verify-email ───────────────────────────────
 
-router.post('/verify-email', async (req: Request, res: Response): Promise<void> => {
+router.post('/verify-email', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const { token } = req.body;
     if (!token || typeof token !== 'string') {
@@ -228,7 +229,7 @@ router.post('/verify-email', async (req: Request, res: Response): Promise<void> 
 
 // ─── POST /auth/forgot-password ────────────────────────────
 
-router.post('/forgot-password', async (req: Request, res: Response): Promise<void> => {
+router.post('/forgot-password', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = forgotPasswordSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -269,7 +270,7 @@ router.post('/forgot-password', async (req: Request, res: Response): Promise<voi
 
 // ─── POST /auth/reset-password ─────────────────────────────
 
-router.post('/reset-password', async (req: Request, res: Response): Promise<void> => {
+router.post('/reset-password', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const parsed = resetPasswordSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
@@ -298,7 +299,7 @@ router.post('/reset-password', async (req: Request, res: Response): Promise<void
 
 // ─── POST /auth/refresh ────────────────────────────────────
 
-router.post('/refresh', async (req: Request, res: Response): Promise<void> => {
+router.post('/refresh', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const token = req.cookies?.refreshToken as string | undefined;
     if (!token) {
@@ -606,7 +607,7 @@ router.delete('/avatar', authenticate, async (req: Request, res: Response): Prom
 
 // ─── POST /auth/resend-verification ─────────────────────────
 
-router.post('/resend-verification', async (req: Request, res: Response): Promise<void> => {
+router.post('/resend-verification', authRateLimit, async (req: Request, res: Response): Promise<void> => {
   try {
     const { email } = req.body;
     if (!email || typeof email !== 'string') {
