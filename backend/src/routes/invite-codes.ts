@@ -1,10 +1,9 @@
-import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { createInviteCodeSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { generateInviteCode } from '../lib/auth.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
-import { isValidationOk } from '../lib/http.js';
+import { asyncHandler, isValidationOk } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -14,8 +13,9 @@ router.use(requireRole('ADMIN', 'ROOT'));
 
 // ─── POST /invite-codes — Create invite code ───────────────
 
-router.post('/', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.post(
+  '/',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = createInviteCodeSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
 
@@ -44,16 +44,14 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
         createdAt: invite.createdAt,
       },
     });
-  } catch (err) {
-    log.error('Create invite code error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── GET /invite-codes — List all invite codes ──────────────
 
-router.get('/', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const codes = await prisma.inviteCode.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
@@ -74,16 +72,14 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
         usedBy: c.usedBy,
       })),
     });
-  } catch (err) {
-    log.error('List invite codes error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── DELETE /invite-codes/:id — Deactivate invite code ──────
 
-router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.delete(
+  '/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id as string;
 
     const invite = await prisma.inviteCode.findUnique({ where: { id } });
@@ -103,10 +99,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
     });
 
     res.json({ success: true, data: { message: 'Invite code deactivated' } });
-  } catch (err) {
-    log.error('Delete invite code error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 export default router;

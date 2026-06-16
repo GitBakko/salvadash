@@ -1,9 +1,8 @@
-import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { adminUpdateUserSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
-import { isValidationOk } from '../lib/http.js';
+import { asyncHandler, isValidationOk } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -13,8 +12,9 @@ router.use(requireRole('ADMIN', 'ROOT'));
 
 // ─── GET /admin/overview — System-wide stats ────────────────
 
-router.get('/overview', async (_req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/overview',
+  asyncHandler(async (_req: Request, res: Response): Promise<void> => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -50,16 +50,14 @@ router.get('/overview', async (_req: Request, res: Response): Promise<void> => {
       success: true,
       data: { totalUsers, totalEntries, avgGrowth, activeUsers30d },
     });
-  } catch (err) {
-    log.error('Admin overview error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── GET /admin/users — List users with search/filter ───────
 
-router.get('/users', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/users',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const search = (req.query.search as string) || '';
     const role = req.query.role as string | undefined;
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
@@ -119,16 +117,14 @@ router.get('/users', async (req: Request, res: Response): Promise<void> => {
     });
 
     res.json({ success: true, data, total, page, limit });
-  } catch (err) {
-    log.error('Admin list users error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── GET /admin/users/:id — User detail ─────────────────────
 
-router.get('/users/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/users/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id as string;
 
     const user = await prisma.user.findUnique({
@@ -180,16 +176,14 @@ router.get('/users/:id', async (req: Request, res: Response): Promise<void> => {
         totalSavings,
       },
     });
-  } catch (err) {
-    log.error('Admin get user error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── PUT /admin/users/:id — Update user role/status ─────────
 
-router.put('/users/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.put(
+  '/users/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id as string;
     const parsed = adminUpdateUserSchema.safeParse(req.body);
     if (!isValidationOk(res, parsed)) return;
@@ -225,16 +219,14 @@ router.put('/users/:id', async (req: Request, res: Response): Promise<void> => {
     });
 
     res.json({ success: true, data: updated });
-  } catch (err) {
-    log.error('Admin update user error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── DELETE /admin/users/:id — Delete user (ROOT only) ──────
 
-router.delete('/users/:id', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.delete(
+  '/users/:id',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     // Only ROOT can delete users
     if (req.user!.role !== 'ROOT') {
       res.status(403).json({ success: false, error: 'Only ROOT can delete users' });
@@ -265,10 +257,7 @@ router.delete('/users/:id', async (req: Request, res: Response): Promise<void> =
     await prisma.user.delete({ where: { id } });
 
     res.json({ success: true, data: { message: 'User deleted' } });
-  } catch (err) {
-    log.error('Admin delete user error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 export default router;

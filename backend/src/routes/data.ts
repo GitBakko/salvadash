@@ -4,6 +4,7 @@ import { z } from 'zod';
 import * as ExcelJS from 'exceljs';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
+import { asyncHandler } from '../lib/http.js';
 import { Prisma } from '../generated/prisma/client.js';
 import { rawEntryToRow, computeDashboard, computeAnalytics } from '../lib/calculations.js';
 import { entryInclude } from '../lib/entries-shared.js';
@@ -26,8 +27,9 @@ const router: RouterType = Router();
 
 router.use(authenticate);
 
-router.get('/dashboard', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/dashboard',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
     const year = (req.query.year as string) ?? new Date().getFullYear().toString();
 
@@ -41,16 +43,14 @@ router.get('/dashboard', async (req: Request, res: Response): Promise<void> => {
     const dashboard = computeDashboard(rows, year);
 
     res.json({ success: true, data: dashboard });
-  } catch (error) {
-    log.error('GET /data/dashboard error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── Analytics Data ─────────────────────────────────────────
 
-router.get('/analytics', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/analytics',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
 
     const accountIdsParam = (req.query.accountIds as string | undefined)?.trim();
@@ -83,11 +83,8 @@ router.get('/analytics', async (req: Request, res: Response): Promise<void> => {
     const analytics = computeAnalytics(rows, { accountIds });
 
     res.json({ success: true, data: analytics });
-  } catch (error) {
-    log.error('GET /data/analytics error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── Import Excel ───────────────────────────────────────────
 
@@ -254,8 +251,9 @@ router.post('/import', async (req: Request, res: Response): Promise<void> => {
 
 // ─── Export CSV ─────────────────────────────────────────────
 
-router.get('/export/csv', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/export/csv',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
 
     const entries = await prisma.monthlyEntry.findMany({
@@ -319,16 +317,14 @@ router.get('/export/csv', async (req: Request, res: Response): Promise<void> => 
       `attachment; filename="salvadash-export-${new Date().toISOString().split('T')[0]}.csv"`,
     );
     res.send(csvContent);
-  } catch (error) {
-    log.error('GET /data/export/csv error:', error);
-    res.status(500).json({ success: false, error: 'Export failed' });
-  }
-});
+  }),
+);
 
 // ─── Export JSON (for PDF generation client-side or future server-side) ──
 
-router.get('/export/json', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/export/json',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
 
     const entries = await prisma.monthlyEntry.findMany({
@@ -354,16 +350,14 @@ router.get('/export/json', async (req: Request, res: Response): Promise<void> =>
         exportedAt: new Date().toISOString(),
       },
     });
-  } catch (error) {
-    log.error('GET /data/export/json error:', error);
-    res.status(500).json({ success: false, error: 'Export failed' });
-  }
-});
+  }),
+);
 
 // ─── Reset All User Data ────────────────────────────────────
 
-router.delete('/reset', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.delete(
+  '/reset',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const userId = req.user!.userId;
     const { confirm } = req.body ?? {};
 
@@ -383,10 +377,7 @@ router.delete('/reset', async (req: Request, res: Response): Promise<void> => {
     ]);
 
     res.json({ success: true, message: 'All entries deleted' });
-  } catch (error) {
-    log.error('DELETE /data/reset error:', error);
-    res.status(500).json({ success: false, error: 'Reset failed' });
-  }
-});
+  }),
+);
 
 export default router;
