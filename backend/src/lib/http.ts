@@ -9,6 +9,25 @@ export function asyncHandler(fn: AsyncHandler) {
   };
 }
 
+/**
+ * Error a route handler can `throw` to produce a specific HTTP response instead
+ * of hand-rolling `res.status(...).json(...)`. The central error handler
+ * (`middleware/error.ts`) turns it into the standard `{ success, error, details? }`
+ * envelope. Use this for *expected* client errors (4xx); let everything else
+ * throw normally so it is logged + Sentry-captured as a 500.
+ */
+export class HttpError extends Error {
+  readonly status: number;
+  readonly details?: unknown;
+
+  constructor(status: number, message: string, details?: unknown) {
+    super(message);
+    this.name = 'HttpError';
+    this.status = status;
+    this.details = details;
+  }
+}
+
 export function respondValidation<T extends z.ZodTypeAny>(
   res: Response,
   parsed: z.SafeParseReturnType<z.input<T>, z.infer<T>>,

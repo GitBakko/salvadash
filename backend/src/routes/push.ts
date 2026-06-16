@@ -1,9 +1,9 @@
-import { log } from '../lib/logger.js';
 import { Router, type Router as RouterType, type Request, type Response } from 'express';
 import { z } from 'zod';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 import { config } from '../config/index.js';
+import { asyncHandler, HttpError } from '../lib/http.js';
 
 const router: RouterType = Router();
 
@@ -25,41 +25,45 @@ router.get('/vapid-key', (_req: Request, res: Response): void => {
 
 // ─── POST /push/subscribe — Save push subscription ─────────
 
-router.post('/subscribe', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.post(
+  '/subscribe',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const parsed = subscribeSchema.safeParse(req.body);
     if (!parsed.success) {
-      res
-        .status(400)
-        .json({ success: false, error: 'Invalid subscription', details: parsed.error.flatten() });
-      return;
+      throw new HttpError(400, 'Invalid subscription', parsed.error.flatten());
     }
 
     const { endpoint, keys } = parsed.data;
     const userId = req.user!.userId;
 
-    // Upsert: if endpoint exists, update; otherwise create
-    await prisma.pushSubscription.upsert({
-      where: { endpoint },
-      update: { userId, p256dh: keys.p256dh, auth: keys.auth },
-      create: { userId, endpoint, p256dh: keys.p256dh, auth: keys.auth },
+    // A push endpoint is unique to a single browser install. Bind it to the
+    // current user, explicitly reassigning it (and dropping any stale record
+    // from a previous owner on the same device) instead of letting a bare
+    // upsert silently clobber another user's subscription with our keys.
+    await prisma.$transaction(async (tx) => {
+      const existing = await tx.pushSubscription.findUnique({ where: { endpoint } });
+      if (existing && existing.userId !== userId) {
+        await tx.pushSubscription.delete({ where: { endpoint } });
+      }
+      await tx.pushSubscription.upsert({
+        where: { endpoint },
+        update: { userId, p256dh: keys.p256dh, auth: keys.auth },
+        create: { userId, endpoint, p256dh: keys.p256dh, auth: keys.auth },
+      });
     });
 
     res.status(201).json({ success: true, data: { message: 'Subscribed' } });
-  } catch (err) {
-    log.error('Push subscribe error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── DELETE /push/unsubscribe — Remove push subscription ────
 
-router.delete('/unsubscribe', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.delete(
+  '/unsubscribe',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { endpoint } = req.body as { endpoint?: string };
     if (!endpoint) {
-      res.status(400).json({ success: false, error: 'Endpoint required' });
-      return;
+      throw new HttpError(400, 'Endpoint required');
     }
 
     await prisma.pushSubscription.deleteMany({
@@ -67,24 +71,19 @@ router.delete('/unsubscribe', async (req: Request, res: Response): Promise<void>
     });
 
     res.json({ success: true, data: { message: 'Unsubscribed' } });
-  } catch (err) {
-    log.error('Push unsubscribe error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 // ─── GET /push/status — Check if user has active subscription ─
 
-router.get('/status', async (req: Request, res: Response): Promise<void> => {
-  try {
+router.get(
+  '/status',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const count = await prisma.pushSubscription.count({
       where: { userId: req.user!.userId },
     });
     res.json({ success: true, data: { subscribed: count > 0, count } });
-  } catch (err) {
-    log.error('Push status error:', err);
-    res.status(500).json({ success: false, error: 'Internal server error' });
-  }
-});
+  }),
+);
 
 export default router;

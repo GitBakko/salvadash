@@ -11,6 +11,7 @@ import { logger, log } from './lib/logger.js';
 import { initSentry, flushSentry } from './lib/sentry.js';
 import { startBackupScheduler, stopBackupScheduler } from './lib/backup-scheduler.js';
 import { apiRateLimit } from './middleware/rate-limit.js';
+import { errorHandler, notFoundHandler } from './middleware/error.js';
 
 initSentry();
 
@@ -55,19 +56,9 @@ app.get('/api/health', async (_req, res) => {
 import apiRoutes from './routes/index.js';
 app.use('/api', apiRateLimit, apiRoutes);
 
-// ─── 404 Handler ───────────────────────────────────────────
-app.use((_req, res) => {
-  res.status(404).json({ success: false, error: 'Not found' });
-});
-
-// ─── Error Handler ─────────────────────────────────────────
-app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  log.error('Unhandled error:', err);
-  res.status(500).json({
-    success: false,
-    error: config.nodeEnv === 'development' ? err.message : 'Internal server error',
-  });
-});
+// ─── 404 + Central Error Handler ───────────────────────────
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // ─── Start Server ──────────────────────────────────────────
 const server = app.listen(config.port, () => {
