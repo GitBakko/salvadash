@@ -72,8 +72,10 @@ const mockPrisma = vi.hoisted(() => ({
     findMany: vi.fn(),
     findUnique: vi.fn(),
     create: vi.fn(),
+    upsert: vi.fn(),
     delete: vi.fn(),
     deleteMany: vi.fn(),
+    count: vi.fn(),
   },
   $transaction: vi.fn(),
   $queryRaw: vi.fn(),
@@ -93,12 +95,15 @@ vi.mock('../lib/push.js', () => ({
 // ─── Test App Setup ─────────────────────────────────────────
 
 import apiRoutes from '../routes/index.js';
+import { errorHandler, notFoundHandler } from '../middleware/error.js';
 
 function createTestApp(): Express {
   const app = express();
   app.use(express.json({ limit: '10mb' }));
   app.use(cookieParser());
   app.use('/api', apiRoutes);
+  app.use(notFoundHandler);
+  app.use(errorHandler);
   return app;
 }
 
@@ -391,6 +396,58 @@ describe('API Integration Tests', () => {
         .set('Cookie', authCookies('u1', 'BASE'));
       expect(res.status).toBe(200);
       expect(res.body.data).toHaveProperty('publicKey');
+    });
+  });
+
+  describe('POST /api/push/subscribe', () => {
+    it('returns 400 (HttpError) on invalid subscription payload', async () => {
+      mockPrisma.user.findUnique.mockResolvedValue({ id: 'u1', role: 'BASE', isActive: true });
+
+      const res = await request(app)
+        .post('/api/push/subscribe')
+        .set('Cookie', authCookies('u1', 'BASE'))
+        .send({ endpoint: 'not-a-url' });
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body).toHaveProperty('details');
+    });
+
+    it('reassigns an endpoint owned by another user instead of clobbering it', async () => {
+      mockPrisma.user.findUnique.mockResolvedValue({ id: 'u2', role: 'BASE', isActive: true });
+      // Run the transaction callback against the same mock client.
+      mockPrisma.$transaction.mockImplementation((cb: (tx: typeof mockPrisma) => unknown) =>
+        cb(mockPrisma),
+      );
+      // Endpoint currently belongs to a DIFFERENT user.
+      mockPrisma.pushSubscription.findUnique.mockResolvedValue({
+        id: 'sub1',
+        endpoint: 'https://push.example/abc',
+        userId: 'u1',
+      });
+      mockPrisma.pushSubscription.delete.mockResolvedValue({});
+      mockPrisma.pushSubscription.upsert.mockResolvedValue({});
+
+      const res = await request(app)
+        .post('/api/push/subscribe')
+        .set('Cookie', authCookies('u2', 'BASE'))
+        .send({
+          endpoint: 'https://push.example/abc',
+          keys: { p256dh: 'key', auth: 'auth' },
+        });
+
+      expect(res.status).toBe(201);
+      // Stale row from the previous owner is removed...
+      expect(mockPrisma.pushSubscription.delete).toHaveBeenCalledWith({
+        where: { endpoint: 'https://push.example/abc' },
+      });
+      // ...and the endpoint is (re)bound to the current user.
+      expect(mockPrisma.pushSubscription.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { endpoint: 'https://push.example/abc' },
+          create: expect.objectContaining({ userId: 'u2' }),
+          update: expect.objectContaining({ userId: 'u2' }),
+        }),
+      );
     });
   });
 
