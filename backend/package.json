@@ -42,7 +42,7 @@
     "sharp": "^0.35.1",
     "tsx": "^4.22.4",
     "web-push": "^3.6.7",
-    "zod": "^3.23.0"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

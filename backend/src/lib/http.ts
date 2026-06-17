@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { z } from 'zod';
+import { z } from 'zod';
 import { log } from './logger.js';
 import { config } from '../config/index.js';
 
@@ -32,20 +32,20 @@ export class HttpError extends Error {
 
 export function respondValidation<T extends z.ZodTypeAny>(
   res: Response,
-  parsed: z.SafeParseReturnType<z.input<T>, z.infer<T>>,
+  parsed: z.ZodSafeParseResult<z.infer<T>>,
 ): void {
   if (parsed.success) return;
   res.status(400).json({
     success: false,
     error: 'Validation failed',
-    details: parsed.error.flatten(),
+    details: z.flattenError(parsed.error),
   });
 }
 
 export function isValidationOk<T extends z.ZodTypeAny>(
   res: Response,
-  parsed: z.SafeParseReturnType<z.input<T>, z.infer<T>>,
-): parsed is z.SafeParseSuccess<z.infer<T>> {
+  parsed: z.ZodSafeParseResult<z.infer<T>>,
+): parsed is z.ZodSafeParseSuccess<z.infer<T>> {
   if (parsed.success) return true;
   respondValidation(res, parsed);
   return false;
