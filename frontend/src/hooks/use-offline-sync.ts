@@ -15,8 +15,13 @@ export function useOfflineSync() {
   // ─── SW message listener (background sync complete) ──────
   useEffect(() => {
     function onMessage(event: MessageEvent) {
-      if (event.data?.type === 'SYNC_COMPLETE') {
-        // Refetch everything after background sync replayed queued mutations
+      // SYNC_COMPLETE: queued mutations replayed. SYNC_FAILED: one or more
+      // poisoned items were dropped after exhausting retries. Both require
+      // re-reading server state so the UI reconciles with what actually landed.
+      if (event.data?.type === 'SYNC_COMPLETE' || event.data?.type === 'SYNC_FAILED') {
+        if (event.data?.type === 'SYNC_FAILED') {
+          console.warn(`Offline sync dropped ${event.data.dropped} unrecoverable change(s).`);
+        }
         queryClient.invalidateQueries({ queryKey: ['entries'] });
         queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         queryClient.invalidateQueries({ queryKey: ['analytics'] });
