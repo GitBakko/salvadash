@@ -121,6 +121,13 @@ jobs:
       - name: Build shared (required by backend/frontend imports)
         run: pnpm --filter shared build
 
+      # Apply the Prisma schema to the throwaway Postgres service so the
+      # real-DB integration tests (db-integration.test.ts) have tables to run
+      # against. Mocked suites ignore the DB; the real-DB suite is gated on the
+      # DATABASE_URL naming the `salvadash_test` database (set in this job's env).
+      - name: Apply schema to test database
+        run: pnpm db:push
+
       - name: Backend tests
         run: pnpm test:backend -- --reporter=verbose
 
