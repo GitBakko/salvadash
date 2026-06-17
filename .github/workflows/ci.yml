@@ -176,13 +176,38 @@ jobs:
           retention-days: 7
 
   # ─── E2E (Playwright) ─────────────────────────────────────
-  # The specs exercise only the frontend (UI/navigation/validation), so this
-  # builds the SPA and serves it via `vite preview` (see playwright.config.ts) —
-  # no backend or database required.
+  # Playwright boots the full dev stack (backend + frontend, see
+  # playwright.config.ts), so the API responds (401s etc.). Needs Postgres + env.
   e2e:
     name: 🎭 E2E
     runs-on: ubuntu-latest
     needs: [lint, typecheck]
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: salvadash_test
+          POSTGRES_USER: salvadash
+          POSTGRES_PASSWORD: salvadash_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U salvadash"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: 'postgresql://salvadash:salvadash_test@localhost:5432/salvadash_test?schema=public'
+      JWT_ACCESS_SECRET: 'ci-e2e-access-secret'
+      JWT_REFRESH_SECRET: 'ci-e2e-refresh-secret'
+      SMTP_HOST: 'localhost'
+      SMTP_USER: 'e2e@test.local'
+      SMTP_PASS: 'e2e'
+      SMTP_FROM: 'e2e@test.local'
+      NODE_ENV: 'development'
+
     steps:
       - uses: actions/checkout@v4
 
@@ -196,9 +221,13 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm db:generate
 
-      - name: Build shared + frontend
-        run: pnpm --filter shared build && pnpm --filter frontend build
+      - name: Build shared (imported by backend/frontend)
+        run: pnpm --filter shared build
+
+      - name: Apply schema to the database
+        run: pnpm db:push
 
       - name: Install Playwright browser (chromium)
         run: pnpm --filter frontend exec playwright install --with-deps chromium

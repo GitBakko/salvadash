@@ -27,10 +27,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    // The e2e specs only exercise the frontend (UI/navigation/validation), so
-    // in CI we serve the built SPA via `vite preview` — no backend/DB needed.
-    // Locally we use the full dev stack for convenience.
-    command: process.env.CI ? 'pnpm exec vite preview --port 5173 --strictPort' : 'pnpm dev',
+    // Brings up the full dev stack (backend :3000 + frontend :5173). The specs
+    // need the API to respond (e.g. /auth/me → 401, invalid-login → 401), so the
+    // frontend alone is not enough. CI provisions Postgres + env for the backend.
+    command: 'pnpm dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
