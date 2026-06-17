@@ -268,6 +268,16 @@ Creare `E:\www\salvadash\backend\.env`:
 # vanno codificati in formato URL. Es: @ → %40, # → %23, % → %25
 DATABASE_URL="postgresql://salvadash:UNA_PASSWORD_SICURA_QUI@localhost:5432/salvadash?schema=public"
 
+# ─── DB connection pool (opzionali, hanno default) ──────────
+# Connessioni riusate dal pool pg sotto @prisma/adapter-pg.
+# DB_POOL_MAX: max connessioni simultanee verso Postgres. Default 10.
+#   Tenerlo sotto max_connections del server PG; alzare se molti utenti concorrenti.
+# DB_POOL_IDLE_TIMEOUT_MS: chiude connessioni idle dopo N ms. Default 10000.
+# DB_POOL_CONNECTION_TIMEOUT_MS: attesa max per ottenere una connessione prima di errore. Default 10000.
+DB_POOL_MAX=10
+DB_POOL_IDLE_TIMEOUT_MS=10000
+DB_POOL_CONNECTION_TIMEOUT_MS=10000
+
 # ─── JWT (CAMBIARE OBBLIGATORIAMENTE!) ───────────────────────
 JWT_ACCESS_SECRET="generare-con-openssl-rand-hex-64"
 JWT_REFRESH_SECRET="generare-con-openssl-rand-hex-64"
@@ -288,6 +298,13 @@ APP_URL="https://salvadash.tuodominio.com"
 API_URL="https://salvadash.tuodominio.com"
 API_PORT=3000
 NODE_ENV="production"
+
+# ─── Metrics (Prometheus) ──────────────────────────────────
+# Bearer token che protegge GET /api/metrics.
+# VUOTO o non impostato = endpoint /api/metrics DISABILITATO.
+# Impostare un token segreto solo se Prometheus deve fare scraping.
+# Lo scraper passa poi header: Authorization: Bearer <token>
+METRICS_TOKEN=""
 
 # ─── VAPID (Web Push) ──────────────────────────────────────
 VAPID_PUBLIC_KEY=""
