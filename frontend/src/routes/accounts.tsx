@@ -264,6 +264,7 @@ function AccountsPage() {
               key={account.id}
               account={account}
               color={getAccountColor(account, idx)}
+              index={idx}
               onEdit={() => openEdit(account)}
               onDelete={() => handleDelete(account)}
               onToggleActive={() => handleToggleActive(account)}
@@ -320,6 +321,7 @@ function AccountsPage() {
 interface DraggableAccountCardProps {
   account: AccountPublic;
   color: string;
+  index: number;
   onEdit: () => void;
   onDelete: () => void;
   onToggleActive: () => void;
@@ -330,6 +332,7 @@ interface DraggableAccountCardProps {
 function DraggableAccountCard({
   account,
   color,
+  index,
   onEdit,
   onDelete,
   onToggleActive,
@@ -344,6 +347,9 @@ function DraggableAccountCard({
       dragListener={false}
       dragControls={dragControls}
       onDragEnd={onDragEnd}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: index * 0.04, duration: 0.3 }}
       whileDrag={{ scale: 1.02, boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}
     >
       <AccountCardContent
