@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Wallet, Home, Clock, Plus, BarChart3, Settings } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
+import { SPRING } from '../lib/motion';
 
 interface NavItem {
   path: string;
@@ -28,7 +29,10 @@ export function BottomNav() {
   const avatarUrl = useAuthStore((s) => s.user?.avatarUrl);
 
   return (
-    <nav
+    <motion.nav
+      initial={{ y: '100%' }}
+      animate={{ y: 0 }}
+      transition={SPRING.gentle}
       className="fixed bottom-0 inset-x-0 z-40 glass-card border-t border-border-default"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
@@ -38,23 +42,28 @@ export function BottomNav() {
 
           if (item.isFab) {
             return (
-              <button
+              <motion.button
                 key={item.path}
                 onClick={() => navigate({ to: item.path })}
-                className="relative -mt-6 w-14 h-14 rounded-full bg-brand flex items-center justify-center shadow-lg glow-brand active:scale-95 transition-transform"
+                whileTap={{ scale: 0.92 }}
+                whileHover={{ scale: 1.05 }}
+                transition={SPRING.snappy}
+                className="relative -mt-6 w-14 h-14 rounded-full bg-brand flex items-center justify-center shadow-lg glow-brand"
                 aria-label={t(item.labelKey)}
               >
                 <item.Icon size={28} className="text-surface-base" />
-              </button>
+              </motion.button>
             );
           }
 
           const isSettingsWithAvatar = item.path === '/settings' && avatarUrl;
 
           return (
-            <button
+            <motion.button
               key={item.path}
               onClick={() => navigate({ to: item.path })}
+              whileTap={{ scale: 0.88 }}
+              transition={SPRING.snappy}
               className="flex flex-col items-center justify-center gap-0.5 px-2 relative self-stretch"
               aria-label={t(item.labelKey)}
             >
@@ -82,10 +91,10 @@ export function BottomNav() {
               >
                 {t(item.labelKey)}
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>
-    </nav>
+    </motion.nav>
   );
 }
