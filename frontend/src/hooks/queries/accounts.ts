@@ -2,16 +2,27 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AccountPublic } from '@salvadash/shared';
 import { api } from '../../lib/api';
 import { queryKeys } from './keys';
+import { useAuthStore } from '../../stores/auth-store';
+import { cacheBlob, getCachedBlob } from '../../lib/db';
+import { withOfflineCache } from '../../lib/offline-cache';
 import type { SearchResult } from '../../components/AccountLogoPicker';
 
 export function useAccounts() {
+  const userId = useAuthStore((s) => s.user?.id);
   return useQuery({
     queryKey: queryKeys.accounts,
-    queryFn: async () => {
-      const res = await api.get<AccountPublic[]>('/accounts');
-      if (!res.success) throw new Error(res.error ?? 'Failed to fetch accounts');
-      return res.data!;
-    },
+    queryFn: () =>
+      withOfflineCache(
+        async () => {
+          const res = await api.get<AccountPublic[]>('/accounts');
+          if (!res.success) throw new Error(res.error ?? 'Failed to fetch accounts');
+          return res.data!;
+        },
+        {
+          read: () => getCachedBlob<AccountPublic[]>(`accounts-${userId}`),
+          write: (v) => (userId ? cacheBlob(`accounts-${userId}`, userId, v) : Promise.resolve()),
+        },
+      ),
   });
 }
 

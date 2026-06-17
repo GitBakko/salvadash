@@ -2,6 +2,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { EntryPublic, EntryListItem } from '@salvadash/shared';
 import { api } from '../../lib/api';
 import { queryKeys } from './keys';
+import { useAuthStore } from '../../stores/auth-store';
+import { cacheBlob, getCachedBlob } from '../../lib/db';
+import { withOfflineCache } from '../../lib/offline-cache';
 
 export interface EntriesResponse {
   success: boolean;
@@ -12,15 +15,25 @@ export interface EntriesResponse {
 }
 
 export function useEntries(year?: string, page = 1, limit = 50) {
+  const userId = useAuthStore((s) => s.user?.id);
   return useQuery({
     queryKey: [...queryKeys.entries(year), page] as const,
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      if (year) params.set('year', year);
-      params.set('page', String(page));
-      params.set('limit', String(limit));
-      const res = await api.get<EntryListItem[]>(`/entries?${params}`);
-      return res as unknown as EntriesResponse;
+    queryFn: () => {
+      const key = `entries-${userId}-${year ?? 'all'}-${page}-${limit}`;
+      return withOfflineCache(
+        async () => {
+          const params = new URLSearchParams();
+          if (year) params.set('year', year);
+          params.set('page', String(page));
+          params.set('limit', String(limit));
+          const res = await api.get<EntryListItem[]>(`/entries?${params}`);
+          return res as unknown as EntriesResponse;
+        },
+        {
+          read: () => getCachedBlob<EntriesResponse>(key),
+          write: (v) => (userId ? cacheBlob(key, userId, v) : Promise.resolve()),
+        },
+      );
     },
   });
 }

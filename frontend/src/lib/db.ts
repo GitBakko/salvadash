@@ -103,6 +103,24 @@ export async function getCachedDashboard(userId: string) {
   }
 }
 
+// ─── Generic JSON blob cache (offline read fallback) ───────
+// Reuses the dashboard table as a keyed JSON store: lossless, unlike the
+// structured account/entry tables whose shapes differ from the API responses.
+
+export async function cacheBlob(key: string, userId: string, data: unknown) {
+  await db.dashboard.put({ id: key, userId, dataJson: JSON.stringify(data), syncedAt: Date.now() });
+}
+
+export async function getCachedBlob<T>(key: string): Promise<T | undefined> {
+  const row = await db.dashboard.get(key);
+  if (!row) return undefined;
+  try {
+    return JSON.parse(row.dataJson) as T;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function getCachedEntries(userId: string) {
   return db.entries.where('userId').equals(userId).reverse().sortBy('date');
 }
