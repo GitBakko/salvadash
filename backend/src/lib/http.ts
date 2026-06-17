@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { z } from 'zod';
+import { z } from 'zod';
 import { log } from './logger.js';
 import { config } from '../config/index.js';
 
