@@ -54,3 +54,5 @@ export type { SendNotificationInput } from './notification.js';
 
 export { adminUpdateUserSchema } from './admin.js';
 export type { AdminUpdateUserInput } from './admin.js';
+
+export { dashboardDataSchema, analyticsDataSchema } from './response.js';
