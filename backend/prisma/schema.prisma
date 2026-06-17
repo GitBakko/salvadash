@@ -56,6 +56,7 @@ model User {
   inviteCodeUsed     InviteCode?        @relation("InviteUsedBy")
   notifications      Notification[]
   pushSubscriptions  PushSubscription[]
+  refreshTokens      RefreshToken[]
 
   @@map("users")
 }
@@ -201,6 +202,26 @@ model PushSubscription {
   @@map("push_subscriptions")
 }
 
+// ─── Refresh Token ─────────────────────────────────────────
+// One row per issued refresh token (keyed by the JWT's `jti`). Rotation marks
+// the old row revoked and links it to its successor; presenting an already-
+// revoked token is treated as theft and revokes the whole user's tokens.
+
+model RefreshToken {
+  id         String    @id @default(cuid())
+  jti        String    @unique
+  userId     String
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  replacedBy String? // jti of the token issued when this one was rotated
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
 // ─── Backup Log ────────────────────────────────────────────
 
 enum BackupStatus {
@@ -215,7 +236,7 @@ model BackupLog {
   sizeBytes   Int          @default(0)
   status      BackupStatus @default(RUNNING)
   error       String?
-  triggeredBy String?      // userId or "scheduler"
+  triggeredBy String? // userId or "scheduler"
   createdAt   DateTime     @default(now())
   completedAt DateTime?
 

@@ -43,16 +43,17 @@ describe('Auth Utilities', () => {
     });
 
     it('generates and verifies refresh token', () => {
-      const token = generateRefreshToken(payload);
+      const token = generateRefreshToken(payload, 'test-jti');
       expect(token).toBeTruthy();
 
       const decoded = verifyRefreshToken(token);
       expect(decoded.userId).toBe(payload.userId);
       expect(decoded.role).toBe(payload.role);
+      expect(decoded.jti).toBe('test-jti');
     });
 
     it('access token fails with wrong secret (cross-verify)', () => {
-      const token = generateRefreshToken(payload);
+      const token = generateRefreshToken(payload, 'test-jti');
       expect(() => verifyAccessToken(token)).toThrow();
     });
   });

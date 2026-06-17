@@ -47,7 +47,7 @@ describe('JWT Edge Cases', () => {
   });
 
   it('refresh token cannot be verified as access token', () => {
-    const token = generateRefreshToken({ userId: 'abc', role: 'BASE' });
+    const token = generateRefreshToken({ userId: 'abc', role: 'BASE' }, 'jti-1');
     expect(() => verifyAccessToken(token)).toThrow();
   });
 
