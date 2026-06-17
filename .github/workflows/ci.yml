@@ -128,8 +128,10 @@ jobs:
       - name: Apply schema to test database
         run: pnpm db:push
 
+      # Runs with --coverage so the vitest threshold gate is enforced in CI (the
+      # salvadash_test DB above means the real-DB suites run and cover routes/**).
       - name: Backend tests
-        run: pnpm test:backend -- --reporter=verbose
+        run: pnpm test:backend -- --reporter=verbose --coverage
 
       - name: Frontend tests
         run: pnpm test:frontend -- --reporter=verbose
