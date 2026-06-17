@@ -22,6 +22,38 @@ export interface ChangelogEntry {
 
 export const changelog: ChangelogEntry[] = [
   {
+    version: '1.3.0',
+    date: '2026-06-17',
+    categories: [
+      {
+        type: 'improvement',
+        items: [
+          {
+            it: 'Revamp interfaccia Aurora: micro-interazioni "subtle-pro" in tutta l\'app — count-up dell\'importo hero, entrate in stagger, transizioni di pagina, grafici animati. Solo transform/opacity (60fps), reduced-motion rispettato ovunque.',
+            en: 'Aurora interface revamp: "subtle-pro" micro-interactions across the app — hero amount count-up, staggered entrances, page transitions, animated charts. Transform/opacity only (60fps), reduced-motion honored everywhere.',
+          },
+          {
+            it: 'Importo patrimonio hero: dimensionamento dinamico (fit-to-width) — qualsiasi cifra resta su una riga senza andare a capo.',
+            en: 'Hero patrimony amount: dynamic fit-to-width sizing — any magnitude stays on one line without wrapping.',
+          },
+          {
+            it: 'Skeleton di caricamento con effetto shimmer; pulsanti, card e bottom-nav con feedback al tocco più curato.',
+            en: 'Loading skeletons with shimmer; buttons, cards and bottom-nav with refined tap feedback.',
+          },
+        ],
+      },
+      {
+        type: 'fix',
+        items: [
+          {
+            it: 'Seed database: lettura Excel migrata a exceljs (rimossa dipendenza xlsx non dichiarata che faceva fallire `pnpm db:seed` su install pulito).',
+            en: 'Database seed: Excel reading migrated to exceljs (removed undeclared xlsx dependency that broke `pnpm db:seed` on a clean install).',
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '1.2.5',
     date: '2026-05-01',
     categories: [
