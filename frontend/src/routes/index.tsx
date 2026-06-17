@@ -1,11 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { DashboardData } from '@salvadash/shared';
 import { useDashboard } from '../hooks/queries';
 import { useCacheDashboard } from '../hooks/use-offline-sync';
-import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
+import { useCountUp } from '../hooks/use-count-up';
+import { useFitText } from '../hooks/use-fit-text';
+import { staggerContainer, staggerItem } from '../lib/motion';
 import { Card, Skeleton } from '../components/ui';
 import { QueryErrorState } from '../components/QueryErrorState';
 import { Delta } from '../components/ui/Delta';
@@ -53,28 +55,49 @@ function DashboardPage() {
   }
 
   return (
-    <div className="p-4 max-w-lg mx-auto space-y-4">
+    <motion.div
+      className="p-4 max-w-lg mx-auto space-y-4"
+      variants={staggerContainer()}
+      initial="hidden"
+      animate="visible"
+    >
       <h1 className="sr-only">{t('nav.home')}</h1>
       {/* Year selector pills */}
-      <YearPills years={years} active={year} onChange={(y) => setYear(y as string)} />
+      <motion.div variants={staggerItem}>
+        <YearPills years={years} active={year} onChange={(y) => setYear(y as string)} />
+      </motion.div>
 
       {/* Hero KPI */}
-      <HeroCard data={data} t={t} />
+      <motion.div variants={staggerItem}>
+        <HeroCard data={data} t={t} />
+      </motion.div>
 
       {/* Secondary KPIs */}
-      <KPIGrid data={data} t={t} year={year} lang={i18n.language} />
+      <motion.div variants={staggerItem}>
+        <KPIGrid data={data} t={t} year={year} lang={i18n.language} />
+      </motion.div>
 
       {/* Sparkline */}
-      {data.sparklineData.length > 1 && <SparklineCard data={data.sparklineData} t={t} />}
+      {data.sparklineData.length > 1 && (
+        <motion.div variants={staggerItem}>
+          <SparklineCard data={data.sparklineData} t={t} />
+        </motion.div>
+      )}
 
       {/* Account breakdown */}
-      {data.accountBreakdown.length > 0 && <AccountBreakdown data={data} t={t} />}
+      {data.accountBreakdown.length > 0 && (
+        <motion.div variants={staggerItem}>
+          <AccountBreakdown data={data} t={t} />
+        </motion.div>
+      )}
 
       {/* Recent entries */}
       {data.recentEntries.length > 0 && (
-        <RecentEntries entries={data.recentEntries} t={t} lang={i18n.language} />
+        <motion.div variants={staggerItem}>
+          <RecentEntries entries={data.recentEntries} t={t} lang={i18n.language} />
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -87,7 +110,14 @@ function HeroCard({
   data: DashboardData;
   t: (k: string, o?: Record<string, string>) => string;
 }) {
-  const { integer: integerPart, cents: centsPart } = fmtCurrencyParts(data.currentTotal);
+  // Count-up to the current total; fit-to-width keeps any magnitude on one line.
+  const animatedTotal = useCountUp(data.currentTotal);
+  const { integer: integerPart, cents: centsPart } = fmtCurrencyParts(animatedTotal);
+  const { ref: amountRef, fontSize, refit } = useFitText<HTMLDivElement>({ max: 88, min: 30 });
+  // Re-fit as the integer length changes during count-up (never wraps).
+  useLayoutEffect(() => {
+    refit();
+  }, [integerPart, refit]);
 
   const delta = data.currentEntry?.delta ?? null;
   const deltaPercent = data.currentEntry?.deltaPercent ?? null;
@@ -122,10 +152,14 @@ function HeroCard({
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-text-muted mb-3.5">
         {t('dashboard.currentTotal')}
       </p>
-      <div className="hero-amount font-heading text-[clamp(3.5rem,11vw,5.5rem)] font-extrabold tracking-[-0.045em] leading-[0.95] text-text-primary tabular-nums">
+      <div
+        ref={amountRef}
+        style={{ fontSize }}
+        className="hero-amount font-heading font-extrabold tracking-[-0.045em] leading-[0.95] text-text-primary tabular-nums whitespace-nowrap"
+      >
         <span>{integerPart}</span>
         {centsPart && (
-          <span className="text-[2.6rem] font-bold text-text-muted tracking-[-0.03em] ml-1">
+          <span className="text-[0.46em] font-bold text-text-muted tracking-[-0.03em] ml-1">
             {centsPart}
           </span>
         )}
@@ -217,26 +251,19 @@ function KPIGrid({
 // ─── Sparkline Card ────────────────────────────────────────
 
 function SparklineCard({ data, t }: { data: number[]; t: (k: string) => string }) {
-  const reducedMotion = usePrefersReducedMotion();
   const label = t('dashboard.trend12mo');
 
   return (
-    <motion.div
-      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
-      className="solid-card p-4 overflow-hidden"
-    >
+    <div className="solid-card p-4 overflow-hidden">
       <p className="text-text-muted text-xs font-medium mb-2">{label}</p>
       <MiniSparkline values={data} className="w-full h-20" ariaLabel={label} />
-    </motion.div>
+    </div>
   );
 }
 
 // ─── Account Breakdown ─────────────────────────────────────
 
 function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => string }) {
-  const reducedMotion = usePrefersReducedMotion();
   // Default: backend order (custom). Client-side view-only sort.
   const [sortMode, setSortMode] = useState<SortMode>('custom');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
@@ -246,11 +273,7 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
   );
 
   return (
-    <motion.div
-      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.35 }}
-    >
+    <div>
       <div className="flex items-center justify-between mb-2 gap-2">
         <p className="text-text-muted text-xs font-medium">{t('accounts.title')}</p>
         <AccountSortControl
@@ -284,7 +307,7 @@ function AccountBreakdown({ data, t }: { data: DashboardData; t: (k: string) => 
           </Card>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -299,13 +322,8 @@ function RecentEntries({
   t: (k: string) => string;
   lang: string;
 }) {
-  const reducedMotion = usePrefersReducedMotion();
   return (
-    <motion.div
-      initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
-    >
+    <div>
       <p className="text-text-muted text-xs font-medium mb-2">{t('dashboard.recentEntries')}</p>
       <Card className="space-y-1">
         {entries.map((entry) => (
@@ -333,7 +351,7 @@ function RecentEntries({
           </div>
         ))}
       </Card>
-    </motion.div>
+    </div>
   );
 }
 

@@ -11,8 +11,9 @@ import { usePrefersReducedMotion } from './use-prefers-reduced-motion';
  */
 export function useCountUp(target: number, durationMs = 900): number {
   const reduced = usePrefersReducedMotion();
-  const [value, setValue] = useState(target);
-  const fromRef = useRef(target);
+  // Start at 0 so the first mount animates 0 → target (reduced-motion jumps to target).
+  const [value, setValue] = useState(reduced ? target : 0);
+  const fromRef = useRef(reduced ? target : 0);
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
