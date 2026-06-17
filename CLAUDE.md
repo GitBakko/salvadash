@@ -93,7 +93,7 @@ Prod: `pm2 start backend/ecosystem.config.json`; IIS reverse-proxy `/api`,`/uplo
 
 2. **NEVER ship `frontend/web.config` in the release package.** Prod has its own minimal working config (3 rewrite rules: API proxy, uploads proxy, SPA fallback). The dev template `web.config` adds `<outboundRules>` referencing `RESPONSE_Cache-Control` which is NOT registered in IIS `allowedServerVariables` → every request returns 500. Compression / custom headers / static MIME blocks also reference modules that may not be installed. Override them only when an upgrade explicitly requires a config change, and document that as a separate manual step.
 
-3. The dev `dist-release/` packaging script needs to be aware of #1 and #2. Re-validate any time the release flow is touched.
+3. The dev `dist-release/` packaging is automated by `pnpm package:release` (`scripts/package-release.mjs`): it builds, flattens `frontend/dist/` into `<pkg>/frontend/`, excludes `web.config`, and **fails** if any structural check (#1/#2) regresses. Re-validate the script any time the release flow is touched. Still add the per-release `UPGRADE-v<version>.md` by hand.
 
 4. **Staging path on prod is `E:\www\salvadash-v<version>\`, NOT `E:\install\`.** The release zip is uploaded next to the running app under `E:\www\` and extracted there. Deploy guides and UPGRADE docs must use `E:\www\salvadash-v<version>\` as the source path when copying files into `E:\www\salvadash\`.
 
