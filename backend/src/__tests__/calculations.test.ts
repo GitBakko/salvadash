@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { computeDashboard, computeAnalytics, rawEntryToRow } from '../lib/calculations.js';
+import {
+  computeDashboard,
+  computeAnalytics,
+  rawEntryToRow,
+  computeSystemAvgGrowth,
+} from '../lib/calculations.js';
 
 // ─── Test Fixtures ──────────────────────────────────────────
 
@@ -279,5 +284,49 @@ describe('money precision', () => {
     // ascending: Jan 0.8, Feb 0.3
     expect(result.patrimonyOverTime.map((p) => p.total)).toEqual([0.8, 0.3]);
     expect(result.bestMonth.delta).toBe(-0.5);
+  });
+});
+
+// ─── computeSystemAvgGrowth (admin overview) ────────────────
+
+describe('computeSystemAvgGrowth', () => {
+  it('takes deltas within each user, never across users', () => {
+    // Dates interleave A/B so a naive global sort would mix users.
+    const result = computeSystemAvgGrowth([
+      { userId: 'A', date: new Date('2025-01-01'), balances: [{ amount: 100 }] },
+      { userId: 'B', date: new Date('2025-02-01'), balances: [{ amount: 50 }] },
+      { userId: 'A', date: new Date('2025-03-01'), balances: [{ amount: 110 }] },
+      { userId: 'B', date: new Date('2025-04-01'), balances: [{ amount: 40 }] },
+    ]);
+    // Per user: A +10, B -10 → mean 0. (The old global-delta bug gave ≈ -20.)
+    expect(result).toBe(0);
+  });
+
+  it('sorts each user by date before differencing', () => {
+    const result = computeSystemAvgGrowth([
+      { userId: 'A', date: new Date('2025-03-01'), balances: [{ amount: 300 }] },
+      { userId: 'A', date: new Date('2025-01-01'), balances: [{ amount: 100 }] },
+      { userId: 'A', date: new Date('2025-02-01'), balances: [{ amount: 200 }] },
+    ]);
+    // sorted 100→200→300 → deltas +100,+100 → mean 100
+    expect(result).toBe(100);
+  });
+
+  it('sums multi-account balances in cents (exact)', () => {
+    const result = computeSystemAvgGrowth([
+      { userId: 'A', date: new Date('2025-01-01'), balances: [{ amount: 0.1 }, { amount: 0.2 }] },
+      { userId: 'A', date: new Date('2025-02-01'), balances: [{ amount: 0.8 }] },
+    ]);
+    // 0.3 → 0.8 → delta 0.5
+    expect(result).toBe(0.5);
+  });
+
+  it('ignores users with fewer than two entries; empty → 0', () => {
+    expect(computeSystemAvgGrowth([])).toBe(0);
+    expect(
+      computeSystemAvgGrowth([
+        { userId: 'A', date: new Date('2025-01-01'), balances: [{ amount: 10 }] },
+      ]),
+    ).toBe(0);
   });
 });

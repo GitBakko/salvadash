@@ -3,7 +3,8 @@ import { adminUpdateUserSchema } from '@salvadash/shared';
 import prisma from '../lib/prisma.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { asyncHandler, isValidationOk } from '../lib/http.js';
-import { sumMoney, toCents, fromCents } from '../lib/money.js';
+import { sumMoney } from '../lib/money.js';
+import { computeSystemAvgGrowth } from '../lib/calculations.js';
 
 const router: RouterType = Router();
 
@@ -27,25 +28,14 @@ router.get(
           entries: { some: { createdAt: { gte: thirtyDaysAgo } } },
         },
       }),
-      // Compute avg growth: get all entries with balances for delta calculation
+      // Per-user balances over time, for the system-wide avg-growth calc.
       prisma.monthlyEntry.findMany({
-        orderBy: { date: 'asc' },
-        include: { balances: { select: { amount: true } } },
+        select: { userId: true, date: true, balances: { select: { amount: true } } },
       }),
     ]);
 
-    // Compute avg growth across all entries (in cents to stay exact)
-    let avgGrowth = 0;
-    if (allEntries.length > 1) {
-      const totalsCents = allEntries.map((e) =>
-        e.balances.reduce((sum, b) => sum + toCents(b.amount), 0),
-      );
-      const deltasCents: number[] = [];
-      for (let i = 1; i < totalsCents.length; i++) {
-        deltasCents.push(totalsCents[i] - totalsCents[i - 1]);
-      }
-      avgGrowth = fromCents(deltasCents.reduce((s, d) => s + d, 0) / deltasCents.length);
-    }
+    // Mean of each user's month-over-month deltas (deltas never cross users).
+    const avgGrowth = computeSystemAvgGrowth(allEntries);
 
     res.json({
       success: true,

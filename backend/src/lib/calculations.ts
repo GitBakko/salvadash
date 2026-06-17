@@ -91,6 +91,43 @@ function entryTotalIncome(row: EntryRow): number {
   return fromCents(entryIncomeCents(row));
 }
 
+// ─── Admin / System Calculations ────────────────────────────
+
+export interface SystemEntryInput {
+  userId: string;
+  date: Date;
+  balances: { amount: DecimalLike }[];
+}
+
+/**
+ * System-wide average monthly growth = the mean of every user's consecutive
+ * month-over-month balance deltas. Deltas are taken **within a single user**:
+ * the previous implementation computed them across a globally date-sorted list
+ * of all users' entries, so consecutive items often belonged to different users
+ * and the resulting figure was meaningless. Summed in integer cents to stay
+ * exact, then converted back to euros.
+ */
+export function computeSystemAvgGrowth(entries: SystemEntryInput[]): number {
+  const byUser = new Map<string, { date: Date; totalCents: number }[]>();
+  for (const e of entries) {
+    const totalCents = e.balances.reduce((sum, b) => sum + toCents(b.amount), 0);
+    const list = byUser.get(e.userId);
+    if (list) list.push({ date: e.date, totalCents });
+    else byUser.set(e.userId, [{ date: e.date, totalCents }]);
+  }
+
+  const deltasCents: number[] = [];
+  for (const list of byUser.values()) {
+    list.sort((a, b) => a.date.getTime() - b.date.getTime());
+    for (let i = 1; i < list.length; i++) {
+      deltasCents.push(list[i].totalCents - list[i - 1].totalCents);
+    }
+  }
+
+  if (deltasCents.length === 0) return 0;
+  return fromCents(deltasCents.reduce((s, d) => s + d, 0) / deltasCents.length);
+}
+
 // ─── Dashboard Calculations ─────────────────────────────────
 
 export function computeDashboard(
