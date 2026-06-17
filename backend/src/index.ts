@@ -11,6 +11,7 @@ import { logger, log } from './lib/logger.js';
 import { initSentry, flushSentry } from './lib/sentry.js';
 import { startBackupScheduler, stopBackupScheduler } from './lib/backup-scheduler.js';
 import { apiRateLimit } from './middleware/rate-limit.js';
+import { csrfGuard } from './middleware/csrf.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 import { healthHandler } from './middleware/health.js';
 import { metricsHandler } from './middleware/metrics.js';
@@ -52,7 +53,7 @@ app.get('/api/metrics', metricsHandler);
 
 // ─── API Routes ────────────────────────────────────────────
 import apiRoutes from './routes/index.js';
-app.use('/api', apiRateLimit, apiRoutes);
+app.use('/api', apiRateLimit, csrfGuard, apiRoutes);
 
 // ─── 404 + Central Error Handler ───────────────────────────
 app.use(notFoundHandler);
