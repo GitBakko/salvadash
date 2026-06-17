@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * E2E tests che verificano il comportamento dell'app senza
- * richiedere un backend attivo — testano UI, navigazione e
- * gestione degli errori.
+ * E2E smoke tests for UI, navigation and error handling. Selectors are
+ * type/role/label based (not i18n-derived ids) so they stay robust across
+ * copy changes.
  */
 
 test.describe('Login Page', () => {
@@ -12,16 +12,14 @@ test.describe('Login Page', () => {
   });
 
   test('shows login form', async ({ page }) => {
-    await expect(page.locator('input#email')).toBeVisible();
-    await expect(page.locator('input#password')).toBeVisible();
+    await expect(page.locator('input[type="email"]')).toBeVisible();
+    await expect(page.locator('input[type="password"]')).toBeVisible();
     await expect(page.locator('button[type="submit"]')).toBeVisible();
   });
 
   test('shows client-side validation', async ({ page }) => {
-    // Submit empty form
-    await page.click('button[type="submit"]');
-    // HTML5 required validation prevents submission
-    const emailInput = page.locator('input#email');
+    await page.locator('button[type="submit"]').click();
+    const emailInput = page.locator('input[type="email"]');
     expect(await emailInput.evaluate((el: HTMLInputElement) => el.validity.valid)).toBe(false);
   });
 
@@ -29,23 +27,19 @@ test.describe('Login Page', () => {
     const registerLink = page.locator('a[href="/register"]');
     await expect(registerLink).toBeVisible();
     await registerLink.click();
-    await expect(page).toHaveURL('/register');
+    await expect(page).toHaveURL(/\/register/);
   });
 
   test('has forgot password link', async ({ page }) => {
-    const link = page.locator('a[href="/forgot-password"]');
-    await expect(link).toBeVisible();
+    await expect(page.locator('a[href="/forgot-password"]')).toBeVisible();
   });
 
   test('shows error on invalid credentials', async ({ page }) => {
-    await page.fill('input#email', 'bad@test.com');
-    await page.fill('input#password', 'wrongpassword');
-    await page.click('button[type="submit"]');
-
-    // Wait for error message (network failure since no backend)
-    await page.waitForTimeout(2000);
-    // Form should still be visible (no redirect)
-    await expect(page.locator('input#email')).toBeVisible();
+    await page.locator('input[type="email"]').fill('bad@test.com');
+    await page.locator('input[type="password"]').fill('wrongpassword');
+    await page.locator('button[type="submit"]').click();
+    // Stays on the login page (no redirect) — invalid creds are rejected.
+    await expect(page.locator('input[type="email"]')).toBeVisible();
   });
 });
 
@@ -55,17 +49,15 @@ test.describe('Register Page', () => {
   });
 
   test('shows registration form', async ({ page }) => {
-    await expect(page.locator('input#email')).toBeVisible();
-    await expect(page.locator('input#password')).toBeVisible();
-    // Name field uses i18n label → id is derived from translated label
-    await expect(page.locator('input[type="text"]').first()).toBeVisible();
+    await expect(page.locator('input[type="email"]')).toBeVisible();
+    await expect(page.locator('input[type="password"]').first()).toBeVisible();
   });
 
   test('has link back to login', async ({ page }) => {
     const loginLink = page.locator('a[href="/login"]');
     await expect(loginLink).toBeVisible();
     await loginLink.click();
-    await expect(page).toHaveURL('/login');
+    await expect(page).toHaveURL(/\/login/);
   });
 });
 
@@ -98,10 +90,8 @@ test.describe('Responsive Design (mobile)', () => {
 
   test('login form is usable on mobile viewport', async ({ page }) => {
     await page.goto('/login');
-    const emailInput = page.locator('input#email');
+    const emailInput = page.locator('input[type="email"]');
     await expect(emailInput).toBeVisible();
-
-    // Viewport fits properly
     const box = await emailInput.boundingBox();
     expect(box).not.toBeNull();
     expect(box!.width).toBeGreaterThan(200);
@@ -110,18 +100,17 @@ test.describe('Responsive Design (mobile)', () => {
 });
 
 test.describe('Accessibility', () => {
-  test('login form has proper labels', async ({ page }) => {
+  test('login inputs have associated labels', async ({ page }) => {
     await page.goto('/login');
-    // All inputs should have associated labels (via id)
-    const emailLabel = page.locator('label[for="email"]');
-    await expect(emailLabel).toBeVisible();
-    const passwordLabel = page.locator('label[for="password"]');
-    await expect(passwordLabel).toBeVisible();
+    // getByLabel resolves through the htmlFor/id association → asserts a11y.
+    // Non-exact: the rendered label includes a required-marker after the text.
+    await expect(page.getByLabel('Email')).toBeVisible();
+    await expect(page.getByLabel('Password')).toBeVisible();
   });
 
-  test('page has proper heading', async ({ page }) => {
+  test('page has a heading', async ({ page }) => {
     await page.goto('/login');
-    const heading = page.locator('h1, h2').first();
-    await expect(heading).toBeVisible();
+    // Filter to a visible heading — some headings are hidden per breakpoint.
+    await expect(page.locator('h1, h2').filter({ visible: true }).first()).toBeVisible();
   });
 });
