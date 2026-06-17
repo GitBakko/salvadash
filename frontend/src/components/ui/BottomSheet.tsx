@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useCallback, useRef, useId } from 'react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useFocusTrap } from '../../hooks/use-focus-trap';
+import { overlayFade, sheet } from '../../lib/motion';
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -40,9 +41,10 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
           {/* Backdrop */}
           <motion.div
             className="absolute inset-0 bg-surface-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            variants={overlayFade}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             onClick={onClose}
           />
 
@@ -54,10 +56,10 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
             aria-labelledby={title ? titleId : undefined}
             tabIndex={-1}
             className="absolute bottom-0 inset-x-0 solid-card rounded-t-2xl max-h-[85dvh] flex flex-col"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            variants={sheet}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             drag="y"
             dragControls={dragControls}
             dragConstraints={{ top: 0 }}

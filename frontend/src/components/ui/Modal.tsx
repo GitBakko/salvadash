@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useFocusTrap } from '../../hooks/use-focus-trap';
+import { overlayFade, modalPop } from '../../lib/motion';
 
 interface ModalProps {
   isOpen: boolean;
@@ -50,9 +51,10 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
           {/* Backdrop */}
           <motion.div
             className="absolute inset-0 bg-surface-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            variants={overlayFade}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             onClick={onClose}
           />
 
@@ -64,10 +66,10 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
             aria-labelledby={title ? titleId : undefined}
             tabIndex={-1}
             className={`relative w-full ${sizeClasses[size]} solid-card p-6 shadow-2xl`}
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            variants={modalPop}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
           >
             {title && (
               <div className="flex items-center justify-between mb-4">

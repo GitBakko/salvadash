@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import { CircleDollarSign } from 'lucide-react';
 import { VersionBadge } from './VersionBadge';
+import { fadeInUp } from '../lib/motion';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -45,7 +47,12 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
       {/* Form column */}
       <main className="flex items-center justify-center p-6 md:p-8 min-h-dvh relative">
-        <div className="w-full max-w-sm space-y-8">
+        <motion.div
+          className="w-full max-w-sm space-y-8"
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+        >
           {/* Mobile-only brand */}
           <div className="md:hidden text-center">
             <CircleDollarSign size={56} strokeWidth={1.5} className="text-brand mx-auto" />
@@ -56,7 +63,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </div>
 
           {children}
-        </div>
+        </motion.div>
 
         {/* Mobile-only version badge (sidebar shows it on desktop) */}
         <VersionBadge className="absolute bottom-4 right-4 opacity-60 md:hidden" />
