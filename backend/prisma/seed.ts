@@ -2,7 +2,8 @@ import 'dotenv/config';
 import { PrismaClient, Role, AccountType } from '../src/generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
-import XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
+import { sheetToMatrix } from '../src/lib/xlsx-import.js';
 import path from 'path';
 
 // Strip Prisma-specific ?schema= param from DATABASE_URL before passing to pg driver
@@ -143,21 +144,19 @@ async function main(): Promise<void> {
   );
   console.log(`\n📊 Reading Excel: ${excelPath}`);
 
-  const workbook = XLSX.readFile(excelPath);
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile(excelPath);
   let totalEntries = 0;
 
   for (const sheetName of SHEETS_TO_IMPORT) {
-    if (!workbook.SheetNames.includes(sheetName)) {
+    const sheet = workbook.getWorksheet(sheetName);
+    if (!sheet) {
       console.log(`⚠️  Sheet "${sheetName}" not found, skipping`);
       continue;
     }
 
-    const sheet = workbook.Sheets[sheetName];
-    const rows: (string | number | null)[][] = XLSX.utils.sheet_to_json(sheet, {
-      header: 1,
-      defval: null,
-      raw: true,
-    });
+    // 0-indexed matrix, equivalent to xlsx's sheet_to_json(sheet, { header: 1 }).
+    const rows = sheetToMatrix(sheet);
 
     if (rows.length < 7) {
       console.log(`⚠️  Sheet "${sheetName}" too short, skipping`);
@@ -248,7 +247,12 @@ async function main(): Promise<void> {
 
 // ─── Helpers ───────────────────────────────────────────────
 
-function parseExcelDate(raw: string | number, sheetYear: number): Date | null {
+function parseExcelDate(raw: unknown, sheetYear: number): Date | null {
+  // exceljs returns Date objects for date-formatted cells
+  if (raw instanceof Date) {
+    return new Date(Date.UTC(raw.getFullYear(), raw.getMonth(), raw.getDate()));
+  }
+
   // Excel serial number
   if (typeof raw === 'number') {
     // XLSX stores dates as serial numbers — convert to JS Date
@@ -274,7 +278,7 @@ function parseExcelDate(raw: string | number, sheetYear: number): Date | null {
   return null;
 }
 
-function numAt(rows: (string | number | null)[][], row: number, col: number): number | null {
+function numAt(rows: unknown[][], row: number, col: number): number | null {
   if (row >= rows.length) return null;
   const cell = rows[row]?.[col];
   if (cell == null || cell === '') return null;
