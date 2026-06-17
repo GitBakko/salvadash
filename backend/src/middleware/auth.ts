@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/index.js';
 import prisma from '../lib/prisma.js';
+import { getCachedUser, setCachedUser } from '../lib/user-cache.js';
 
 export interface AuthPayload {
   userId: string;
@@ -26,17 +27,29 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
 
   try {
     const payload = jwt.verify(token, config.jwt.accessSecret) as AuthPayload;
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: { id: true, role: true, isActive: true },
-    });
 
-    if (!user || !user.isActive) {
+    // Short-TTL cache avoids a DB round-trip on every authenticated request.
+    // Invalidated explicitly when a user's role/active state changes.
+    let cached = getCachedUser(payload.userId);
+    if (!cached) {
+      const user = await prisma.user.findUnique({
+        where: { id: payload.userId },
+        select: { id: true, role: true, isActive: true },
+      });
+      if (!user) {
+        res.status(401).json({ success: false, error: 'User not found or inactive' });
+        return;
+      }
+      cached = { role: user.role, isActive: user.isActive };
+      setCachedUser(payload.userId, cached);
+    }
+
+    if (!cached.isActive) {
       res.status(401).json({ success: false, error: 'User not found or inactive' });
       return;
     }
 
-    req.user = { userId: user.id, role: user.role };
+    req.user = { userId: payload.userId, role: cached.role };
     next();
   } catch {
     res.status(401).json({ success: false, error: 'Invalid or expired token' });

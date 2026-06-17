@@ -12,6 +12,7 @@ vi.mock('../lib/prisma.js', () => ({
 
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { generateAccessToken } from '../lib/auth.js';
+import { clearUserCache } from '../lib/user-cache.js';
 import prisma from '../lib/prisma.js';
 
 function mockReq(cookies: Record<string, string> = {}): Request {
@@ -29,6 +30,7 @@ function mockRes(): Response {
 describe('authenticate middleware', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearUserCache(); // isolate the module-level auth cache between cases
   });
 
   it('returns 401 if no accessToken cookie', async () => {
@@ -102,6 +104,24 @@ describe('authenticate middleware', () => {
     await authenticate(req, res, next);
     expect(req.user).toEqual({ userId: 'user1', role: 'ADMIN' });
     expect(next).toHaveBeenCalled();
+  });
+
+  it('caches the user so a second request skips the DB lookup', async () => {
+    const token = generateAccessToken({ userId: 'user1', role: 'BASE' });
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      id: 'user1',
+      role: 'BASE',
+      isActive: true,
+    } as any);
+
+    const next1 = vi.fn();
+    await authenticate(mockReq({ accessToken: token }), mockRes(), next1);
+    const next2 = vi.fn();
+    await authenticate(mockReq({ accessToken: token }), mockRes(), next2);
+
+    expect(next1).toHaveBeenCalled();
+    expect(next2).toHaveBeenCalled();
+    expect(prisma.user.findUnique).toHaveBeenCalledTimes(1); // second served from cache
   });
 });
 
