@@ -96,6 +96,7 @@ vi.mock('../lib/push.js', () => ({
 
 import apiRoutes from '../routes/index.js';
 import { errorHandler, notFoundHandler } from '../middleware/error.js';
+import { clearUserCache } from '../lib/user-cache.js';
 
 function createTestApp(): Express {
   const app = express();
@@ -119,6 +120,7 @@ describe('API Integration Tests', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    clearUserCache(); // module-level auth cache must not leak between cases
     app = createTestApp();
   });
 

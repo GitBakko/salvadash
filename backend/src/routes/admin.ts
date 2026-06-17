@@ -5,6 +5,7 @@ import { authenticate, requireRole } from '../middleware/auth.js';
 import { asyncHandler, isValidationOk } from '../lib/http.js';
 import { sumMoney } from '../lib/money.js';
 import { computeSystemAvgGrowth } from '../lib/calculations.js';
+import { invalidateUser } from '../lib/user-cache.js';
 
 const router: RouterType = Router();
 
@@ -205,6 +206,9 @@ router.put(
       select: { id: true, name: true, role: true, isActive: true },
     });
 
+    // Role/active change must take effect now, not after the auth-cache TTL.
+    invalidateUser(id);
+
     res.json({ success: true, data: updated });
   }),
 );
@@ -242,6 +246,7 @@ router.delete(
 
     // Cascade delete handled by Prisma schema
     await prisma.user.delete({ where: { id } });
+    invalidateUser(id);
 
     res.json({ success: true, data: { message: 'User deleted' } });
   }),
