@@ -19,7 +19,7 @@ export function Skeleton({
 
   return (
     <div
-      className={`animate-pulse bg-surface-elevated/80 ${variantClasses[variant]} ${className}`}
+      className={`skeleton-shimmer ${variantClasses[variant]} ${className}`}
       style={{ width, height }}
     />
   );

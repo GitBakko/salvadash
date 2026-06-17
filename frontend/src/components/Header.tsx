@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CircleDollarSign, Bell, ShieldCheck, Moon, Sun, Monitor } from 'lucide-react';
 import { useAuthStore } from '../stores/auth-store';
 import { useThemeStore } from '../stores/theme-store';
@@ -9,7 +9,7 @@ import { useUnreadCount } from '../hooks/queries';
 import { NotificationCenter } from './NotificationCenter';
 import { VersionBadge } from './VersionBadge';
 
-export function Header() {
+export function Header({ scrolled = false }: { scrolled?: boolean }) {
   const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const isAdmin = user?.role === 'ROOT' || user?.role === 'ADMIN';
@@ -26,8 +26,13 @@ export function Header() {
 
   return (
     <>
-      <header
-        className="sticky top-0 z-40 solid-card border-b border-border-default px-4 py-3"
+      <motion.header
+        initial={{ y: -8, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className={`sticky top-0 z-40 solid-card border-b px-4 py-3 transition-shadow duration-300 ${
+          scrolled ? 'border-border-active/40 shadow-md' : 'border-border-default'
+        }`}
         style={{ minHeight: 'var(--header-height)' }}
       >
         <div className="flex items-center justify-between max-w-lg mx-auto">
@@ -73,7 +78,7 @@ export function Header() {
             )}
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Notification Center Sheet */}
       <AnimatePresence>

@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp, ChevronRight, Pencil, Trash2, CalendarDays } from '
 import type { EntryListItem } from '@salvadash/shared';
 import { useEntries, useEntry, useDeleteEntry } from '../hooks/queries';
 import { Card, Skeleton, BottomSheet, Button } from '../components/ui';
+import { staggerContainer, listItem } from '../lib/motion';
 import { QueryErrorState } from '../components/QueryErrorState';
 import { AccountIcon } from '../components/AccountIcon';
 import { fmtCurrency } from '../lib/format';
@@ -71,17 +72,15 @@ function HistoryPage() {
       ) : entries.length === 0 ? (
         <EmptyState t={t} />
       ) : (
-        <div className="space-y-3">
+        <motion.div
+          className="space-y-3"
+          variants={staggerContainer(0.04)}
+          initial="hidden"
+          animate="visible"
+        >
           <AnimatePresence mode="popLayout">
-            {entries.map((entry, i) => (
-              <motion.div
-                key={entry.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ delay: i * 0.03 }}
-                layout
-              >
+            {entries.map((entry) => (
+              <motion.div key={entry.id} variants={listItem} exit="exit" layout>
                 <EntryCard
                   entry={entry}
                   lang={i18n.language}
@@ -90,7 +89,7 @@ function HistoryPage() {
               </motion.div>
             ))}
           </AnimatePresence>
-        </div>
+        </motion.div>
       )}
 
       {/* Entry detail bottom sheet */}

@@ -14,7 +14,7 @@ import { useAuthStore } from '../stores/auth-store';
 import { useUIStore } from '../stores/ui-store';
 import { Skeleton } from '../components/ui/Skeleton';
 import { useOfflineSync } from '../hooks/use-offline-sync';
-import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
+import { pageTransition } from '../lib/motion';
 import '../i18n';
 
 export const Route = createRootRoute({
@@ -36,7 +36,7 @@ function RootLayout() {
   const isFullscreen =
     FULLSCREEN_PATHS.some((p) => pathname.startsWith(p)) || FULLSCREEN_REGEX.test(pathname);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
-  const reducedMotion = usePrefersReducedMotion();
+  const [scrolled, setScrolled] = useState(false);
 
   // Setup offline sync (SW message listener + online/offline events)
   useOfflineSync();
@@ -121,21 +121,25 @@ function RootLayout() {
       >
         {t('common.skipToContent')}
       </a>
-      <Header />
+      <Header scrolled={scrolled} />
 
       <main
         id="main"
         tabIndex={-1}
+        onScroll={(e) => {
+          const top = e.currentTarget.scrollTop;
+          setScrolled((prev) => (prev ? top > 2 : top > 8));
+        }}
         className="flex-1 overflow-y-auto"
         style={{ paddingBottom: 'calc(var(--nav-height) + env(safe-area-inset-bottom) + 1rem)' }}
       >
         <AnimatePresence mode="wait">
           <motion.div
             key={pathname}
-            initial={reducedMotion ? false : { opacity: 0, y: 8 }}
-            animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            exit={reducedMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
-            transition={{ duration: reducedMotion ? 0 : 0.2, ease: 'easeInOut' }}
+            variants={pageTransition}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
           >
             <Outlet />
           </motion.div>

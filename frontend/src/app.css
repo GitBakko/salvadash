@@ -134,6 +134,33 @@ html.light {
   box-shadow: 0 0 12px var(--color-brand-glow);
 }
 
+/* ─── Skeleton shimmer (loading) ────────────────────────── */
+/* Nicer than a flat pulse: a brand-tinted highlight sweeps across. Falls back */
+/* to a static surface under prefers-reduced-motion (see media query below). */
+@utility skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-surface-elevated) 0%,
+    color-mix(in srgb, var(--color-surface-elevated) 55%, var(--color-brand) 10%) 50%,
+    var(--color-surface-elevated) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-sweep {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+    background: var(--color-surface-elevated);
+  }
+}
+
 /* ─── Base Overrides ────────────────────────────────────── */
 html {
   font-family: var(--font-body);
