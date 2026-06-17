@@ -20,6 +20,16 @@ updates:
         update-types:
           - 'minor'
           - 'patch'
+      # vitest and its coverage plugin must share the same major, so always
+      # bump them together in one PR (a single consistent lockfile).
+      vitest:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+        update-types:
+          - 'major'
+          - 'minor'
+          - 'patch'
 
   # ─── GitHub Actions ──────────────────────────────────────
   - package-ecosystem: 'github-actions'
