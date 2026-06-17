@@ -22,6 +22,7 @@ import {
 import type { AnalyticsData } from '@salvadash/shared';
 import { useAnalytics, useAccounts } from '../hooks/queries';
 import { usePrefersReducedMotion } from '../hooks/use-prefers-reduced-motion';
+import { staggerContainer, staggerItem } from '../lib/motion';
 import { Card, Skeleton } from '../components/ui';
 import { Delta } from '../components/ui/Delta';
 import { fmtCurrency, fmtCurrencyCompact } from '../lib/format';
@@ -140,36 +141,41 @@ function AnalyticsPage() {
         </motion.div>
       ) : (
         <div className="@container">
-          <div className="space-y-5 mt-4 @md:space-y-0 @md:grid @md:grid-cols-2 @md:gap-4">
+          <motion.div
+            className="space-y-5 mt-4 @md:space-y-0 @md:grid @md:grid-cols-2 @md:gap-4"
+            variants={staggerContainer(0.08)}
+            initial="hidden"
+            animate="visible"
+          >
             {/* Patrimony over time — AreaChart */}
-            <ChartSection title={t('analytics.patrimony')} delay={0}>
+            <ChartSection title={t('analytics.patrimony')}>
               <PatrimonyChart data={data.patrimonyOverTime} lang={i18n.language} />
             </ChartSection>
 
             {/* Year comparison — LineChart */}
-            <ChartSection title={t('analytics.yearComparison')} delay={0.05}>
+            <ChartSection title={t('analytics.yearComparison')}>
               <YearComparisonChart data={data.yearComparison} lang={i18n.language} />
             </ChartSection>
 
             {/* Account breakdown — PieChart. Hidden when exactly 1 account selected (a single 100% slice is not informative). */}
             {data.accountBreakdown.length > 0 && selectedAccountIds.length !== 1 && (
-              <ChartSection title={t('analytics.accountBreakdown')} delay={0.1}>
+              <ChartSection title={t('analytics.accountBreakdown')}>
                 <AccountPieChart data={data.accountBreakdown} />
               </ChartSection>
             )}
 
             {/* Income by source — BarChart (income is not account-bound, shown unfiltered) */}
             {data.monthlyIncome.length > 0 && (
-              <ChartSection title={t('analytics.incomeBySource')} delay={0.15}>
+              <ChartSection title={t('analytics.incomeBySource')}>
                 <IncomeBarChart data={data.monthlyIncome} lang={i18n.language} />
               </ChartSection>
             )}
 
             {/* Performance section — full width at md+ */}
-            <ChartSection title={t('analytics.performance')} delay={0.2} className="@md:col-span-2">
+            <ChartSection title={t('analytics.performance')} className="@md:col-span-2">
               <PerformanceGrid data={data} t={t} lang={i18n.language} />
             </ChartSection>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>
@@ -219,23 +225,15 @@ function AppliedFilterPill({
 
 function ChartSection({
   title,
-  delay,
   children,
   className,
 }: {
   title: string;
-  delay: number;
   children: React.ReactNode;
   className?: string;
 }) {
-  const reducedMotion = usePrefersReducedMotion();
   return (
-    <motion.div
-      initial={reducedMotion ? false : { opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-      className={className}
-    >
+    <motion.div variants={staggerItem} className={className}>
       <Card className="p-4 overflow-hidden">
         <div className="flex items-center gap-2 mb-3">
           <span className="w-1.5 h-1.5 rounded-full bg-brand" />
@@ -258,6 +256,7 @@ function PatrimonyChart({
   data: AnalyticsData['patrimonyOverTime'];
   lang: string;
 }) {
+  const reduced = usePrefersReducedMotion();
   const brand = brandColor();
   const positive = useMemo(() => readVar('--color-positive', '#5dd6b8'), []);
   const tickFill = useMemo(() => readVar('--color-text-muted', '#7a7a8a'), []);
@@ -316,6 +315,7 @@ function PatrimonyChart({
             stroke="url(#patrimStroke)"
             strokeWidth={2.5}
             fill="url(#patrimFill)"
+            isAnimationActive={!reduced}
             animationDuration={1200}
             dot={EndpointDot}
             activeDot={{ r: 5, fill: brand, stroke: surfaceBase, strokeWidth: 2 }}
@@ -336,6 +336,7 @@ function YearComparisonChart({
   lang: string;
 }) {
   const { t } = useTranslation();
+  const reduced = usePrefersReducedMotion();
   const yearColors = yearPalette();
   const tickFill = useMemo(() => readVar('--color-text-muted', '#7a7a8a'), []);
   const gridStroke = useMemo(() => readVar('--color-border-default', 'rgba(255,255,255,0.08)'), []);
@@ -450,6 +451,7 @@ function YearComparisonChart({
                       strokeOpacity: 0.3,
                     }}
                     connectNulls
+                    isAnimationActive={!reduced}
                     animationDuration={800}
                   />
                 );
@@ -465,6 +467,7 @@ function YearComparisonChart({
 
 function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const reduced = usePrefersReducedMotion();
   const chartColors = chartPalette();
   // Default: largest slice first (most useful for a pie). 'custom' (the
   // drag-drop order from /accounts) is also available — backend now exposes
@@ -509,6 +512,7 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
                 innerRadius={42}
                 outerRadius={66}
                 paddingAngle={4}
+                isAnimationActive={!reduced}
                 animationDuration={800}
                 onMouseEnter={(_, i) => setActiveIndex(i)}
                 onMouseLeave={() => setActiveIndex(null)}
@@ -569,6 +573,7 @@ function AccountPieChart({ data }: { data: AnalyticsData['accountBreakdown'] }) 
 // ─── Income BarChart ───────────────────────────────────────
 
 function IncomeBarChart({ data, lang }: { data: AnalyticsData['monthlyIncome']; lang: string }) {
+  const reduced = usePrefersReducedMotion();
   const chartColors = chartPalette();
   const tickFill = useMemo(() => readVar('--color-text-muted', '#7a7a8a'), []);
   const gridStroke = useMemo(() => readVar('--color-border-default', 'rgba(255,255,255,0.08)'), []);
@@ -636,6 +641,7 @@ function IncomeBarChart({ data, lang }: { data: AnalyticsData['monthlyIncome']; 
                 stackId="income"
                 fill={chartColors[i % chartColors.length]}
                 radius={radius}
+                isAnimationActive={!reduced}
                 animationDuration={800}
               />
             );
