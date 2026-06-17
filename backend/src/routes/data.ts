@@ -4,7 +4,8 @@ import { z } from 'zod';
 import * as ExcelJS from 'exceljs';
 import prisma from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
-import { asyncHandler } from '../lib/http.js';
+import { asyncHandler, respondData } from '../lib/http.js';
+import { dashboardDataSchema, analyticsDataSchema } from '@salvadash/shared';
 import { Prisma } from '../generated/prisma/client.js';
 import { rawEntryToRow, computeDashboard, computeAnalytics } from '../lib/calculations.js';
 import { entryInclude } from '../lib/entries-shared.js';
@@ -43,7 +44,7 @@ router.get(
     const rows = entries.map(rawEntryToRow);
     const dashboard = computeDashboard(rows, year);
 
-    res.json({ success: true, data: dashboard });
+    respondData(res, dashboardDataSchema, dashboard);
   }),
 );
 
@@ -83,7 +84,7 @@ router.get(
     const rows = entries.map(rawEntryToRow);
     const analytics = computeAnalytics(rows, { accountIds });
 
-    res.json({ success: true, data: analytics });
+    respondData(res, analyticsDataSchema, analytics);
   }),
 );
 

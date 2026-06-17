@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { z } from 'zod';
+import { log } from './logger.js';
+import { config } from '../config/index.js';
 
 type AsyncHandler = (req: Request, res: Response, next: NextFunction) => Promise<unknown>;
 
@@ -47,4 +49,28 @@ export function isValidationOk<T extends z.ZodTypeAny>(
   if (parsed.success) return true;
   respondValidation(res, parsed);
   return false;
+}
+
+/**
+ * Send a successful `{ success: true, data }` envelope after validating `data`
+ * against the response `schema`. A failure here is *our* bug (calc↔type drift),
+ * never the client's, so it is logged — and made loud outside production so the
+ * drift is caught by tests/CI. In production we degrade gracefully and send the
+ * payload anyway rather than turning a minor schema mismatch into a 500.
+ */
+export function respondData<T extends z.ZodTypeAny>(
+  res: Response,
+  schema: T,
+  data: z.input<T>,
+): void {
+  const parsed = schema.safeParse(data);
+  if (parsed.success) {
+    res.json({ success: true, data: parsed.data });
+    return;
+  }
+  log.error('Response contract validation failed', { issues: parsed.error.issues });
+  if (config.nodeEnv !== 'production') {
+    throw new Error(`Response contract validation failed: ${JSON.stringify(parsed.error.issues)}`);
+  }
+  res.json({ success: true, data });
 }
