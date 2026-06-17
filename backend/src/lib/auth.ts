@@ -22,9 +22,10 @@ export function generateAccessToken(payload: AuthPayload): string {
   } as SignOptions);
 }
 
-export function generateRefreshToken(payload: AuthPayload): string {
+export function generateRefreshToken(payload: AuthPayload, jti: string): string {
   return jwt.sign(payload, config.jwt.refreshSecret, {
     expiresIn: config.jwt.refreshExpiresIn,
+    jwtid: jti,
   } as SignOptions);
 }
 
@@ -32,8 +33,13 @@ export function verifyAccessToken(token: string): AuthPayload {
   return jwt.verify(token, config.jwt.accessSecret) as AuthPayload;
 }
 
-export function verifyRefreshToken(token: string): AuthPayload {
-  return jwt.verify(token, config.jwt.refreshSecret) as AuthPayload;
+export interface RefreshTokenClaims extends AuthPayload {
+  jti?: string;
+  exp?: number;
+}
+
+export function verifyRefreshToken(token: string): RefreshTokenClaims {
+  return jwt.verify(token, config.jwt.refreshSecret) as RefreshTokenClaims;
 }
 
 // ─── Cookie Helpers ─────────────────────────────────────────

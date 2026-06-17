@@ -17,13 +17,17 @@ import {
   hashPassword,
   verifyPassword,
   generateAccessToken,
-  generateRefreshToken,
-  verifyRefreshToken,
   generateRandomToken,
   generateInviteCode,
   ACCESS_COOKIE_OPTIONS,
   REFRESH_COOKIE_OPTIONS,
 } from '../lib/auth.js';
+import {
+  issueRefreshToken,
+  rotateRefreshToken,
+  revokeRefreshToken,
+  RefreshError,
+} from '../lib/refresh-tokens.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../lib/email-templates.js';
 import { authenticate } from '../middleware/auth.js';
 import type { AuthPayload } from '../middleware/auth.js';
@@ -175,7 +179,7 @@ router.post(
 
     const payload: AuthPayload = { userId: user.id, role: user.role };
     const accessToken = generateAccessToken(payload);
-    const refreshToken = generateRefreshToken(payload);
+    const { token: refreshToken } = await issueRefreshToken(payload);
 
     res.cookie('accessToken', accessToken, ACCESS_COOKIE_OPTIONS);
     res.cookie('refreshToken', refreshToken, REFRESH_COOKIE_OPTIONS);
@@ -305,46 +309,39 @@ router.post(
       return;
     }
 
-    let decoded: AuthPayload;
     try {
-      decoded = verifyRefreshToken(token);
-    } catch {
-      res.clearCookie('accessToken');
-      res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
-      res.status(401).json({ success: false, error: 'Invalid refresh token' });
-      return;
+      const { payload, refreshToken } = await rotateRefreshToken(token);
+      const accessToken = generateAccessToken(payload);
+
+      res.cookie('accessToken', accessToken, ACCESS_COOKIE_OPTIONS);
+      res.cookie('refreshToken', refreshToken, REFRESH_COOKIE_OPTIONS);
+
+      res.json({ success: true, data: { message: 'Tokens refreshed' } });
+    } catch (err) {
+      if (err instanceof RefreshError) {
+        // Invalid / expired / inactive / reuse-detected → drop the session.
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+        res.status(401).json({ success: false, error: 'Invalid refresh token' });
+        return;
+      }
+      throw err; // unexpected → central error handler (500)
     }
-
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      select: { id: true, role: true, isActive: true },
-    });
-
-    if (!user || !user.isActive) {
-      res.clearCookie('accessToken');
-      res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
-      res.status(401).json({ success: false, error: 'User not found or inactive' });
-      return;
-    }
-
-    const payload: AuthPayload = { userId: user.id, role: user.role };
-    const newAccessToken = generateAccessToken(payload);
-    const newRefreshToken = generateRefreshToken(payload);
-
-    res.cookie('accessToken', newAccessToken, ACCESS_COOKIE_OPTIONS);
-    res.cookie('refreshToken', newRefreshToken, REFRESH_COOKIE_OPTIONS);
-
-    res.json({ success: true, data: { message: 'Tokens refreshed' } });
   }),
 );
 
 // ─── POST /auth/logout ─────────────────────────────────────
 
-router.post('/logout', (_req: Request, res: Response): void => {
-  res.clearCookie('accessToken');
-  res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
-  res.json({ success: true, data: { message: 'Logged out' } });
-});
+router.post(
+  '/logout',
+  asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const token = req.cookies?.refreshToken as string | undefined;
+    if (token) await revokeRefreshToken(token);
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+    res.json({ success: true, data: { message: 'Logged out' } });
+  }),
+);
 
 // ─── GET /auth/me ───────────────────────────────────────────
 
