@@ -20,7 +20,15 @@ jobs:
         with:
           fail-on-severity: high
           comment-summary-in-pr: always
-          deny-licenses: GPL-3.0, AGPL-3.0
-          # jszip (transitive via exceljs) is dual-licensed "MIT OR GPL-3.0"; we
-          # elect MIT. The deny-list matches the GPL-3.0 disjunct, so exempt it.
+          # `deny-licenses` is deprecated (actions/dependency-review-action#997);
+          # the recommended approach is an explicit allow-list of acceptable
+          # (permissive) licenses, which inherently blocks strong copyleft
+          # (GPL/AGPL/etc.). Add a license here when a new, vetted dependency
+          # legitimately needs one.
+          allow-licenses: >-
+            MIT, MIT-0, ISC, Apache-2.0, 0BSD, BSD-2-Clause, BSD-3-Clause,
+            BlueOak-1.0.0, CC0-1.0, CC-BY-4.0, CC-BY-3.0, Unlicense, Python-2.0,
+            Zlib, WTFPL, Artistic-2.0, MPL-2.0
+          # jszip (transitive via exceljs) is dual-licensed "MIT OR GPL-3.0"; the
+          # MIT disjunct satisfies the allow-list, but keep it pinned explicitly.
           allow-dependencies-licenses: pkg:npm/jszip
