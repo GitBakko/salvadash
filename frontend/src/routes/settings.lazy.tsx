@@ -32,6 +32,7 @@ import { CURRENCIES, type CurrencyCode, APP_VERSION } from '@salvadash/shared';
 import { useAuthStore } from '../stores/auth-store';
 import { useUIStore } from '../stores/ui-store';
 import { useThemeStore } from '../stores/theme-store';
+import { entrance } from '../lib/motion';
 import { usePushNotifications } from '../hooks/use-push';
 import {
   useIncomeSources,
@@ -951,7 +952,7 @@ function Section({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
+      transition={{ ...entrance, delay }}
     >
       <Card>
         <div className="flex items-center gap-2 mb-3">
