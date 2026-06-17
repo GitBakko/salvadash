@@ -14,8 +14,8 @@
   "dependencies": {
     "@salvadash/shared": "workspace:*",
     "@tanstack/react-query": "^5.101.0",
-    "@tanstack/react-router": "^1.170.15",
-    "dexie": "^4.4.3",
+    "@tanstack/react-router": "^1.170.16",
+    "dexie": "^4.4.4",
     "dexie-react-hooks": "^1.1.7",
     "framer-motion": "^12.40.0",
     "i18next": "^24.2.0",
