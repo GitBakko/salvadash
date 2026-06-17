@@ -134,29 +134,6 @@ html.light {
   box-shadow: 0 0 12px var(--color-brand-glow);
 }
 
-/* ─── Aurora gradient backdrop (subtle radial brand wash) ── */
-/* Additive depth for hero/section surfaces — kept low-opacity so it never */
-/* fights contrast. Safe in both themes (brand-glow flips with the theme). */
-@utility gradient-aurora {
-  background-image: radial-gradient(
-    120% 80% at 50% 0%,
-    var(--color-brand-glow) 0%,
-    transparent 60%
-  );
-}
-
-/* ─── Brand text gradient (headings accent) ─────────────── */
-@utility text-gradient-brand {
-  background-image: linear-gradient(
-    100deg,
-    var(--color-brand) 0%,
-    var(--color-positive) 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 /* ─── Skeleton shimmer (loading) ────────────────────────── */
 /* Nicer than a flat pulse: a brand-tinted highlight sweeps across. Falls back */
 /* to a static surface under prefers-reduced-motion (see media query below). */
