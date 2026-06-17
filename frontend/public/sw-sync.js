@@ -45,14 +45,60 @@ async function dequeueAll() {
   });
 }
 
-async function clearQueue() {
+async function deleteItem(id) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(QUEUE_STORE, 'readwrite');
-    tx.objectStore(QUEUE_STORE).clear();
+    tx.objectStore(QUEUE_STORE).delete(id);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
+}
+
+async function updateItem(item) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(QUEUE_STORE, 'readwrite');
+    tx.objectStore(QUEUE_STORE).put(item);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// ─── Replay policy (mirror of src/lib/sync-policy.ts — unit-tested there) ───
+
+const MAX_SYNC_ATTEMPTS = 5;
+const BACKOFF_CAP_MS = 5 * 60 * 1000;
+
+function classifyReplayResponse(status) {
+  if (status === null) return 'retry';
+  if (status >= 200 && status < 300) return 'success';
+  if (status === 408 || status === 429 || status >= 500) return 'retry';
+  return 'drop';
+}
+
+function nextBackoffMs(attempts) {
+  const base = 1000 * 2 ** Math.max(0, attempts - 1);
+  return Math.min(base, BACKOFF_CAP_MS);
+}
+
+function isDue(nextAttemptAt, now) {
+  return nextAttemptAt === undefined || now >= nextAttemptAt;
+}
+
+function planNextState(status, attempts, now) {
+  const outcome = classifyReplayResponse(status);
+  if (outcome === 'success') return { remove: true, dropped: false, attempts };
+  if (outcome === 'drop') return { remove: true, dropped: true, attempts };
+  const nextAttempts = attempts + 1;
+  if (nextAttempts >= MAX_SYNC_ATTEMPTS)
+    return { remove: true, dropped: true, attempts: nextAttempts };
+  return {
+    remove: false,
+    dropped: false,
+    attempts: nextAttempts,
+    nextAttemptAt: now + nextBackoffMs(nextAttempts),
+  };
 }
 
 // ─── Intercept mutating API calls when offline ─────────────
@@ -103,30 +149,53 @@ async function replayQueue() {
   const items = await dequeueAll();
   if (!items.length) return;
 
+  const now = Date.now();
+  let anySuccess = false;
+  let droppedCount = 0;
+  let pending = 0;
+
   for (const item of items) {
+    // Respect per-item backoff so a flapping item doesn't hammer the server.
+    if (!isDue(item.nextAttemptAt, now)) {
+      pending++;
+      continue;
+    }
+
+    let status;
     try {
-      await fetch(item.url, {
+      const res = await fetch(item.url, {
         method: item.method,
         headers: item.headers,
         body: item.body || undefined,
         credentials: 'include',
       });
+      status = res.status;
     } catch {
-      // Still offline — re-register sync so it retries later
-      if ('sync' in self.registration) {
-        await self.registration.sync.register(SYNC_TAG);
-      }
-      return; // Stop replaying — we'll retry all remaining items next time
+      status = null; // network/transport failure
+    }
+
+    const plan = planNextState(status, item.attempts || 0, now);
+    if (plan.remove) {
+      // Removed per-item on success — so a later failure can't cause an
+      // already-applied mutation to be replayed (no duplicates).
+      await deleteItem(item.id);
+      if (plan.dropped) droppedCount++;
+      else anySuccess = true;
+    } else {
+      await updateItem({ ...item, attempts: plan.attempts, nextAttemptAt: plan.nextAttemptAt });
+      pending++;
     }
   }
 
-  // All replayed successfully
-  await clearQueue();
+  // Anything still queued (retryable or backing off) → ask for another sync.
+  if (pending > 0 && 'sync' in self.registration) {
+    await self.registration.sync.register(SYNC_TAG);
+  }
 
-  // Notify clients to refetch
   const clients = await self.clients.matchAll({ type: 'window' });
   for (const client of clients) {
-    client.postMessage({ type: 'SYNC_COMPLETE' });
+    if (anySuccess) client.postMessage({ type: 'SYNC_COMPLETE' });
+    if (droppedCount > 0) client.postMessage({ type: 'SYNC_FAILED', dropped: droppedCount });
   }
 }
 
