@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MotionConfig } from 'framer-motion';
 import { routeTree } from './routeTree.gen';
 import { ErrorBoundary, RouteErrorFallback } from './components/ErrorBoundary';
 import './app.css';
@@ -34,7 +35,11 @@ ReactDOM.createRoot(rootEl).render(
   <React.StrictMode>
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        {/* reducedMotion="user" → framer-motion auto-disables transform/layout
+            animations (keeps opacity) when the OS prefers reduced motion. */}
+        <MotionConfig reducedMotion="user">
+          <RouterProvider router={router} />
+        </MotionConfig>
       </QueryClientProvider>
     </ErrorBoundary>
   </React.StrictMode>,
