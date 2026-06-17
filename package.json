@@ -10,6 +10,7 @@
     "build": "pnpm --filter shared run build && pnpm --filter backend run build && pnpm --filter frontend run build",
     "build:backend": "pnpm --filter backend run build",
     "build:frontend": "pnpm --filter frontend run build",
+    "package:release": "node scripts/package-release.mjs",
     "lint": "pnpm -r run lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
