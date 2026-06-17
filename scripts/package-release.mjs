@@ -67,6 +67,10 @@ cpSync(join(ROOT, 'frontend/dist'), feDest, {
 });
 rmSync(join(feDest, 'web.config'), { force: true }); // belt-and-suspenders
 
+// ── deploy automation (shipped so it runs from the staging dir on prod) ──
+mkdirSync(join(dest, 'scripts'), { recursive: true });
+copyFileSync(join(ROOT, 'scripts/deploy-prod.ps1'), join(dest, 'scripts/deploy-prod.ps1'));
+
 // ── Structural validation ─────────────────────────────────
 const checks = [
   [existsSync(join(feDest, 'index.html')), 'frontend/index.html present (flattened)'],
@@ -77,6 +81,7 @@ const checks = [
   [existsSync(join(beDest, 'prisma', 'schema.prisma')), 'backend/prisma/schema.prisma present'],
   [existsSync(join(dest, 'shared', 'dist')), 'shared/dist present'],
   [existsSync(join(dest, 'pnpm-lock.yaml')), 'pnpm-lock.yaml present'],
+  [existsSync(join(dest, 'scripts', 'deploy-prod.ps1')), 'scripts/deploy-prod.ps1 present'],
 ];
 
 let ok = true;
