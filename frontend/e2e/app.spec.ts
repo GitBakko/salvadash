@@ -103,12 +103,14 @@ test.describe('Accessibility', () => {
   test('login inputs have associated labels', async ({ page }) => {
     await page.goto('/login');
     // getByLabel resolves through the htmlFor/id association → asserts a11y.
+    // Non-exact: the rendered label includes a required-marker after the text.
     await expect(page.getByLabel('Email')).toBeVisible();
-    await expect(page.getByLabel('Password', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('Password')).toBeVisible();
   });
 
   test('page has a heading', async ({ page }) => {
     await page.goto('/login');
-    await expect(page.locator('h1, h2').first()).toBeVisible();
+    // Filter to a visible heading — some headings are hidden per breakpoint.
+    await expect(page.locator('h1, h2').filter({ visible: true }).first()).toBeVisible();
   });
 });
