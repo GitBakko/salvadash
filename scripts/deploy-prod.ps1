@@ -175,11 +175,23 @@ try {
   # ════════════════════════════════════════════════════════════
   # 3. BACKUP APP (filesystem)
   # ════════════════════════════════════════════════════════════
-  Write-Step 3 'Backup app folder (zip, minus node_modules)'
+  Write-Step 3 'Backup app folder (zip, minus node_modules/logs/backups)'
   $script:appBackupFile = Join-Path (Split-Path $AppPath -Parent) "salvadash-app-backup_$ts.zip"
-  # Zip top-level items except node_modules (the bulk) — preserves .env/uploads/backups.
-  $items = Get-ChildItem -Path $AppPath -Force | Where-Object { $_.Name -ne 'node_modules' }
-  Compress-Archive -Path $items.FullName -DestinationPath $script:appBackupFile -CompressionLevel Optimal -Force
+  # Stage with robocopy (same drive as the app), then zip the staged copy. robocopy /XD
+  # excludes dir NAMES anywhere in the tree — node_modules (the bulk), live PM2 `logs`
+  # (held open by the pm2 daemon → can't be read by Compress-Archive), and the `backups`
+  # dump dir (huge + redundant). /XF *.log skips any stray logs. This preserves .env,
+  # uploads, dist, prisma — everything needed for a rollback.
+  $tmpCopy = Join-Path (Split-Path $AppPath -Parent) "salvadash-bktmp_$ts"
+  try {
+    & robocopy $AppPath $tmpCopy /E /XD node_modules logs backups /XF *.log /R:1 /W:1 /NFL /NDL /NJH /NJS /NC /NS /NP | Out-Null
+    # robocopy exit codes: 0-7 = success (1=files copied, etc.); >=8 = real failure.
+    if ($LASTEXITCODE -ge 8) { Fail "robocopy failed (exit $LASTEXITCODE) staging app backup" }
+    $global:LASTEXITCODE = 0
+    Compress-Archive -Path (Join-Path $tmpCopy '*') -DestinationPath $script:appBackupFile -CompressionLevel Optimal -Force
+  } finally {
+    if (Test-Path $tmpCopy) { Remove-Item $tmpCopy -Recurse -Force -ErrorAction SilentlyContinue }
+  }
   $asz = [math]::Round((Get-Item $script:appBackupFile).Length / 1MB, 2)
   Write-Ok "App backup: $script:appBackupFile ($asz MB)"
 
